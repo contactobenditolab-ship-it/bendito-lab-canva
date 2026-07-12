@@ -99,15 +99,24 @@ footer{background:var(--rose);}
 </section>
 
 <section class="form-wrap">
-  <form id="contacto-form">
-    <div class="grid2">
-      <input class="field" name="nombre" type="text" placeholder="Nombre" required>
-      <input class="field" name="email" type="email" placeholder="Email" required>
+  <div>
+    <form id="contacto-form">
+      <div class="grid2">
+        <input class="field" name="nombre" type="text" placeholder="Nombre" required>
+        <input class="field" name="email" type="email" placeholder="Email" required>
+      </div>
+      <input class="field" name="asunto" type="text" placeholder="Asunto">
+      <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
+      <button type="submit" class="btn-send">ENVIAR→</button>
+      <p id="contacto-error" style="display:none;color:#B3261E;font-size:13px;margin:4px 0 0;"></p>
+    </form>
+    <div id="contacto-success" style="display:none;text-align:center;padding:40px 20px;">
+      <div style="font-size:40px;margin-bottom:12px;">✓</div>
+      <h2 style="font-size:22px;margin:0 0 8px;">¡Mensaje enviado!</h2>
+      <p style="font-size:14px;color:var(--deep);">Te responderemos en menos de 24 horas.</p>
     </div>
-    <input class="field" name="asunto" type="text" placeholder="Asunto">
-    <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
-    <button type="submit" class="btn-send">ENVIAR→</button>
-  </form>
+  </div>
 
   <div class="info-card">
     <h2 data-edit="contacto.info.title">También puedes escribirnos por</h2>
@@ -136,7 +145,7 @@ footer{background:var(--rose);}
       <a href="dilo-bonito.html">Dilo bonito</a>
       <a href="bendito-lab.html">Bendito lab.</a>
       <a href="colaboradores.html">Colaboradores</a>
-      <a href="#" onclick="abrirModal();return false;">Política de privacidad</a>
+      <a href="#" onclick="abrirModal('privacidad');return false;">Política de privacidad</a>
       <a href="faq.html">F.A.Q.</a>
     </div>
     <span class="footer-copy">© 2026 Bendito lab.</span>
@@ -150,7 +159,36 @@ footer{background:var(--rose);}
   </div>
 </div>
 
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#fff;padding:16px 24px;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 12px rgba(0,0,0,0.3);align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <span style="flex:1;min-width:200px;">
+    🍪 Usamos cookies propias y de Google Analytics para mejorar tu experiencia.
+    <a href="#" onclick="abrirModal('privacidad');return false;" style="color:#E8C24A;text-decoration:underline;">Privacidad</a> ·
+    <a href="#" onclick="abrirModal('cookies');return false;" style="color:#E8C24A;text-decoration:underline;">Cookies</a>
+  </span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="rechazarCookies()" style="background:transparent;border:1px solid #E8C24A;color:#E8C24A;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;">Rechazar</button>
+    <button onclick="aceptarCookies()" style="background:#E8C24A;border:none;color:#17233F;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">Aceptar</button>
+  </div>
+</div>
+
 <script>
+var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso Legal</h2>
+<ul>
+<li><strong>Titular:</strong> Silvia G. M. · NIF: 05931103-R</li>
+<li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares, Ciudad Real</li>
+<li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+<li><strong>Actividad:</strong> Personalización y merchandising (Bendito Lab · Dilo Bonito)</li>
+</ul>
+<p>Todos los contenidos del sitio son propiedad de la titular o de terceros autorizados. Queda prohibida su reproducción sin autorización escrita. Legislación española aplicable — Juzgados de Manzanares, Ciudad Real.</p>`;
+
+var textoCookies = `<h2 style="color:#17233F;margin-top:0">Política de Cookies</h2>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<tr style="background:#f5f5f5;"><th style="padding:8px;border:1px solid #ddd;text-align:left;">Cookie</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Tipo</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Finalidad</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Duración</th></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">bl_cookie_consent</td><td style="padding:8px;border:1px solid #ddd;">Técnica propia</td><td style="padding:8px;border:1px solid #ddd;">Guardar tu preferencia</td><td style="padding:8px;border:1px solid #ddd;">1 año</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">_ga, _gid, _gat</td><td style="padding:8px;border:1px solid #ddd;">Analítica (Google)</td><td style="padding:8px;border:1px solid #ddd;">Análisis anónimo del tráfico</td><td style="padding:8px;border:1px solid #ddd;">Hasta 2 años</td></tr>
+</table>
+<p style="margin-top:16px;">Puedes rechazar o retirar el consentimiento en cualquier momento. Desactivar Analytics: <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">tools.google.com/dlpage/gaoptout</a></p>`;
+
 var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Privacidad</h2>
 <p><strong>Responsable:</strong> Silvia G. M. · NIF 05931103-R · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
 <p><strong>Datos recabados:</strong> A través del formulario de contacto: nombre, email, teléfono (opcional) y mensaje. Finalidad: gestionar tu consulta o relación comercial.</p>
@@ -158,8 +196,8 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Priva
 <p><strong>Conservación:</strong> Durante el tiempo necesario y los plazos legales (hasta 5 años).</p>
 <p><strong>Terceros:</strong> Google Analytics (Google LLC, adherida al Data Privacy Framework UE-EE.UU.).</p>
 <p><strong>Tus derechos:</strong> Acceso, rectificación, supresión, oposición, limitación y portabilidad. Escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a> o reclama ante la <a href="https://www.aepd.es" target="_blank">AEPD</a>.</p>`;
-function abrirModal() {
-  document.getElementById('modal-contenido').innerHTML = textoPrivacidad;
+function abrirModal(tipo) {
+  document.getElementById('modal-contenido').innerHTML = tipo==='aviso'?textoAviso:tipo==='cookies'?textoCookies:textoPrivacidad;
   document.getElementById('modal-legal').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -168,18 +206,61 @@ function cerrarModal() {
   document.body.style.overflow = '';
 }
 document.getElementById('modal-legal').addEventListener('click', function(e){ if(e.target===this) cerrarModal(); });
+
+function aceptarCookies() {
+  localStorage.setItem('bl_cookie_consent','accepted');
+  document.getElementById('cookie-banner').style.display = 'none';
+  activarAnalytics();
+}
+function rechazarCookies() {
+  localStorage.setItem('bl_cookie_consent','rejected');
+  document.getElementById('cookie-banner').style.display = 'none';
+}
+function activarAnalytics() {
+  if(window._gaActivado) return; window._gaActivado=true;
+  var s=document.createElement('script'); s.src='https://www.googletagmanager.com/gtag/js?id=G-QHM1133FL4'; s.async=true; document.head.appendChild(s);
+  window.dataLayer=window.dataLayer||[]; function gtag(){dataLayer.push(arguments);} window.gtag=gtag;
+  gtag('js',new Date()); gtag('config','G-QHM1133FL4');
+}
+window.addEventListener('DOMContentLoaded', function(){
+  var consent = localStorage.getItem('bl_cookie_consent');
+  if (!consent) { var b=document.getElementById('cookie-banner'); if(b) b.style.display='flex'; }
+  if (consent==='accepted') activarAnalytics();
+});
 </script>
 <script>
 function toggleNav(){ document.body.classList.toggle('nav-open'); }
 document.querySelectorAll('.site-nav a').forEach(function(a){
   a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
 });
-document.getElementById('contacto-form').addEventListener('submit', function(e){
+document.getElementById('contacto-form').addEventListener('submit', async function(e){
   e.preventDefault();
-  var f = new FormData(e.target);
-  var body = encodeURIComponent('Nombre: ' + f.get('nombre') + '\n\nMensaje:\n' + f.get('mensaje'));
-  var subject = encodeURIComponent(f.get('asunto') || 'Contacto desde la web');
-  window.location.href = 'mailto:contacto@benditolab.com?subject=' + subject + '&body=' + body;
+  var form = e.target;
+  var f = new FormData(form);
+  var errEl = document.getElementById('contacto-error');
+  errEl.style.display = 'none';
+  var btn = form.querySelector('.btn-send');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    var r = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contacto',
+        website: f.get('website'),
+        data: { nombre: f.get('nombre'), email: f.get('email'), asunto: f.get('asunto'), mensaje: f.get('mensaje') }
+      })
+    });
+    var d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Error al enviar');
+    form.style.display = 'none';
+    document.getElementById('contacto-success').style.display = 'block';
+  } catch (err) {
+    errEl.textContent = err.message + ' — o escríbenos directamente a contacto@benditolab.com';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'ENVIAR→';
+  }
 });
 </script>
 <script src="js/bl-images.js" defer></script>

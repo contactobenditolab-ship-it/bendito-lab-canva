@@ -24,7 +24,6 @@ form{display:flex;flex-direction:column;gap:20px;align-items:center;}
 .hint{margin:24px 0 0;font-size:13px;opacity:.85;}
 .brands{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:56px;}
 .brands img{height:28px;width:auto;filter:brightness(0) invert(1);}
-#soon-msg{display:none;margin-top:20px;font-size:14px;background:rgba(251,244,233,.15);border-radius:10px;padding:14px 18px;}
 @media(max-width:600px){ .back-btn{left:16px;bottom:16px;} }
 </style>
   <link rel="apple-touch-icon" href="/icon-web-180.png">
@@ -40,12 +39,7 @@ form{display:flex;flex-direction:column;gap:20px;align-items:center;}
 <div class="wrap">
   <h1>PORTAL DE CLIENTES Y COLABORADORES</h1>
 
-  <form id="area-login-form">
-    <input class="field" type="email" placeholder="miemail@email.com" required>
-    <input class="field" type="password" placeholder="********" required>
-    <button type="submit" class="btn-enter">ENTRAR→</button>
-  </form>
-  <div id="soon-msg">El área privada de clientes está en construcción. Escríbenos si necesitas acceso: <a href="mailto:contacto@benditolab.com" style="text-decoration:underline;">contacto@benditolab.com</a></div>
+  <a class="btn-enter" href="https://bendito-os.vercel.app/login" style="display:inline-block;">ENTRAR→</a>
 
   <p class="hint">Accede a Bendito OS, tu área privada de presupuestos y pedidos.</p>
 
@@ -56,11 +50,5 @@ form{display:flex;flex-direction:column;gap:20px;align-items:center;}
   </div>
 </div>
 
-<script>
-document.getElementById('area-login-form').addEventListener('submit', function(e){
-  e.preventDefault();
-  document.getElementById('soon-msg').style.display = 'block';
-});
-</script>
 </body>
 </html>
