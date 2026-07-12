@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área de Clientes · Bendito Lab</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://www.benditolab.com/area-clientes.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{ --poppy:#E2704A; --white:#FBF4E9; --sage:#9AB791; --deep:#17233F; }
+*{box-sizing:border-box;}
+body{margin:0;background:var(--poppy);min-height:100vh;font-family:'Inter',sans-serif;color:var(--white);position:relative;}
+a{color:inherit;text-decoration:none;}
+h1{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;}
+input::placeholder{color:var(--poppy);opacity:.7;}
+.back-btn{position:fixed;left:32px;bottom:32px;background:transparent;border:1px solid var(--white);font-weight:700;font-size:13px;padding:10px 20px;border-radius:20px;}
+.wrap{max-width:700px;margin:0 auto;padding:120px 24px 80px;text-align:center;}
+.wrap h1{font-weight:800;font-size:clamp(30px,6vw,54px);line-height:1.15;margin:0 0 56px;}
+form{display:flex;flex-direction:column;gap:20px;align-items:center;}
+.field{width:100%;max-width:420px;padding:16px 22px;border-radius:24px;border:none;font-weight:700;font-size:15px;background:var(--white);color:var(--poppy);text-align:center;box-sizing:border-box;}
+.btn-enter{background:var(--sage);color:var(--deep);font-weight:700;font-size:15px;padding:16px 40px;border-radius:24px;border:none;cursor:pointer;}
+.hint{margin:24px 0 0;font-size:13px;opacity:.85;}
+.brands{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:56px;}
+.brands img{height:28px;width:auto;filter:brightness(0) invert(1);}
+#soon-msg{display:none;margin-top:20px;font-size:14px;background:rgba(251,244,233,.15);border-radius:10px;padding:14px 18px;}
+@media(max-width:600px){ .back-btn{left:16px;bottom:16px;} }
+</style>
+  <link rel="apple-touch-icon" href="/icon-web-180.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon-web-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon-web-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-web-192.png">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+
+<a href="portada.html" class="back-btn">VOLVER→</a>
+
+<div class="wrap">
+  <h1>PORTAL DE CLIENTES Y COLABORADORES</h1>
+
+  <form id="area-login-form">
+    <input class="field" type="email" placeholder="miemail@email.com" required>
+    <input class="field" type="password" placeholder="********" required>
+    <button type="submit" class="btn-enter">ENTRAR→</button>
+  </form>
+  <div id="soon-msg">El área privada de clientes está en construcción. Escríbenos si necesitas acceso: <a href="mailto:contacto@benditolab.com" style="text-decoration:underline;">contacto@benditolab.com</a></div>
+
+  <p class="hint">Accede a tu área privada de presupuestos y pedidos.</p>
+
+  <div class="brands">
+    <img src="logo-bendito.png" alt="Bendito Lab">
+    <img src="logo.png" alt="Dilo Bonito">
+  </div>
+</div>
+
+<script>
+document.getElementById('area-login-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  document.getElementById('soon-msg').style.display = 'block';
+});
+</script>
+</body>
+</html>

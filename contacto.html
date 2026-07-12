@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacto · Bendito Lab</title>
+<meta name="description" content="Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.">
+<link rel="canonical" href="https://www.benditolab.com/contacto.html">
+<meta property="og:title" content="Contacto · Bendito Lab">
+<meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{ --cream:#F4F1E6; --deep:#17233F; --white:#FBF4E9; --poppy:#E2704A; --sage:#9AB791; --captain:#2F8FEA; --rose:#E3A29C; }
+*{box-sizing:border-box;}
+body{margin:0;background:var(--cream);font-family:'Inter',sans-serif;color:var(--deep);overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+h1,h2{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;}
+.navlink:hover{opacity:.7;}
+input,textarea{font-family:'Inter',sans-serif;}
+input::placeholder,textarea::placeholder{color:#8A9099;}
+
+.site-header{background:var(--poppy);padding:32px 5vw 22px;}
+.header-tag{text-align:center;color:var(--white);font-weight:700;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;}
+.header-logo{margin-top:14px;display:flex;justify-content:center;}
+.header-logo img{height:64px;width:auto;display:block;}
+.site-nav{display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,36px);margin-top:24px;flex-wrap:wrap;}
+.site-nav a{font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--white);}
+.site-nav a.pill{border:1px solid var(--white);padding:9px 18px;border-radius:22px;}
+.nav-hamburger{display:none;}
+
+.intro{max-width:1200px;margin:0 auto;padding:64px 5vw 16px;text-align:center;}
+.intro h1{font-weight:800;font-size:clamp(32px,5vw,48px);margin:0 0 16px;}
+.intro p{max-width:640px;margin:0 auto;font-size:17px;line-height:1.6;}
+
+.form-wrap{max-width:1100px;margin:0 auto;padding:32px 5vw 80px;display:grid;grid-template-columns:1.2fr 1fr;gap:56px;}
+.form-wrap form{display:flex;flex-direction:column;gap:16px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field{padding:14px 18px;border-radius:8px;border:1px solid #D9D3C0;background:#fff;font-size:15px;color:var(--deep);}
+textarea.field{resize:vertical;}
+.btn-send{background:var(--captain);color:var(--white);font-weight:700;font-size:14px;padding:16px 32px;border-radius:8px;border:none;cursor:pointer;align-self:flex-start;}
+.info-card{background:var(--sage);border-radius:14px;padding:32px;}
+.info-card h2{font-weight:800;font-size:20px;margin:0 0 24px;}
+.info-block{margin-bottom:20px;}
+.info-block:last-of-type{margin-bottom:28px;}
+.info-label{font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;opacity:.8;margin-bottom:4px;}
+.info-value{font-size:15px;font-weight:600;}
+.social-row{display:flex;align-items:center;gap:14px;font-size:20px;}
+
+footer{background:var(--rose);}
+.footer-bottom{max-width:1200px;margin:0 auto;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-bottom-links{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.footer-bottom-links img{height:26px;width:26px;display:block;}
+.footer-bottom-links a{color:var(--white);font-weight:600;font-size:14px;}
+.footer-copy{color:var(--white);font-size:13px;}
+
+@media(max-width:900px){
+  .form-wrap{grid-template-columns:1fr;gap:32px;}
+  .grid2{grid-template-columns:1fr;}
+  .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
+  .site-nav a{font-size:20px;color:var(--white)!important;}
+  .nav-hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;position:absolute;top:28px;right:5vw;z-index:1001;}
+  .nav-hamburger span{display:block;width:22px;height:2px;background:var(--white);}
+  .site-header{position:relative;}
+  body.nav-open .site-nav{display:flex;}
+  body.nav-open{overflow:hidden;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+  .footer-bottom-links{justify-content:center;}
+}
+</style>
+  <link rel="apple-touch-icon" href="/icon-web-180.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon-web-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon-web-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-web-192.png">
+  <link rel="manifest" href="/manifest.json">
+<script src="/js/bl-api.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-tag">Artículos personalizados para empresas y eventos</div>
+  <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
+  <button class="nav-hamburger" onclick="toggleNav()" aria-label="Menú"><span></span><span></span><span></span></button>
+  <nav class="site-nav" id="site-nav">
+    <a class="navlink" href="portada.html">PORTADA→</a>
+    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
+    <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+    <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+    <a class="navlink" href="contacto.html">CONTACTO→</a>
+    <a class="navlink pill" href="area-clientes.html">ÁREA CLIENTE→</a>
+  </nav>
+</header>
+
+<section class="intro">
+  <h1>¿Hablamos?</h1>
+  <p>Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.</p>
+</section>
+
+<section class="form-wrap">
+  <form id="contacto-form">
+    <div class="grid2">
+      <input class="field" name="nombre" type="text" placeholder="Nombre" required>
+      <input class="field" name="email" type="email" placeholder="Email" required>
+    </div>
+    <input class="field" name="asunto" type="text" placeholder="Asunto">
+    <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
+    <button type="submit" class="btn-send">ENVIAR→</button>
+  </form>
+
+  <div class="info-card">
+    <h2>También puedes escribirnos por</h2>
+    <div class="info-block">
+      <div class="info-label">Email</div>
+      <a class="info-value" href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>
+    </div>
+    <div class="info-block">
+      <div class="info-label">WhatsApp</div>
+      <a class="info-value" href="https://wa.me/34647444308" target="_blank">+34 647 44 43 08</a>
+    </div>
+    <div class="info-label">Redes sociales</div>
+    <div class="social-row">
+      <a href="https://instagram.com/bendito_lab" target="_blank" aria-label="Instagram">📸</a>
+      <a href="https://wa.me/34647444308" target="_blank" aria-label="WhatsApp">💬</a>
+      <a href="https://tiktok.com/@bendito_lab" target="_blank" aria-label="TikTok">🎵</a>
+      <a href="mailto:contacto@benditolab.com" aria-label="Email">✉️</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="footer-bottom-links">
+      <img src="icon-web-32.png" alt="" style="height:26px;width:26px;">
+      <a href="dilo-bonito.html">Dilo bonito</a>
+      <a href="bendito-lab.html">Bendito lab.</a>
+      <a href="colaboradores.html">Colaboradores</a>
+      <a href="faq.html">F.A.Q.</a>
+    </div>
+    <span class="footer-copy">© 2026 Bendito lab.</span>
+  </div>
+</footer>
+
+<script>
+function toggleNav(){ document.body.classList.toggle('nav-open'); }
+document.querySelectorAll('.site-nav a').forEach(function(a){
+  a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
+});
+document.getElementById('contacto-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var f = new FormData(e.target);
+  var body = encodeURIComponent('Nombre: ' + f.get('nombre') + '\n\nMensaje:\n' + f.get('mensaje'));
+  var subject = encodeURIComponent(f.get('asunto') || 'Contacto desde la web');
+  window.location.href = 'mailto:contacto@benditolab.com?subject=' + subject + '&body=' + body;
+});
+</script>
+<script src="js/bl-images.js" defer></script>
+</body>
+</html>

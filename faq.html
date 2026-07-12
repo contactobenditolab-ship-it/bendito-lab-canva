@@ -2,306 +2,90 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preguntas frecuentes · Bendito Lab</title>
-  <meta name="description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab y Dilo Bonito.">
-  <meta name="keywords" content="preguntas frecuentes bendito lab, faq dilo bonito, pedido mínimo merchandising, plazos personalización, dudas colaboradores">
-  <meta name="author" content="Bendito Lab">
-  <meta name="robots" content="index, follow">
-  <meta name="geo.region" content="ES-CR">
-  <meta name="geo.placename" content="Manzanares, Ciudad Real">
-  <link rel="canonical" href="https://www.benditolab.com/faq.html">
-  <!-- Open Graph -->
-  <meta property="og:title" content="Preguntas frecuentes · Bendito Lab">
-  <meta property="og:description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo.">
-  <meta property="og:url" content="https://www.benditolab.com/faq.html">
-  <meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="es_ES">
-  <meta property="og:site_name" content="Bendito Lab">
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Preguntas frecuentes · Bendito Lab">
-  <meta name="twitter:description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo.">
-  <meta name="twitter:image" content="https://www.benditolab.com/logo-bendito.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+<meta name="description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab y Dilo Bonito.">
+<link rel="canonical" href="https://www.benditolab.com/faq.html">
+<meta property="og:title" content="Preguntas frecuentes · Bendito Lab">
+<meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream:#F4F1E6; --deep:#17233F; --captain:#2F8FEA; --baby:#93ACA7;
-    --sunshine:#E8C24A; --rose:#E3A29C; --poppy:#E2704A; --white:#FBF4E9;
-    --sand:#E3DFCF; --text-mid:#5A6470; --text-light:#8A96A0;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--deep); overflow-x:hidden; }
-
-  .faq-hero { background:var(--poppy); padding:96px 40px 72px; text-align:center; }
-  .faq-tag { font-family:'Inter',sans-serif; font-weight:700; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--white); opacity:.9; margin-bottom:20px; }
-  .faq-h1 { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:clamp(36px,5vw,56px); line-height:1; color:var(--white); margin-bottom:20px; }
-  .faq-sub { font-size:15px; color:var(--white); opacity:.9; max-width:560px; margin:0 auto; line-height:1.7; font-weight:400; }
-
-  section { padding:0; }
-  .container { max-width:900px; margin:0 auto; padding:0 40px; }
-
-  .faq-list { padding:72px 0; }
-  .faq-item { border-bottom:1px solid var(--sand); border-radius:12px; margin-bottom:8px; }
-  .faq-item:first-child { border-top:1px solid var(--sand); }
-  .faq-q { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:26px 4px; cursor:pointer; background:none; border:none; width:100%; text-align:left; font-family:'Inter',sans-serif; }
-  .faq-q-text { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:17px; color:var(--deep); }
-  .faq-q-icon { font-family:'Inter',sans-serif; font-weight:800; font-size:22px; color:var(--captain); flex-shrink:0; transition:transform .2s; }
-  .faq-item.open .faq-q-icon { transform:rotate(45deg); }
-  .faq-a { max-height:0; overflow:hidden; transition:max-height .3s ease; }
-  .faq-a-inner { padding:0 4px 26px; font-size:15px; line-height:1.75; color:var(--text-mid); font-weight:400; max-width:720px; }
-  .faq-item.open .faq-a { max-height:400px; }
-
-  .faq-cta { background:var(--sunshine); padding:72px 0; text-align:center; }
-  .faq-cta h2 { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:clamp(28px,3.6vw,40px); color:var(--deep); line-height:1; margin-bottom:16px; }
-  .faq-cta p { font-size:15px; color:var(--deep); opacity:0.8; margin-bottom:32px; }
-  .cta-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-  .btn-dark { background:var(--deep); color:var(--white); border-radius:8px; font-family:'Inter',sans-serif; font-weight:800; font-size:14px; letter-spacing:.5px; padding:16px 32px; text-decoration:none; transition:all 0.2s; display:inline-block; }
-  .btn-dark:hover { background:var(--captain); color:white; }
-  .btn-wa { background:#25D366; color:white; border-radius:8px; font-family:'Inter',sans-serif; font-weight:800; font-size:14px; letter-spacing:.5px; padding:16px 32px; text-decoration:none; display:inline-block; transition:opacity 0.2s; }
-  .btn-wa:hover { opacity:0.85; }
-
-  footer { background:var(--poppy); padding:40px 0; }
-  .footer-inner { max-width:1200px; margin:0 auto; padding:0 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; }
-  .footer-logo { height:36px; width:auto; filter:brightness(0) invert(1); }
-  .footer-links { display:flex; gap:20px; flex-wrap:wrap; }
-  .footer-links a { font-family:'Inter',sans-serif; font-size:13px; color:var(--white); opacity:.85; text-decoration:none; transition:opacity 0.2s; }
-  .footer-links a:hover { opacity:1; }
-  .footer-copy { font-family:'Inter',sans-serif; font-size:12px; color:var(--white); opacity:.7; }
-
-  .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.7s, transform 0.7s; }
-  .reveal.visible { opacity:1; transform:translateY(0); }
-
-  @media (max-width: 768px) {
-    .faq-hero { padding:72px 24px 56px; }
-    .container { padding:0 20px; }
-    .faq-q-text { font-size:15px; }
-    .cta-btns { flex-direction:column; align-items:center; }
-    .btn-dark, .btn-wa { width:100%; max-width:320px; text-align:center; }
-    footer .footer-links { flex-direction:column; gap:12px; }
-  }
+:root{ --cream:#F4F1E6; --deep:#17233F; --white:#FBF4E9; --sage:#9AB791; --rose:#E3A29C; --yellow:#E8C24A; }
+*{box-sizing:border-box;}
+body{margin:0;background:var(--cream);font-family:'Inter',sans-serif;color:var(--deep);}
+a{color:inherit;text-decoration:none;}
+h1{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;}
+.topbar{max-width:1300px;margin:0 auto;padding:32px 5vw 0;display:flex;align-items:center;justify-content:space-between;}
+.btn-pill{background:var(--yellow);font-weight:700;font-size:13px;padding:10px 20px;border-radius:20px;display:inline-block;}
+.topbar-logo{display:flex;align-items:center;gap:10px;}
+.topbar-logo img{height:44px;width:auto;display:block;}
+.faq-title{max-width:1300px;margin:24px auto 0;padding:0 5vw;font-weight:800;font-size:clamp(34px,5.5vw,54px);}
+.faq-list{max-width:1300px;margin:32px auto 0;padding:0 5vw 24px;}
+.faq-row{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid #E3DFCF;}
+.faq-num{background:var(--sage);color:var(--white);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.faq-text{padding:20px 0;font-size:15px;line-height:1.6;}
+.faq-back{max-width:1300px;margin:0 auto;padding:8px 5vw 56px;}
+footer{background:var(--rose);}
+.footer-bottom{max-width:1300px;margin:0 auto;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-bottom-links{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.footer-bottom-links img{height:26px;width:26px;display:block;}
+.footer-bottom-links a{color:var(--white);font-weight:600;font-size:14px;}
+.footer-copy{color:var(--white);font-size:13px;}
+@media(max-width:700px){
+  .faq-row{grid-template-columns:60px 1fr;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+  .footer-bottom-links{justify-content:center;}
+}
 </style>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHM1133FL4"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-QHM1133FL4');
-  </script>
-  <meta name="theme-color" content="#E2704A">
   <link rel="apple-touch-icon" href="/icon-web-180.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icon-web-16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icon-web-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-web-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-web-512.png">
   <link rel="manifest" href="/manifest.json">
-<link rel="stylesheet" href="/css/nav.css">
 </head>
 <body>
 
-<header class="nav" id="nav">
-  <div class="nav-logo">
-    <a href="portada.html">
-      <img src="logo-bendito.png" alt="Bendito Lab">
-    </a>
-  </div>
-  <button class="nav-hamburger" id="nav-ham" onclick="toggleNav()" aria-label="Menú">
-    <span></span><span></span><span></span>
-  </button>
-  <nav class="nav-links" id="nav-links">
-    <a href="portada.html">Inicio</a>
-    <a href="dilo-bonito.html">Dilo Bonito</a>
-    <a href="bendito-lab.html">Bendito Lab</a>
-    <a href="colaboradores.html">Colaboradores</a>
-    <a href="portada.html#sec-cotizacion" onclick="closeMob()">Contacto</a>
-    <a href="/portal" class="nav-cta" onclick="closeMob()">Área cliente</a>
-  </nav>
-</header>
-<script>
-document.addEventListener('click', e => {
-  if (!e.target.closest('.nav-item')) {
-    document.querySelectorAll('.nav-item.open').forEach(el => el.classList.remove('open'));
-  }
-});
-</script>
-
-<section class="faq-hero">
-  <div class="faq-tag">Ayuda</div>
-  <h1 class="faq-h1">PREGUNTAS<br>FRECUENTES</h1>
-  <p class="faq-sub">Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo.</p>
-</section>
-
-<section class="faq-list">
-  <div class="container">
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Qué servicios ofrecéis?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Ayudamos a empresas, organizaciones y particulares con productos personalizados, merchandising, ropa laboral, regalos corporativos y experiencias de personalización en directo para bodas, comuniones y todo tipo de eventos.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Cuál es el pedido mínimo?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Depende del producto. Trabajamos desde pequeñas cantidades y también realizamos producciones de mayor volumen. Te asesoraremos según tus necesidades.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Puedo personalizar cualquier diseño?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Sí. Adaptamos cada proyecto a tu marca, evento o idea. Si tu diseño necesita ajustes para obtener el mejor resultado, nosotros nos encargamos.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Cuánto tardáis en entregar un pedido?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Los plazos dependen del producto y la cantidad solicitada. Una vez aprobado el diseño, te indicaremos la fecha estimada de producción y entrega antes de comenzar.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Trabajáis en toda España?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Sí. Realizamos envíos a cualquier punto de la península y, si estás cerca de nuestras instalaciones en Manzanares, también puedes recoger tu pedido en persona.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Qué incluye el servicio de personalización en directo?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Nos encargamos del transporte, montaje, personalización durante el evento y desmontaje. Tú solo tienes que disfrutar de la experiencia junto a tus invitados.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Puedo seguir el estado de mi pedido?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Sí. Dispondrás de un área privada de cliente donde podrás consultar presupuestos, aprobar diseños, revisar el estado de tus pedidos y acceder a toda la documentación relacionada con tus proyectos.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Puedo colaborar con Bendito Lab o Dilo Bonito?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes. Consulta la sección de <a href="colaboradores.html" style="color:var(--captain);font-weight:700;">Colaboradores</a> para más información.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Y si no encuentro el producto o servicio que necesito?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">No trabajamos con un catálogo cerrado. Si tienes una idea o un proyecto especial, prepararemos una propuesta personalizada adaptada a tus necesidades.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Cómo solicito un presupuesto?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Puedes hacerlo a través del formulario de contacto, por WhatsApp o por correo electrónico. Cuéntanos tu idea y prepararemos una propuesta personalizada sin compromiso.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Cómo funciona el proceso de trabajo?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Solo tienes que contarnos tu idea. Nosotros te asesoramos, preparamos el presupuesto, adaptamos el diseño, producimos el pedido y te mantenemos informado hasta la entrega.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Qué formas de pago aceptáis?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Aceptamos diferentes métodos de pago: transferencia, Bizum y efectivo. Te informaremos de las opciones disponibles junto al presupuesto.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        <span class="faq-q-text">¿Alguna duda más?</span>
-        <span class="faq-q-icon">+</span>
-      </button>
-      <div class="faq-a"><div class="faq-a-inner">Escríbenos a <a href="mailto:contacto@benditolab.com" style="color:var(--captain);font-weight:700;">contacto@benditolab.com</a> o vía WhatsApp al <a href="https://wa.me/34647444308" target="_blank" style="color:var(--captain);font-weight:700;">647 444 308</a>.</div></div>
-    </div>
-  </div>
-</section>
-
-<div class="faq-cta">
-  <div class="container">
-    <h2>¿No has encontrado tu respuesta?</h2>
-    <p>Cuéntanos qué necesitas y te respondemos en menos de 24 horas.</p>
-    <div class="cta-btns">
-      <a href="mailto:contacto@benditolab.com" class="btn-dark">✉️ CONTACTO →</a>
-      <a href="https://wa.me/34647444308" target="_blank" class="btn-wa">💬 WHATSAPP</a>
-    </div>
-  </div>
+<div class="topbar">
+  <a href="portada.html" class="btn-pill">VOLVER→</a>
+  <a href="portada.html" class="topbar-logo"><img src="logo-bendito.png" alt="Bendito Lab"></a>
 </div>
 
+<h1 class="faq-title">Preguntas frecuentes</h1>
+
+<div class="faq-list">
+  <div class="faq-row"><div class="faq-num">01</div><div class="faq-text"><strong>¿Qué servicios ofrecéis?</strong> Ayudamos a empresas, organizaciones y particulares con productos personalizados, merchandising, ropa laboral, regalos corporativos y experiencias de personalización en directo para bodas, comuniones y todo tipo de eventos.</div></div>
+  <div class="faq-row"><div class="faq-num">02</div><div class="faq-text"><strong>¿Cuál es el pedido mínimo?</strong> Depende del producto. Trabajamos desde pequeñas cantidades y también realizamos producciones de mayor volumen. Te asesoraremos según tus necesidades.</div></div>
+  <div class="faq-row"><div class="faq-num">03</div><div class="faq-text"><strong>¿Puedo personalizar cualquier diseño?</strong> Sí. Adaptamos cada proyecto a tu marca, evento o idea. Si tu diseño necesita ajustes para obtener el mejor resultado, nosotros nos encargamos.</div></div>
+  <div class="faq-row"><div class="faq-num">04</div><div class="faq-text"><strong>¿Cuánto tardáis en entregar un pedido?</strong> Los plazos dependen del producto y la cantidad solicitada. Una vez aprobado el diseño, te indicaremos la fecha estimada de producción y entrega antes de comenzar.</div></div>
+  <div class="faq-row"><div class="faq-num">05</div><div class="faq-text"><strong>¿Trabajáis en toda España?</strong> Sí. Realizamos envíos a cualquier punto de la península y, si estás cerca de nuestras instalaciones, también puedes recoger tu pedido en persona.</div></div>
+  <div class="faq-row"><div class="faq-num">06</div><div class="faq-text"><strong>¿Qué incluye el servicio de personalización en directo?</strong> Nos encargamos del transporte, montaje, personalización durante el evento y desmontaje. Tú solo tienes que disfrutar de la experiencia junto a tus invitados.</div></div>
+  <div class="faq-row"><div class="faq-num">07</div><div class="faq-text"><strong>¿Puedo seguir el estado de mi pedido?</strong> Sí. Dispondrás de un área privada de cliente donde podrás consultar presupuestos, aprobar diseños, revisar el estado de tus pedidos y acceder a toda la documentación relacionada con tus proyectos.</div></div>
+  <div class="faq-row"><div class="faq-num">08</div><div class="faq-text"><strong>¿Puedo colaborar con Bendito Lab o Dilo Bonito?</strong> Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes.</div></div>
+  <div class="faq-row"><div class="faq-num">09</div><div class="faq-text"><strong>¿Y si no encuentro el producto o servicio que necesito?</strong> No trabajamos con un catálogo cerrado. Si tienes una idea o un proyecto especial, prepararemos una propuesta personalizada adaptada a tus necesidades.</div></div>
+  <div class="faq-row"><div class="faq-num">10</div><div class="faq-text"><strong>¿Cómo solicito un presupuesto?</strong> Puedes hacerlo a través del formulario de contacto, por WhatsApp o por correo electrónico. Cuéntanos tu idea y prepararemos una propuesta personalizada sin compromiso.</div></div>
+  <div class="faq-row"><div class="faq-num">11</div><div class="faq-text"><strong>¿Cómo funciona el proceso de trabajo?</strong> Solo tienes que contarnos tu idea. Nosotros te asesoramos, preparamos el presupuesto, adaptamos el diseño, producimos el pedido y te mantenemos informado hasta la entrega.</div></div>
+  <div class="faq-row"><div class="faq-num">12</div><div class="faq-text"><strong>¿Qué formas de pago aceptáis?</strong> Aceptamos diferentes métodos de pago. Transferencia, Bizum y efectivo. Te informaremos de las opciones disponibles junto al presupuesto.</div></div>
+  <div class="faq-row"><div class="faq-num">13</div><div class="faq-text"><strong>¿Alguna duda más?</strong> Escríbenos a contacto@benditolab.com o vía whatsapp al +34647444308</div></div>
+</div>
+
+<div class="faq-back"><a href="portada.html" class="btn-pill">VOLVER→</a></div>
+
 <footer>
-  <div class="footer-inner">
-    <img src="logo-bendito.png" class="footer-logo" alt="Bendito Lab">
-    <div class="footer-links">
-      <a href="portada.html">Inicio</a>
-      <a href="dilo-bonito.html">Dilo Bonito</a>
-      <a href="bendito-lab.html">Bendito Lab</a>
+  <div class="footer-bottom">
+    <div class="footer-bottom-links">
+      <img src="icon-web-32.png" alt="" style="height:26px;width:26px;">
+      <a href="dilo-bonito.html">Dilo bonito</a>
+      <a href="bendito-lab.html">Bendito lab.</a>
       <a href="colaboradores.html">Colaboradores</a>
-      <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>
+      <a href="faq.html">F.A.Q.</a>
     </div>
-    <span class="footer-copy">© 2026 Bendito Lab · Dilo Bonito</span>
+    <span class="footer-copy">© 2026 Bendito lab.</span>
   </div>
 </footer>
-<script>
-const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:0.1});
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-function toggleFaq(btn){
-  var item = btn.closest('.faq-item');
-  var wasOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item.open').forEach(function(el){ el.classList.remove('open'); });
-  if (!wasOpen) item.classList.add('open');
-}
-
-// ── NAV MOBILE ────────────────────────────────────────────
-function toggleNav(){
-  var nav=document.getElementById('nav');
-  var ham=document.getElementById('nav-ham');
-  if(document.body.classList.contains('nav-open')){closeMob();}
-  else{nav.classList.add('mob-open');ham.classList.add('open');document.body.classList.add('nav-open');document.body.style.overflow='hidden';}
-}
-function closeMob(){
-  var nav=document.getElementById('nav');
-  var ham=document.getElementById('nav-ham');
-  nav.classList.remove('mob-open');ham.classList.remove('open');
-  document.body.classList.remove('nav-open');document.body.style.overflow='';
-}
-document.querySelectorAll('.nav-links a').forEach(function(a){
-  a.addEventListener('click', closeMob);
-});
-</script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-  </script>
-  <!-- WhatsApp flotante -->
-  <a href="https://wa.me/34647444308?text=Hola%2C%20tengo%20una%20duda%20%F0%9F%91%8B"
-     target="_blank" rel="noopener"
-     style="position:fixed;bottom:24px;right:24px;z-index:9999;background:#25D366;color:#fff;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.25);text-decoration:none;transition:transform .2s,box-shadow .2s;"
-     onmouseover="this.style.transform='scale(1.1)'"
-     onmouseout="this.style.transform='scale(1)'"
-     aria-label="Contactar por WhatsApp">
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  </a>
-  <script src="js/bl-images.js" defer></script>
+<script src="js/bl-images.js" defer></script>
 </body>
 </html>
