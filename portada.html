@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+  <link rel="canonical" href="https://www.benditolab.com/">
+  <meta name="description" content="Bendito Lab — Artículos personalizados para empresas y eventos en Manzanares, Ciudad Real. Merchandising corporativo y personalización en directo para bodas y comuniones.">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bendito Lab · Personalización que marca</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F4F1E6;
+  --deep:#17233F;
+  --captain:#2F8FEA;
+  --baby:#93ACA7;
+  --sunshine:#E8C24A;
+  --poppy:#E2704A;
+  --white:#FBF4E9;
+  --mid:#5A6470;
+  --gray:#E3DFCF;
+  --dark:#17233F;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;}
+h1,h2,h3{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;}
+
+/* ── CARRUSEL ── */
+.carousel{width:100%;height:50vh;min-height:280px;max-height:540px;position:relative;overflow:hidden;background:var(--poppy);border-radius:24px;max-width:1000px;margin:0 auto;}
+.c-track{display:flex;height:100%;transition:transform .8s cubic-bezier(.77,0,.175,1);}
+.c-slide{min-width:100%;height:100%;flex-shrink:0;position:relative;}
+.c-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.c-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05) 0%,rgba(0,0,0,.35) 100%);pointer-events:none;}
+.c-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.18);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.3);color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;font-size:20px;transition:background .2s;}
+.c-arrow:hover{background:rgba(255,255,255,.35);}
+.c-arrow.prev{left:24px;}
+.c-arrow.next{right:24px;}
+.c-dots{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;}
+.c-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);border:none;cursor:pointer;transition:all .3s;}
+.c-dot.on{background:#fff;transform:scale(1.3);}
+
+/* ── HERO CLAIM ── */
+.hero-claim{
+  background:var(--poppy);
+  padding:80px 40px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero-claim::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:rgba(251,244,233,.12);pointer-events:none;}
+.hero-eyebrow{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--white);opacity:.92;margin-bottom:20px;}
+.hero-h1{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(40px,6vw,68px);color:var(--white);line-height:1.1;letter-spacing:0;margin-bottom:28px;}
+.hero-h1 em{color:var(--sunshine);font-style:normal;}
+.hero-sub{font-size:17px;font-weight:400;color:var(--white);opacity:.9;line-height:1.7;max-width:580px;margin:0 auto 44px;}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{background:var(--sunshine);color:var(--deep);border:none;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;letter-spacing:.5px;text-transform:uppercase;padding:16px 40px;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-primary:hover{background:var(--white);color:var(--poppy);transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--white);border:1.5px solid rgba(251,244,233,.5);font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;padding:15px 36px;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--white);background:rgba(251,244,233,.12);}
+
+/* ── DOS LÍNEAS ── */
+.lineas{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:var(--cream);max-width:1200px;margin:0 auto;padding:0 40px;}
+.linea{padding:56px 48px;border-radius:16px;display:flex;flex-direction:column;justify-content:space-between;min-height:480px;position:relative;overflow:hidden;}
+.linea-db{background:var(--sage,var(--baby));background:var(--baby);}
+.linea-bl{background:var(--sunshine);}
+.linea-tag{font-family:'Inter',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:28px;}
+.linea-db .linea-tag{color:var(--white);}
+.linea-bl .linea-tag{color:var(--deep);}
+.linea-title{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(32px,4vw,44px);line-height:1;margin-bottom:24px;}
+.linea-db .linea-title{color:var(--white);}
+.linea-bl .linea-title{color:var(--deep);}
+.linea-desc{font-size:15px;line-height:1.7;max-width:360px;margin-bottom:32px;}
+.linea-db .linea-desc{color:var(--white);opacity:.9;}
+.linea-bl .linea-desc{color:var(--deep);opacity:.85;}
+.linea-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;}
+.pill{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:20px;}
+.linea-db .pill{background:rgba(255,255,255,.2);color:var(--white);border:1px solid rgba(255,255,255,.25);}
+.linea-bl .pill{background:rgba(23,35,63,.08);color:var(--deep);border:1px solid rgba(23,35,63,.15);}
+.linea-cta{display:inline-block;text-decoration:none;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;padding:14px 32px;border-radius:8px;transition:all .2s;align-self:flex-start;}
+.linea-db .linea-cta{background:var(--deep);color:var(--white);}
+.linea-db .linea-cta:hover{background:var(--poppy);color:#fff;}
+.linea-bl .linea-cta{background:var(--deep);color:var(--sunshine);}
+.linea-bl .linea-cta:hover{background:var(--captain);color:#fff;}
+.linea-num{position:absolute;bottom:-20px;right:-10px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:160px;line-height:1;opacity:.06;color:#fff;pointer-events:none;user-select:none;}
+.linea-bl .linea-num{color:#000;}
+
+/* ── COTIZACIÓN ── */
+.cotizacion{background:var(--cream);padding:100px 40px;}
+.cotizacion-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.cot-left .eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--captain);margin-bottom:16px;}
+.cot-left h2{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(30px,3.6vw,44px);color:var(--deep);line-height:1;margin-bottom:20px;}
+.cot-left p{font-size:15px;color:var(--mid);line-height:1.8;margin-bottom:32px;}
+.cot-contacts{display:flex;flex-direction:column;gap:12px;}
+.cot-contact{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dark);text-decoration:none;}
+.cot-contact:hover .cot-contact-text{color:var(--captain);}
+.cot-contact-icon{width:40px;height:40px;border-radius:10px;background:var(--poppy);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.cot-contact-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mid);display:block;}
+.cot-contact-text{font-size:14px;font-weight:700;color:var(--dark);}
+.cot-right{}
+.cot-form{background:var(--white);border:1px solid var(--gray);border-radius:16px;padding:40px;}
+.cot-form-title{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:20px;color:var(--deep);margin-bottom:24px;}
+.cot-field{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
+.cot-field label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mid);}
+.cot-field input,.cot-field select,.cot-field textarea{padding:12px 14px;border:1.5px solid var(--gray);border-radius:8px;background:var(--cream);font-family:'Inter',sans-serif;font-size:14px;color:var(--dark);outline:none;transition:border-color .2s;}
+.cot-field input:focus,.cot-field select:focus,.cot-field textarea:focus{border-color:var(--captain);background:var(--white);}
+.cot-field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-color:var(--cream);padding-right:36px;cursor:pointer;}
+.cot-field textarea{min-height:90px;resize:vertical;line-height:1.6;}
+.cot-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.cot-submit{width:100%;background:var(--poppy);color:var(--white);border:none;border-radius:8px;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;letter-spacing:.5px;text-transform:uppercase;padding:16px;cursor:pointer;margin-top:8px;transition:background .2s;}
+.cot-submit:hover{background:var(--deep);}
+.cot-ok{display:none;text-align:center;padding:40px 20px;}
+.cot-ok-icon{font-size:40px;margin-bottom:12px;}
+.cot-ok h3{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:26px;color:var(--deep);margin-bottom:8px;}
+.cot-ok p{font-size:14px;color:var(--mid);}
+
+/* ── REDES ── */
+.redes{background:var(--deep);padding:72px 40px;}
+.redes-inner{max-width:900px;margin:0 auto;text-align:center;}
+.redes-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--baby);margin-bottom:12px;}
+.redes h2{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(30px,3.6vw,44px);color:var(--white);line-height:1;margin-bottom:14px;}
+.redes-sub{font-size:15px;color:var(--white);opacity:.7;margin-bottom:48px;font-weight:400;}
+.redes-grid{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.red-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;transition:all .2s;min-width:160px;}
+.red-card:hover{background:rgba(255,255,255,.12);border-color:var(--sunshine);transform:translateY(-3px);}
+.red-icon{font-size:28px;}
+.red-name{font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--white);}
+.red-handle{font-size:12px;color:var(--baby);}
+
+/* ── FOOTER ── */
+footer{background:var(--poppy);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+footer p{font-size:12px;color:var(--white);opacity:.85;letter-spacing:.5px;}
+footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  .lineas{grid-template-columns:1fr;padding:0 20px;}
+  .linea{min-height:400px;padding:48px 32px;}
+  .cotizacion{padding:64px 20px;}
+  .cotizacion-inner{grid-template-columns:1fr;gap:40px;}
+  .cot-grid2{grid-template-columns:1fr;}
+  .carousel{height:60vw;min-height:220px;max-height:400px;overflow:hidden;border-radius:16px;}
+  .c-track{width:100%;}
+  .c-slide{min-width:100%;width:100%;}
+  .c-slide img{width:100%;height:100%;object-fit:cover;}
+  .c-arrow{display:none;}
+  .hero-claim{padding:56px 24px;}
+  .c-arrow{display:none;}
+  footer{flex-direction:column;text-align:center;}
+}
+</style>
+  <link rel="apple-touch-icon" href="/icon-web-180.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon-web-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon-web-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-web-192.png">
+  <link rel="manifest" href="/manifest.json">
+<script src="/js/bl-api.js" defer></script>
+<link rel="stylesheet" href="/css/nav.css">
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="nav-logo">
+    <a href="portada.html">
+      <img src="logo-bendito.png" alt="Bendito Lab">
+    </a>
+  </div>
+  <button class="nav-hamburger" id="nav-ham" onclick="toggleNav()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav-links" id="nav-links">
+    <a href="portada.html">Inicio</a>
+    <a href="dilo-bonito.html">Dilo Bonito</a>
+    <a href="bendito-lab.html">Bendito Lab</a>
+    <a href="colaboradores.html">Colaboradores</a>
+    <a href="portada.html#sec-cotizacion" onclick="closeMob()">Contacto</a>
+    <a href="/portal" class="nav-cta" onclick="closeMob()">Área cliente</a>
+  </nav>
+</header>
+
+<!-- CARRUSEL -->
+<div class="carousel" id="carousel" data-section="carrusel" style="background:#E2704A;">
+  <div class="c-track" id="c-track">
+    <div class="c-slide"><img src="images/carrusel-1.jpg" alt="Personalización en vivo" loading="eager" style="min-height:220px;"></div>
+    <div class="c-slide"><img src="images/carrusel-2.jpg" alt="Personalización" loading="lazy"></div>
+    <div class="c-slide"><img src="images/carrusel-3.jpg" alt="Neceser personalizado" loading="lazy"></div>
+    <div class="c-slide"><img src="images/carrusel-4.jpg" alt="Gorras personalizadas" loading="lazy"></div>
+    <div class="c-slide"><img src="images/carrusel-5.jpg" alt="Tote bags" loading="lazy"></div>
+  </div>
+  <button class="c-arrow prev" onclick="cPrev()" aria-label="Anterior">&#8592;</button>
+  <button class="c-arrow next" onclick="cNext()" aria-label="Siguiente">&#8594;</button>
+  <div class="c-dots" id="c-dots"></div>
+</div>
+
+<!-- HERO CLAIM -->
+<section class="hero-claim" id="sec-hero" data-section="hero">
+  <div class="hero-eyebrow" id="p-eyebrow">Bendito Lab · Manzanares, Ciudad Real</div>
+  <h1 class="hero-h1" id="p-h1">ARTÍCULOS<br>PERSONALIZADOS<br><em id="p-h1-em">PARA EMPRESAS Y EVENTOS.</em></h1>
+  <p class="hero-sub" id="p-sub">Merchandising corporativo para empresas y personalización en directo para bodas, comuniones y eventos. Producción propia. Trato directo. Respuesta en 24h.</p>
+  <div class="hero-actions">
+    <a href="#sec-cotizacion" class="btn-primary">Solicitar cotización →</a>
+    <a href="dilo-bonito.html" class="btn-ghost">Ver servicios</a>
+  </div>
+</section>
+
+<!-- DOS LÍNEAS DE NEGOCIO -->
+<div class="lineas" id="sec-lineas" data-section="lineas">
+
+  <!-- DILO BONITO -->
+  <div class="linea linea-db">
+    <div>
+      <div class="linea-tag" id="p-db-tag">Para bodas, comuniones y eventos</div>
+      <div class="linea-title" id="p-db-title">DILO<br>BONITO.</div>
+      <p class="linea-desc" id="p-db-desc">Llevamos nuestro taller a tu evento. Cada invitado personaliza su artículo en el momento y se lo lleva ese mismo día.</p>
+      <div class="linea-pills">
+        <span class="pill">Bodas</span>
+        <span class="pill">Comuniones</span>
+        <span class="pill">Corporativo</span>
+        <span class="pill">Cumpleaños</span>
+      </div>
+    </div>
+    <a href="dilo-bonito.html" class="linea-cta" id="p-db-cta">Ver el servicio →</a>
+    <div class="linea-num">01</div>
+  </div>
+
+  <!-- BENDITO LAB -->
+  <div class="linea linea-bl">
+    <div>
+      <div class="linea-tag" id="p-bl-tag">Para empresas y negocios</div>
+      <div class="linea-title" id="p-bl-title">BENDITO<br>LAB.</div>
+      <p class="linea-desc" id="p-bl-desc">Camisetas, gorras, tote bags y regalos de empresa con tu logo. Desde 10 unidades, diseño incluido y entrega en 7–10 días hábiles.</p>
+      <div class="linea-pills">
+        <span class="pill">Regalos corporativos</span>
+        <span class="pill">Merchandising</span>
+        <span class="pill">Uniformes</span>
+      </div>
+    </div>
+    <a href="bendito-lab.html" class="linea-cta" id="p-bl-cta">Ver catálogo →</a>
+    <div class="linea-num">02</div>
+  </div>
+
+</div>
+
+<!-- COTIZACIÓN -->
+<section class="cotizacion" id="sec-cotizacion" data-section="cotizacion">
+  <div class="cotizacion-inner">
+    <div class="cot-left">
+      <div class="eyebrow">Sin compromiso</div>
+      <h2>SOLICITA TU<br>COTIZACIÓN</h2>
+      <p>Dinos qué necesitas — evento, empresa o las dos cosas — y te enviamos una propuesta cerrada en menos de 24 horas. Sin compromiso, sin formularios interminables.</p>
+      <div class="cot-contacts">
+        <a href="tel:647444308" class="cot-contact">
+          <div class="cot-contact-icon">📞</div>
+          <div>
+            <span class="cot-contact-label">Teléfono</span>
+            <span class="cot-contact-text">647 444 308</span>
+          </div>
+        </a>
+        <a href="mailto:contacto@benditolab.com" class="cot-contact">
+          <div class="cot-contact-icon">✉️</div>
+          <div>
+            <span class="cot-contact-label">Email</span>
+            <span class="cot-contact-text">contacto@benditolab.com</span>
+          </div>
+        </a>
+        <a href="https://instagram.com/bendito_lab" target="_blank" class="cot-contact">
+          <div class="cot-contact-icon">📸</div>
+          <div>
+            <span class="cot-contact-label">Instagram</span>
+            <span class="cot-contact-text">@bendito_lab</span>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="cot-right">
+      <div class="cot-form" id="cot-form">
+        <div class="cot-form-title" id="p-cot-title">Cuéntanos qué necesitas</div>
+        <div class="cot-grid2">
+          <div class="cot-field">
+            <label>Nombre *</label>
+            <input type="text" id="f-nombre" placeholder="Tu nombre">
+          </div>
+          <div class="cot-field">
+            <label>Teléfono *</label>
+            <input type="tel" id="f-tel" placeholder="6XX XXX XXX">
+          </div>
+        </div>
+        <div class="cot-field">
+          <label>Email *</label>
+          <input type="email" id="f-email" placeholder="tu@email.com">
+        </div>
+        <div class="cot-field">
+          <label>Tipo de servicio</label>
+          <select id="f-tipo">
+            <option value="">— Selecciona —</option>
+            <option>Dilo Bonito · Evento personalizado</option>
+            <option>Bendito Lab · Artículos para empresa</option>
+            <option>Los dos</option>
+          </select>
+        </div>
+        <div class="cot-field">
+          <label>Cuéntanos más</label>
+          <textarea id="f-msg" placeholder="Tipo de evento o proyecto, fecha aproximada, número de personas o unidades, productos que te interesan..."></textarea>
+        </div>
+        <button class="cot-submit" onclick="enviarCotizacion()">ENVIAR SOLICITUD →</button>
+      </div>
+      <div class="cot-ok" id="cot-ok">
+        <div class="cot-ok-icon">✓</div>
+        <h3>¡Solicitud recibida!</h3>
+        <p>Te respondemos en menos de 24 horas con una propuesta personalizada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REDES SOCIALES -->
+<section class="redes" id="sec-redes" data-section="redes">
+  <div class="redes-inner">
+    <div class="redes-eyebrow">Síguenos</div>
+    <h2>SÍGUENOS<br>EN REDES</h2>
+    <p class="redes-sub" id="p-redes-sub">Publicamos trabajos reales: eventos, pedidos B2B y el proceso detrás de cada personalización.</p>
+    <div class="redes-grid">
+      <a href="https://instagram.com/bendito_lab" target="_blank" class="red-card" id="red-ig1">
+        <span class="red-icon">📸</span>
+        <span class="red-name">Instagram</span>
+        <span class="red-handle">@bendito_lab</span>
+      </a>
+      <a href="https://instagram.com/dilobonitopersonalizados" target="_blank" class="red-card" id="red-ig2">
+        <span class="red-icon">✨</span>
+        <span class="red-name">Instagram</span>
+        <span class="red-handle">@dilobonitopersonalizados</span>
+      </a>
+      <a href="https://tiktok.com/@bendito_lab" target="_blank" class="red-card" id="red-tiktok">
+        <span class="red-icon">🎵</span>
+        <span class="red-name">TikTok</span>
+        <span class="red-handle">@bendito_lab</span>
+      </a>
+      <a href="https://wa.me/34647444308" target="_blank" class="red-card" id="red-wa">
+        <span class="red-icon">💬</span>
+        <span class="red-name">WhatsApp</span>
+        <span class="red-handle">647 444 308</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Bendito Lab · Ciudad Real · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
+  <p><a href="dilo-bonito.html">Dilo Bonito</a> · <a href="bendito-lab.html">Bendito Lab</a> · <a href="colaboradores.html">Colaboradores</a> · <a href="faq.html">F.A.Q.</a></p>
+  <p>
+    <a href="#" onclick="abrirModal('aviso');return false;">Aviso Legal</a> ·
+    <a href="#" onclick="abrirModal('privacidad');return false;">Privacidad</a> ·
+    <a href="#" onclick="abrirModal('cookies');return false;">Cookies</a>
+  </p>
+</footer>
+
+<script>
+// ── CARRUSEL ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+(function(){
+  var track = document.getElementById('c-track');
+  var dotsEl = document.getElementById('c-dots');
+  var slides = track.children;
+  var n = slides.length;
+  var cur = 0;
+  var timer;
+
+  // Crear dots
+  for(var i=0;i<n;i++){
+    var d = document.createElement('button');
+    d.className = 'c-dot' + (i===0?' on':'');
+    d.setAttribute('data-i', i);
+    d.onclick = (function(idx){ return function(){ clearInterval(timer); go(idx); start(); }; })(i);
+    dotsEl.appendChild(d);
+  }
+
+  function go(idx){
+    cur = (idx+n)%n;
+    track.style.transform = 'translateX(-'+cur*100+'%)';
+    document.querySelectorAll('.c-dot').forEach(function(d,j){ d.classList.toggle('on',j===cur); });
+  }
+  window.cPrev = function(){ clearInterval(timer); go(cur-1); start(); };
+  window.cNext = function(){ clearInterval(timer); go(cur+1); start(); };
+  function start(){ timer = setInterval(function(){ go(cur+1); }, 4500); }
+
+  // Swipe
+  var sx=0;
+  var el=document.getElementById('carousel');
+  el.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
+  el.addEventListener('touchend',function(e){
+    var dx=sx-e.changedTouches[0].clientX;
+    if(Math.abs(dx)>50){ dx>0?cNext():cPrev(); }
+  },{passive:true});
+
+  start();
+})();
+}); // DOMContentLoaded
+
+// ── NAV MOBILE ────────────────────────────────────────────
+function toggleNav(){
+  var isOpen=document.body.classList.contains('nav-open');
+  if(isOpen){closeMob();}else{
+    document.getElementById('nav').classList.add('mob-open');
+    document.getElementById('nav-ham').classList.add('open');
+    document.body.classList.add('nav-open');
+    document.body.style.overflow='hidden';
+  }
+}
+function closeMob(){
+  document.getElementById('nav').classList.remove('mob-open');
+  document.getElementById('nav-ham').classList.remove('open');
+  document.body.classList.remove('nav-open');
+  document.body.style.overflow='';
+}
+document.querySelectorAll('.nav-links a').forEach(function(a){a.addEventListener('click',closeMob);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMob();});
+
+
+// ── FORMULARIO COTIZACIÓN ─────────────────────────────────
+async function enviarCotizacion(){
+  var nombre = document.getElementById('f-nombre').value.trim();
+  var tel    = document.getElementById('f-tel').value.trim();
+  var email  = document.getElementById('f-email').value.trim();
+  var tipo   = document.getElementById('f-tipo').value;
+  var msg    = document.getElementById('f-msg').value.trim();
+  if(!nombre||!tel||!email){ alert('Por favor rellena nombre, teléfono y email.'); return; }
+  var btn = document.querySelector('.cot-submit');
+  btn.disabled=true; btn.textContent='Enviando...';
+  try{
+    var r = await fetch('/api/contact',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'solicitud',data:{nombre,tel,email,servicio:tipo,msg}})
+    });
+    var d = await r.json();
+    if(!d.ok) throw new Error(d.error||'Error');
+    document.getElementById('cot-form').style.display='none';
+    document.getElementById('cot-ok').style.display='block';
+  }catch(e){
+    btn.disabled=false; btn.textContent='ENVIAR SOLICITUD →';
+    alert('Error al enviar. Escríbenos directamente a contacto@benditolab.com');
+  }
+}
+async function enviarCotizacion_legacy(){
+  var nombre = document.getElementById('f-nombre').value.trim();
+  var tel    = document.getElementById('f-tel').value.trim();
+  var email  = document.getElementById('f-email').value.trim();
+  var tipo   = document.getElementById('f-tipo').value;
+  var msg    = document.getElementById('f-msg').value.trim();
+
+  if(!nombre||!tel||!email){
+    alert('Por favor rellena nombre, teléfono y email.');
+    return;
+  }
+
+  var btn = document.querySelector('.cot-submit');
+  btn.disabled=true; btn.textContent='Enviando...';
+
+  var htmlEmail = [
+    '<div style="font-family:Georgia,serif;max-width:480px;margin:0 auto;color:#17233F;">',
+    '<div style="background:#17233F;padding:24px 32px;"><div style="font-size:11px;letter-spacing:3px;color:#E8C24A;">NUEVA SOLICITUD · PORTADA WEB</div></div>',
+    '<div style="padding:32px;"><table style="width:100%;border-collapse:collapse;font-size:14px;">',
+    '<tr><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#5A6470;width:35%;">Nombre</td><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;font-weight:700;color:#17233F;">' + nombre + '</td></tr>',
+    '<tr><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#5A6470;">Teléfono</td><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#17233F;">' + tel + '</td></tr>',
+    '<tr><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#5A6470;">Email</td><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#17233F;">' + email + '</td></tr>',
+    '<tr><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#5A6470;">Servicio</td><td style="padding:8px 0;border-bottom:1px solid #F4F1E6;color:#17233F;">' + tipo + '</td></tr>',
+    msg ? '<tr><td style="padding:8px 0;color:#5A6470;vertical-align:top;">Mensaje</td><td style="padding:8px 0;color:#17233F;">' + msg + '</td></tr>' : '',
+    '</table></div></div>'
+  ].join('');
+
+}
+</script>
+
+
+
+<script>
+// Cargar colores personalizados desde Sheets (no bloqueante)
+setTimeout(async function() {
+  try {
+    var r = await fetch('/api/proxy?scope=web&web=portada&t=' + Date.now());
+    var d = await r.json();
+    if (!d.ok || !d.data) return;
+    var data = d.data;
+    var map = {'colores.cream':'--cream','colores.deep':'--deep','colores.sunshine':'--sunshine','colores.poppy':'--poppy'};
+    var root = document.documentElement;
+    var changed = false;
+    Object.keys(map).forEach(function(k) {
+      if (data[k] && data[k].startsWith('#')) {
+        root.style.setProperty(map[k], data[k]);
+        changed = true;
+      }
+    });
+  } catch(e) { /* sin conexión o error — usar colores por defecto */ }
+}, 200);
+</script>
+
+
+<!-- ====== BANNER COOKIES ====== -->
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#fff;padding:16px 24px;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 12px rgba(0,0,0,0.3);align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <span style="flex:1;min-width:200px;">
+    🍪 Usamos cookies propias y de Google Analytics para mejorar tu experiencia.
+    <a href="#" onclick="abrirModal('privacidad');return false;" style="color:#E8C24A;text-decoration:underline;">Privacidad</a> ·
+    <a href="#" onclick="abrirModal('cookies');return false;" style="color:#E8C24A;text-decoration:underline;">Cookies</a>
+  </span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="rechazarCookies()" style="background:transparent;border:1px solid #E8C24A;color:#E8C24A;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;">Rechazar</button>
+    <button onclick="aceptarCookies()" style="background:#E8C24A;border:none;color:#17233F;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">Aceptar</button>
+  </div>
+</div>
+
+<!-- ====== MODAL LEGAL ====== -->
+<div id="modal-legal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;">
+  <div style="background:#fff;max-width:760px;margin:0 auto;border-radius:12px;padding:40px;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222;position:relative;">
+    <button onclick="cerrarModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;">✕</button>
+    <div id="modal-contenido"></div>
+  </div>
+</div>
+
+<script>
+var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso Legal</h2>
+<ul>
+<li><strong>Titular:</strong> Silvia G. M. · NIF: 05931103-R</li>
+<li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares, Ciudad Real</li>
+<li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+<li><strong>Actividad:</strong> Personalización y merchandising (Bendito Lab · Dilo Bonito)</li>
+</ul>
+<p>Todos los contenidos del sitio son propiedad de la titular o de terceros autorizados. Queda prohibida su reproducción sin autorización escrita. Legislación española aplicable — Juzgados de Manzanares, Ciudad Real.</p>`;
+
+var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Privacidad</h2>
+<p><strong>Responsable:</strong> Silvia G. M. · NIF 05931103-R · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
+<p><strong>Datos recabados:</strong> A través del formulario de contacto: nombre, email, teléfono (opcional) y mensaje. Finalidad: gestionar tu consulta o relación comercial.</p>
+<p><strong>Base legal:</strong> Consentimiento (art. 6.1.a RGPD) y ejecución de contrato (art. 6.1.b RGPD).</p>
+<p><strong>Conservación:</strong> Durante el tiempo necesario y los plazos legales (hasta 5 años).</p>
+<p><strong>Terceros:</strong> Google Analytics (Google LLC, adherida al Data Privacy Framework UE-EE.UU.).</p>
+<p><strong>Tus derechos:</strong> Acceso, rectificación, supresión, oposición, limitación y portabilidad. Escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a> o reclama ante la <a href="https://www.aepd.es" target="_blank">AEPD</a>.</p>`;
+
+var textoCookies = `<h2 style="color:#17233F;margin-top:0">Política de Cookies</h2>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<tr style="background:#f5f5f5;"><th style="padding:8px;border:1px solid #ddd;text-align:left;">Cookie</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Tipo</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Finalidad</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Duración</th></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">bl_cookie_consent</td><td style="padding:8px;border:1px solid #ddd;">Técnica propia</td><td style="padding:8px;border:1px solid #ddd;">Guardar tu preferencia</td><td style="padding:8px;border:1px solid #ddd;">1 año</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">_ga, _gid, _gat</td><td style="padding:8px;border:1px solid #ddd;">Analítica (Google)</td><td style="padding:8px;border:1px solid #ddd;">Análisis anónimo del tráfico</td><td style="padding:8px;border:1px solid #ddd;">Hasta 2 años</td></tr>
+</table>
+<p style="margin-top:16px;">Puedes rechazar o retirar el consentimiento en cualquier momento. Desactivar Analytics: <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">tools.google.com/dlpage/gaoptout</a></p>`;
+
+function abrirModal(tipo) {
+  document.getElementById('modal-contenido').innerHTML = tipo==='aviso'?textoAviso:tipo==='privacidad'?textoPrivacidad:textoCookies;
+  document.getElementById('modal-legal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal() {
+  document.getElementById('modal-legal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('modal-legal').addEventListener('click', function(e){ if(e.target===this) cerrarModal(); });
+
+function aceptarCookies() {
+  localStorage.setItem('bl_cookie_consent','accepted');
+  document.getElementById('cookie-banner').style.display = 'none';
+  activarAnalytics();
+}
+function rechazarCookies() {
+  localStorage.setItem('bl_cookie_consent','rejected');
+  document.getElementById('cookie-banner').style.display = 'none';
+}
+function activarAnalytics() {
+  if(window._gaActivado) return; window._gaActivado=true;
+  var s=document.createElement('script'); s.src='https://www.googletagmanager.com/gtag/js?id=G-QHM1133FL4'; s.async=true; document.head.appendChild(s);
+  window.dataLayer=window.dataLayer||[]; function gtag(){dataLayer.push(arguments);} window.gtag=gtag;
+  gtag('js',new Date()); gtag('config','G-QHM1133FL4');
+}
+window.addEventListener('DOMContentLoaded', function(){
+  var consent = localStorage.getItem('bl_cookie_consent');
+  if (!consent) { var b=document.getElementById('cookie-banner'); b.style.display='flex'; }
+  if (consent==='accepted') activarAnalytics();
+});
+</script>
+
+</body>
+</html>
+

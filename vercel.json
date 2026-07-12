@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/portada.html"
+    },
+    {
+      "src": "/colaboradores",
+      "dest": "/colaboradores.html"
+    },
+    {
+      "src": "/dilo-bonito",
+      "dest": "/dilo-bonito.html"
+    },
+    {
+      "src": "/bendito-lab",
+      "dest": "/bendito-lab.html"
+    },
+    {
+      "src": "/unete",
+      "dest": "/unete.html"
+    },
+    {
+      "src": "/faq",
+      "dest": "/faq.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/produccion",
+      "dest": "/produccion.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "outputDirectory": "."
+}
