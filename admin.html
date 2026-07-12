@@ -934,7 +934,7 @@ function renderSecColorList() {
 
     // Título
     var title = document.createElement('div');
-    title.style.cssText = 'font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:13px;color:#17233F;margin-bottom:10px;';
+    title.style.cssText = 'font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:800;font-size:13px;color:#17233F;margin-bottom:10px;';
     title.textContent = s.name;
     wrap.appendChild(title);
 
@@ -1123,16 +1123,41 @@ function toggleSidebar(){
   ov.style.display = open ? 'block' : 'none';
 }
 
-function checkLogin(){
-  if(document.getElementById('pwd').value===PASS){
-    document.getElementById('login').style.display='none';
-    document.getElementById('app').style.display='flex';
-    init();
-  }else{
-    document.getElementById('login-err').style.display='block';
-    document.getElementById('pwd').value='';
+async function checkLogin(){
+  var pwd=document.getElementById('pwd').value;
+  var btn=document.querySelector('.login-btn');
+  var err=document.getElementById('login-err');
+  err.style.display='none';
+  if(btn){btn.disabled=true;btn.textContent='Entrando…';}
+  try{
+    var ok=await BL_API.login(pwd);
+    if(ok){
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='flex';
+      init();
+    }else{
+      err.textContent='Contraseña incorrecta';
+      err.style.display='block';
+      document.getElementById('pwd').value='';
+    }
+  }catch(e){
+    err.textContent='Error de conexión: '+e.message;
+    err.style.display='block';
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='ENTRAR →';}
   }
 }
+
+// Si ya hay una sesión válida (token guardado), saltar la pantalla de login.
+(function(){
+  if(BL_API.getToken()){
+    document.addEventListener('DOMContentLoaded',function(){
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='flex';
+      init();
+    });
+  }
+})();
 
 // ══ NAV ════════════════════════════════════════════════════
 function show(id,el){
@@ -1405,7 +1430,7 @@ function renderImages(grpId,imgs){
   if(!c)return;
   c.innerHTML='';
   imgs.forEach(function(img,i){
-    var url='/'+img.path;
+    var url=IMAGE_CONTENT[img.path]||('/'+img.path);
     var uid=img.key.replace(/[^a-z0-9]/gi,'-');
     var div=document.createElement('div');
     div.className='img-card';
@@ -1419,7 +1444,7 @@ function renderImages(grpId,imgs){
         '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+
           '<label class="img-btn" for="file-'+uid+'">📤 Cambiar</label>'+
           '<input type="file" id="file-'+uid+'" accept="image/*" onchange="uploadImg(this,\''+img.path+'\',\''+uid+'\')">'+
-          '<button onclick="eliminarImg(\''+grpId+'\','+i+',\''+img.path+'\',\''+uid+'\')" style="background:#FFEBEE;color:#C0392B;border:1px solid #FFCDD2;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;">🗑 Quitar</button>'+
+          '<button onclick="eliminarImg(\''+grpId+'\','+i+',\''+img.path+'\',\''+uid+'\')" style="background:#FFEBEE;color:#C0392B;border:1px solid #FFCDD2;padding:6px 12px;font-size:11px;cursor:pointer;font-family:\'Inter\',sans-serif;font-weight:700;">🗑 Quitar</button>'+
         '</div>'+
         '<div class="prog-wrap" id="prog-'+uid+'"><div class="prog-bar" id="pb-'+uid+'"></div></div>'+
         '<div class="img-status" id="st-'+uid+'"></div>'+
@@ -1431,7 +1456,7 @@ function renderImages(grpId,imgs){
   addDiv.style.cssText='border:2px dashed #E3DFCF;padding:20px;text-align:center;margin-top:8px;background:#FAFAF8;';
   addDiv.innerHTML=
     '<p style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:10px;">Añadir nueva foto</p>'+
-    '<label for="file-add-'+grpId+'" style="background:#17233F;color:#E8C24A;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:11px;letter-spacing:1px;padding:8px 18px;cursor:pointer;display:inline-block;">+ AÑADIR FOTO</label>'+
+    '<label for="file-add-'+grpId+'" style="background:#17233F;color:#E8C24A;font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:11px;letter-spacing:1px;padding:8px 18px;cursor:pointer;display:inline-block;">+ AÑADIR FOTO</label>'+
     '<input type="file" id="file-add-'+grpId+'" accept="image/*" style="display:none" onchange="anadirImg(this,\''+grpId+'\')">';
   c.appendChild(addDiv);
 }
@@ -1453,28 +1478,61 @@ function verImgGrande(url){
   o.style.display='flex';
 }
 
+// ══ IMÁGENES — backend real (Vercel Blob vía /api/upload-image) ═══════════
+
+// Redimensiona/comprime en el navegador antes de subir: evita fotos de
+// móvil de varios MB y se mantiene bajo el límite de 4.5MB de body que
+// impone Vercel a las funciones serverless.
+async function resizeImageToDataUrl(file,maxDim,quality){
+  maxDim=maxDim||1600;quality=quality||0.82;
+  var bitmap=await createImageBitmap(file);
+  try{
+    var scale=Math.min(1,maxDim/Math.max(bitmap.width,bitmap.height));
+    var w=Math.max(1,Math.round(bitmap.width*scale));
+    var h=Math.max(1,Math.round(bitmap.height*scale));
+    var canvas=document.createElement('canvas');
+    canvas.width=w;canvas.height=h;
+    canvas.getContext('2d').drawImage(bitmap,0,0,w,h);
+    var q=quality;
+    var dataUrl=canvas.toDataURL('image/webp',q);
+    // Si aun así pesa demasiado, bajar calidad progresivamente.
+    while(dataUrl.length>3.6*1024*1024 && q>0.35){
+      q-=0.1;
+      dataUrl=canvas.toDataURL('image/webp',q);
+    }
+    return dataUrl;
+  }finally{
+    if(bitmap.close)bitmap.close();
+  }
+}
+
+async function subirImagenSlot(slotPath,file){
+  var dataUrl=await resizeImageToDataUrl(file);
+  var r=await fetch('/api/upload-image',{
+    method:'POST',
+    headers:BL_API.authHeaders(),
+    body:JSON.stringify({path:slotPath,dataUrl:dataUrl})
+  });
+  var d=await r.json();
+  if(!d.ok)throw new Error(d.error||'Error al subir la imagen');
+  return d.url;
+}
+
 async function eliminarImg(grpId,idx,filePath,uid){
-  if(!confirm('¿Eliminar esta imagen de la web?\n\nSe borrará del servidor permanentemente.'))return;
-  var token=localStorage.getItem('bl-gh-token');
-  if(!token){alert('Añade el token de GitHub en Ajustes.');return;}
-  var ghUser=document.getElementById('gh-user').value||'contactobenditolab-ship-it';
-  var ghRepo=document.getElementById('gh-repo').value||'dossier-dilo-bonito';
+  if(!confirm('¿Quitar esta foto?\n\nSe borrará la sustitución subida desde el admin y volverá a mostrarse la foto original del sitio.'))return;
   var st=document.getElementById('st-'+uid);
   if(st){st.style.display='block';st.style.color='#888';st.textContent='Eliminando...';}
   try{
-    var r=await fetch('https://api.github.com/repos/'+ghUser+'/'+ghRepo+'/contents/'+filePath,
-      {headers:{'Authorization':'token '+token,'User-Agent':'BenditoAdmin'}});
-    if(!r.ok)throw new Error('Archivo no encontrado en el servidor');
-    var fd=await r.json();
-    var del=await fetch('https://api.github.com/repos/'+ghUser+'/'+ghRepo+'/contents/'+filePath,{
-      method:'DELETE',
-      headers:{'Authorization':'token '+token,'Content-Type':'application/json','User-Agent':'BenditoAdmin'},
-      body:JSON.stringify({message:'Admin: eliminar '+filePath,sha:fd.sha})
+    var r=await fetch('/api/delete-image',{
+      method:'POST',
+      headers:BL_API.authHeaders(),
+      body:JSON.stringify({path:filePath})
     });
-    if(!del.ok)throw new Error('Error al eliminar en GitHub');
-    IMG_GROUPS[grpId].splice(idx,1);
+    var d=await r.json();
+    if(!d.ok)throw new Error(d.error||'Error al eliminar');
+    delete IMAGE_CONTENT[filePath];
     renderImages(grpId,IMG_GROUPS[grpId]);
-    showToast('Imagen eliminada ✓');
+    showToast('Imagen restaurada a la original ✓');
   }catch(err){
     if(st){st.style.color='#C0392B';st.textContent='Error: '+err.message;}
     showToast('Error: '+err.message);
@@ -1484,67 +1542,42 @@ async function eliminarImg(grpId,idx,filePath,uid){
 async function anadirImg(input,grpId){
   var file=input.files[0];
   if(!file)return;
-  var token=localStorage.getItem('bl-gh-token');
-  if(!token){alert('Añade el token de GitHub en Ajustes.');return;}
-  var ghUser=document.getElementById('gh-user').value||'contactobenditolab-ship-it';
-  var ghRepo=document.getElementById('gh-repo').value||'dossier-dilo-bonito';
-  var ext=file.name.split('.').pop().toLowerCase()||'jpg';
   var num=IMG_GROUPS[grpId]?IMG_GROUPS[grpId].length+1:1;
-  var newKey=grpId.replace(/_/g,'-')+'-extra-'+num+'-'+Date.now()+'.'+ext;
-  var folder=(grpId==='logos')?'':'images/';
-  var newPath=folder+newKey;
+  var newKey=grpId.replace(/_/g,'-')+'-extra-'+num+'-'+Date.now();
+  var newPath=(grpId==='logos'?'':'images/')+newKey;
   var newName=grpId.replace(/_/g,' ')+' — Foto '+num;
   showToast('Subiendo '+file.name+'...');
-  var reader=new FileReader();
-  reader.onload=async function(e){
-    var b64=e.target.result.split(',')[1];
-    try{
-      var put=await fetch('https://api.github.com/repos/'+ghUser+'/'+ghRepo+'/contents/'+newPath,{
-        method:'PUT',
-        headers:{'Authorization':'token '+token,'Content-Type':'application/json','User-Agent':'BenditoAdmin'},
-        body:JSON.stringify({message:'Admin: nueva imagen '+newPath,content:b64})
-      });
-      if(!put.ok)throw new Error((await put.json()).message||put.status);
-      if(!IMG_GROUPS[grpId])IMG_GROUPS[grpId]=[];
-      IMG_GROUPS[grpId].push({key:newKey,path:newPath,name:newName});
-      renderImages(grpId,IMG_GROUPS[grpId]);
-      showToast('✓ Imagen añadida. Visible en ~30s');
-    }catch(err){showToast('Error: '+err.message);}
-  };
-  reader.readAsDataURL(file);
+  try{
+    var url=await subirImagenSlot(newPath,file);
+    IMAGE_CONTENT[newPath]=url;
+    if(!IMG_GROUPS[grpId])IMG_GROUPS[grpId]=[];
+    IMG_GROUPS[grpId].push({key:newKey,path:newPath,name:newName});
+    renderImages(grpId,IMG_GROUPS[grpId]);
+    showToast('✓ Imagen añadida');
+  }catch(err){showToast('Error: '+err.message);}
   input.value='';
 }
 
 async function uploadImg(input,filePath,uid){
   var file=input.files[0];
   if(!file)return;
-  var token=localStorage.getItem('bl-gh-token');
-  if(!token){alert('Añade el token de GitHub en Ajustes.');return;}
-  var ghUser=document.getElementById('gh-user').value||'contactobenditolab-ship-it';
-  var ghRepo=document.getElementById('gh-repo').value||'dossier-dilo-bonito';
   var st=document.getElementById('st-'+uid);
   var prog=document.getElementById('prog-'+uid);
   var pb=document.getElementById('pb-'+uid);
-  st.style.display='block';st.style.color='#888';st.textContent='Leyendo...';
-  prog.style.display='block';pb.style.width='15%';
-  var reader=new FileReader();
-  reader.onload=async function(e){
-    var b64=e.target.result.split(',')[1];
-    pb.style.width='40%';st.textContent='Conectando con GitHub...';
-    var sha=null;
-    try{var r=await fetch('https://api.github.com/repos/'+ghUser+'/'+ghRepo+'/contents/'+filePath,{headers:{'Authorization':'token '+token,'User-Agent':'BenditoAdmin'}});if(r.ok)sha=(await r.json()).sha;}catch(e){}
-    pb.style.width='65%';st.textContent='Subiendo...';
-    var body={message:'Admin: '+filePath,content:b64};
-    if(sha)body.sha=sha;
-    try{
-      var put=await fetch('https://api.github.com/repos/'+ghUser+'/'+ghRepo+'/contents/'+filePath,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json','User-Agent':'BenditoAdmin'},body:JSON.stringify(body)});
-      pb.style.width='100%';
-      if(put.ok){st.style.color='#27AE60';st.textContent='✓ Subida — visible en ~30s';setTimeout(function(){var img=document.querySelector('#prev-'+uid+' img');if(img)img.src='/'+filePath+'?t='+Date.now();},8000);}
-      else{throw new Error((await put.json()).message||put.status);}
-    }catch(err){st.style.color='#C0392B';st.textContent='✗ Error: '+err.message;}
-    setTimeout(function(){prog.style.display='none';pb.style.width='0%';},3000);
-  };
-  reader.readAsDataURL(file);
+  st.style.display='block';st.style.color='#888';st.textContent='Procesando imagen...';
+  prog.style.display='block';pb.style.width='30%';
+  try{
+    pb.style.width='60%';st.textContent='Subiendo...';
+    var url=await subirImagenSlot(filePath,file);
+    IMAGE_CONTENT[filePath]=url;
+    pb.style.width='100%';
+    st.style.color='#27AE60';st.textContent='✓ Subida';
+    var img=document.querySelector('#prev-'+uid+' img');
+    if(img)img.src=url+'?t='+Date.now();
+  }catch(err){
+    st.style.color='#C0392B';st.textContent='✗ Error: '+err.message;
+  }
+  setTimeout(function(){prog.style.display='none';pb.style.width='0%';},3000);
 }
 
 // ══ CONTENIDO WEB ═══════════════════════════════════════════
@@ -1727,10 +1760,21 @@ function saveToken(){var v=document.getElementById('gh-token').value;if(v&&!v.st
 function saveToken2(){var v=document.getElementById('gh-token-2').value;if(v&&!v.startsWith('••')){localStorage.setItem('bl-gh-token',v);document.getElementById('gh-token-2').value='••••••••••••';var ok=document.getElementById('tok-ok-2');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
 
 // ══ INIT ═════════════════════════════════════════════════════
+var IMAGE_CONTENT = {}; // slot path -> URL en Vercel Blob (sustituciones subidas desde el admin)
+
+function loadImageContent(){
+  return fetch('/api/content',{cache:'no-store'})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){IMAGE_CONTENT=(d&&d.images)||{};})
+    .catch(function(){IMAGE_CONTENT={};});
+}
+
 function init(){
   loadAll();
-  // Imágenes
-  Object.keys(IMG_GROUPS).forEach(function(g){renderImages(g,IMG_GROUPS[g]);});
+  // Imágenes — primero el mapa de sustituciones reales, luego renderizar
+  loadImageContent().then(function(){
+    Object.keys(IMG_GROUPS).forEach(function(g){renderImages(g,IMG_GROUPS[g]);});
+  });
   // Colores
   renderColorGrid();
   renderSecColorList();
@@ -1856,7 +1900,7 @@ function renderCarruselDB() {
   var addDiv = document.createElement('div');
   addDiv.innerHTML =
     '<div style="border:2px dashed #E3DFCF;padding:16px;text-align:center;background:#FAFAF8;">' +
-      '<label for="file-add-db_carrusel" style="background:#17233F;color:#E8C24A;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:11px;letter-spacing:1px;padding:8px 18px;cursor:pointer;display:inline-block;">+ AÑADIR FOTO AL CARRUSEL</label>' +
+      '<label for="file-add-db_carrusel" style="background:#17233F;color:#E8C24A;font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:11px;letter-spacing:1px;padding:8px 18px;cursor:pointer;display:inline-block;">+ AÑADIR FOTO AL CARRUSEL</label>' +
       '<input type="file" id="file-add-db_carrusel" accept="image/*" style="display:none" data-grp="db_carrusel" onchange="anadirImgData(this)">' +
     '</div>';
   c.appendChild(addDiv);
@@ -1994,7 +2038,7 @@ function editarBanner(i) {
   modal.innerHTML =
     '<div style="background:#fff;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:32px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">' +
-        '<h3 style="font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;color:#17233F;margin:0;">Editar banner</h3>' +
+        '<h3 style="font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:20px;color:#17233F;margin:0;">Editar banner</h3>' +
         '<button onclick="closeBannerModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#aaa;">✕</button>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:14px;">' +
@@ -2020,8 +2064,8 @@ function editarBanner(i) {
         '<div><label style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;display:block;margin-bottom:4px;">Enlace del CTA</label>' +
           '<input id="bm-cta-url" value="' + (b.ctaUrl||'') + '" placeholder="Ej: #cotizador" style="width:100%;padding:10px;border:1.5px solid #E0DDD6;font-size:13px;box-sizing:border-box;"></div>' +
         '<div style="display:flex;gap:10px;margin-top:8px;">' +
-          '<button onclick="guardarBanner(' + i + ')" style="flex:1;background:#17233F;color:#E8C24A;border:none;padding:14px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:1px;cursor:pointer;">💾 GUARDAR</button>' +
-          '<button onclick="verCodigoBanner(' + i + ')" style="flex:1;background:#F4F1E6;color:#17233F;border:1.5px solid #17233F;padding:14px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:1px;cursor:pointer;">📋 VER CÓDIGO HTML</button>' +
+          '<button onclick="guardarBanner(' + i + ')" style="flex:1;background:#17233F;color:#E8C24A;border:none;padding:14px;font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:1px;cursor:pointer;">💾 GUARDAR</button>' +
+          '<button onclick="verCodigoBanner(' + i + ')" style="flex:1;background:#F4F1E6;color:#17233F;border:1.5px solid #17233F;padding:14px;font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:1px;cursor:pointer;">📋 VER CÓDIGO HTML</button>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -2075,8 +2119,8 @@ function verCodigoBanner(i) {
   var inner = '';
   if (b.texto) {
     inner += '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(0,0,0,0.35);padding:40px;">';
-    inner += '<h2 style="font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:clamp(32px,5vw,64px);color:#fff;letter-spacing:-1px;margin-bottom:24px;">' + b.texto + '</h2>';
-    if (b.cta) inner += '<a href="' + (b.ctaUrl||'#') + '" style="background:var(--sunshine);color:var(--deep);font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:15px;letter-spacing:1px;padding:18px 48px;text-decoration:none;display:inline-block;">' + b.cta + '</a>';
+    inner += '<h2 style="font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:clamp(32px,5vw,64px);color:#fff;letter-spacing:-1px;margin-bottom:24px;">' + b.texto + '</h2>';
+    if (b.cta) inner += '<a href="' + (b.ctaUrl||'#') + '" style="background:var(--sunshine);color:var(--deep);font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:15px;letter-spacing:1px;padding:18px 48px;text-decoration:none;display:inline-block;">' + b.cta + '</a>';
     inner += '</div>';
   }
   var html = '<section style="width:100%;height:' + (b.altura||400) + 'px;position:relative;overflow:hidden;background:var(--deep)' + bgImg + ';">' + inner + '</section>';
@@ -2084,12 +2128,12 @@ function verCodigoBanner(i) {
   modal.innerHTML =
     '<div style="background:#fff;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:32px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
-        '<h3 style="font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:18px;color:#17233F;margin:0;">Código HTML del banner</h3>' +
+        '<h3 style="font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:18px;color:#17233F;margin:0;">Código HTML del banner</h3>' +
         '<button onclick="closeBannerModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#aaa;">✕</button>' +
       '</div>' +
       '<p style="font-size:12px;color:#888;margin-bottom:12px;">Copia este código y pégalo en el HTML de la página <strong>' + (b.pagina||'') + '</strong> donde quieras que aparezca el banner.</p>' +
       '<textarea style="width:100%;height:220px;font-family:monospace;font-size:12px;padding:12px;border:1.5px solid #E0DDD6;background:#17233F;color:#7aff7a;resize:vertical;box-sizing:border-box;" readonly>' + html.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</textarea>' +
-      '<button onclick="copiarCodigoBanner()" style="width:100%;margin-top:12px;background:#17233F;color:#E8C24A;border:none;padding:14px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:1px;cursor:pointer;">📋 COPIAR CÓDIGO</button>' +
+      '<button onclick="copiarCodigoBanner()" style="width:100%;margin-top:12px;background:#17233F;color:#E8C24A;border:none;padding:14px;font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:1px;cursor:pointer;">📋 COPIAR CÓDIGO</button>' +
     '</div>';
   modal.style.display = 'flex';
 }
@@ -2490,8 +2534,8 @@ function renderPreciosPortal() {
             '<option value="desde"' + (p.tipo==='desde'?' selected':'') + '>Desde</option>' +
             '<option value="consultar"' + (p.tipo==='consultar'?' selected':'') + '>Consultar</option>' +
           '</select></div>' +
-          '<button onclick="guardarPrecioPortal('' + p.id + '')" style="background:#17233F;color:#E8C24A;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;width:100%;">Guardar</button>' +
-          '<button onclick="eliminarPrecioPortal('' + p.id + '')" style="background:none;border:1px solid #e5e7eb;border-radius:8px;padding:10px;cursor:pointer;color:#aaa;">✕</button>' +
+          '<button onclick="guardarPrecioPortal(\'' + p.id + '\')" style="background:#17233F;color:#E8C24A;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;width:100%;">Guardar</button>' +
+          '<button onclick="eliminarPrecioPortal(\'' + p.id + '\')" style="background:none;border:1px solid #e5e7eb;border-radius:8px;padding:10px;cursor:pointer;color:#aaa;">✕</button>' +
         '</div>';
       }).join('') +
     '</div>';
