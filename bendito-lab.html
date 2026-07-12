@@ -14,7 +14,6 @@
   <meta name="geo.region" content="ES-CR">
   <meta name="geo.placename" content="Manzanares, Ciudad Real">
   <link rel="canonical" href="https://www.benditolab.com/bendito-lab.html">
-  <!-- Open Graph -->
   <meta property="og:title" content="Bendito Lab · Merchandising y Regalos Corporativos para Empresas">
   <meta property="og:description" content="Personalización B2B para empresas. Uniformes corporativos, regalos de empresa, merchandising personalizado y artículos promocionales. Presupuesto sin compromiso.">
   <meta property="og:url" content="https://www.benditolab.com/bendito-lab.html">
@@ -22,437 +21,303 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_ES">
   <meta property="og:site_name" content="Bendito Lab">
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bendito Lab · Merchandising y Regalos Corporativos para Empresas">
   <meta name="twitter:description" content="Personalización B2B para empresas. Uniformes corporativos, regalos de empresa, merchandising personalizado y artículos promocionales. Presupuesto sin compromiso.">
   <meta name="twitter:image" content="https://www.benditolab.com/logo-bendito.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-    <link rel="stylesheet" href="styles.css">    
-  <style>
+:root{
+  --cream:#F4F1E6; --deep:#17233F; --captain:#2F8FEA; --baby:#93ACA7;
+  --sunshine:#E8C24A; --rose:#E3A29C; --poppy:#E2704A; --white:#FBF4E9;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--cream);font-family:'Inter',sans-serif;color:var(--deep);overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;}
+.navlink:hover{opacity:.7;}
 
-  
-  
-  .nav-item { position: relative; }
-  
-  
-  
-  .nav-item.open 
-  
-  .nav-item.open 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  @media (max-width: 768px) {
+.site-header{background:var(--baby);padding:32px 5vw 22px;}
+.header-tag{text-align:center;color:var(--white);font-weight:700;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;}
+.header-logo{margin-top:14px;display:flex;justify-content:center;}
+.header-logo img{height:64px;width:auto;display:block;}
+.site-nav{display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,36px);margin-top:24px;flex-wrap:wrap;}
+.site-nav a{font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--deep);}
+.site-nav a.pill{border:1px solid var(--deep);padding:9px 18px;border-radius:22px;}
+.nav-hamburger{display:none;}
 
+.intro{background:var(--rose);padding:56px 5vw;}
+.intro-wrap{max-width:1300px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.product-grid img{width:100%;height:150px;border-radius:8px;object-fit:cover;display:block;}
+.intro-copy{color:var(--white);text-align:center;}
+.intro-copy h1{font-weight:800;font-size:clamp(28px,3.6vw,40px);line-height:1.15;margin:0 0 24px;}
+.intro-copy p{font-size:16px;line-height:1.6;margin:0 0 18px;}
+.intro-copy p:last-child{margin-bottom:0;}
 
+.que-hacemos{background:var(--cream);padding:72px 5vw;}
+.que-hacemos h2{font-weight:800;font-size:clamp(32px,5vw,48px);margin:0 0 40px;max-width:1200px;margin-left:auto;margin-right:auto;}
+.qh-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.qh-card{background:var(--baby);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;}
+.qh-card-img{height:170px;position:relative;}
+.qh-card-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.qh-card-img span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;color:var(--white);font-weight:700;font-size:15px;background:rgba(23,35,63,.25);}
+.qh-card-body{padding:24px;flex:1;display:flex;flex-direction:column;}
+.qh-card-body p{margin:0 0 20px;font-size:14px;line-height:1.55;flex:1;text-align:center;}
+.qh-card-body a{background:var(--cream);font-weight:700;font-size:12px;padding:12px 20px;border-radius:20px;display:inline-block;margin:0 auto;}
+
+.bl-carrusel-wrap{background:var(--cream);padding:0 5vw 60px;}
+.bl-carrusel{max-width:1200px;margin:0 auto;position:relative;height:220px;border-radius:10px;overflow:hidden;background:var(--deep);}
+.bl-slide{position:absolute;inset:0;transition:opacity .8s ease;opacity:0;}
+.bl-slide.on{opacity:1;z-index:2;}
+.bl-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.bl-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3;}
+.bl-dots span{width:8px;height:8px;border-radius:50%;background:rgba(23,35,63,.25);}
+.bl-dots span.on{background:rgba(23,35,63,.85);}
+
+.por-que{background:var(--cream);padding:0 5vw 80px;}
+.por-que-wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;}
+.por-que h2{font-weight:800;font-size:clamp(28px,4vw,38px);margin:0 0 32px;}
+.por-que-item{margin-bottom:22px;}
+.por-que-item h3{margin:0 0 6px;font-size:16px;color:#3D5A9E;}
+.por-que-item p{margin:0;font-size:15px;line-height:1.5;}
+.rafa-img{height:100%;min-height:420px;border-radius:8px;overflow:hidden;}
+.rafa-img img{width:100%;height:100%;object-fit:cover;display:block;}
+
+.trabajo{background:#9AB791;padding:64px 5vw;}
+.trabajo-wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+.workshop-img{height:420px;border-radius:8px;overflow:hidden;}
+.workshop-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.trabajo h2{font-weight:800;font-size:clamp(28px,4vw,38px);margin:0 0 28px;}
+.trabajo-item{margin-bottom:18px;padding-bottom:18px;border-bottom:1px dashed rgba(23,35,63,.35);}
+.trabajo-item h3{margin:0 0 6px;font-size:15px;}
+.trabajo-item p{margin:0;font-size:14px;line-height:1.5;}
+
+footer{background:var(--poppy);}
+.footer-cta{max-width:1200px;margin:0 auto;padding:28px 5vw 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;}
+.footer-cta h2{color:var(--white);font-weight:800;font-size:clamp(32px,5vw,48px);margin:0;}
+.footer-cta-right{display:flex;align-items:center;gap:24px;}
+.btn-contacto{background:var(--captain);color:var(--white);font-weight:700;font-size:14px;padding:16px 32px;border-radius:8px;}
+.footer-socials{display:flex;gap:14px;}
+.footer-socials a{width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--deep);font-size:18px;}
+.footer-bottom{border-top:1px solid rgba(251,244,233,.25);max-width:1200px;margin:0 auto;padding:24px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-bottom-links{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.footer-bottom-links img{height:26px;width:26px;display:block;}
+.footer-bottom-links a{color:var(--white);font-weight:600;font-size:14px;}
+.footer-copy{color:var(--white);font-size:13px;}
+
+@media(max-width:900px){
+  .intro-wrap,.por-que-wrap,.trabajo-wrap{grid-template-columns:1fr;gap:32px;}
+  .qh-grid{grid-template-columns:1fr;}
+  .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
+  .site-nav a{font-size:20px;color:var(--white)!important;}
+  .nav-hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;position:absolute;top:28px;right:5vw;z-index:1001;}
+  .nav-hamburger span{display:block;width:22px;height:2px;background:var(--deep);}
+  .site-header{position:relative;}
+  body.nav-open .site-nav{display:flex;}
+  body.nav-open{overflow:hidden;}
+  .footer-cta,.footer-bottom{flex-direction:column;text-align:center;}
+  .footer-bottom-links{justify-content:center;}
+}
 </style>
-</style>
-
-<style>
-  :root {
-    --cream:#F4F1E6; --deep:#17233F; --captain:#2F8FEA; --baby:#93ACA7;
-    --sunshine:#E8C24A; --rose:#E3A29C; --poppy:#E2704A; --white:#FBF4E9;
-    --sand:#E3DFCF; --text-mid:#5A6470; --text-light:#8A96A0;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--deep); overflow-x:hidden; }
-
-  .hero { display:grid; grid-template-columns:55% 45%; min-height:calc(100vh - 118px); }
-  .hero-left { background:var(--deep); display:flex; flex-direction:column; justify-content:center; padding:80px 60px; }
-  .hero-tag { font-family:'Inter',sans-serif; font-weight:700; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--baby); margin-bottom:28px; }
-  .hero-title { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:900; font-size:clamp(52px,6vw,88px); line-height:0.88; color:var(--white); margin-bottom:32px; }
-  .hero-title .accent { color:var(--sunshine); }
-  .hero-sub { font-size:16px; line-height:1.8; color:rgba(168,200,232,0.8); max-width:420px; margin-bottom:48px; font-weight:300; }
-  .hero-cta { display:inline-flex; align-items:center; gap:12px; background:var(--sunshine); color:var(--deep); font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:16px; letter-spacing:1px; padding:18px 36px; text-decoration:none; width:fit-content; transition:all 0.2s; }
-  .hero-cta:hover { background:var(--poppy); color:white; }
-  .hero-right { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; overflow:hidden; }
-  .hero-img { overflow:hidden; position:relative; }
-  .hero-img img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s; }
-  .hero-img:hover img { transform:scale(1.04); }
-  .hero-img-label { position:absolute; bottom:12px; left:12px; font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:13px; letter-spacing:1px; color:white; background:rgba(30,58,95,0.7); padding:4px 10px; }
-  .hero-stat { background:var(--sunshine); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
-  .hero-stat-num { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:900; font-size:52px; color:var(--deep); line-height:1; }
-  .hero-stat-lbl { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--deep); }
-
-  section { padding:100px 0; }
-  .container { max-width:1200px; margin:0 auto; padding:0 40px; }
-  .s-label { font-family:'Inter',sans-serif; font-weight:700; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--captain); display:block; margin-bottom:20px; }
-  .s-title { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:900; font-size:clamp(40px,5vw,72px); line-height:0.9; color:var(--deep); margin-bottom:32px; }
-  .s-body { font-size:16px; line-height:1.85; color:var(--text-mid); max-width:600px; font-weight:300; margin-bottom:40px; }
-
-  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
-  .que-es-img { aspect-ratio:4/3; overflow:hidden; }
-  .que-es-img img { width:100%; height:100%; object-fit:cover; }
-
-  .cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:60px; }
-  .card { padding:40px 32px; }
-  .card:nth-child(1),.card:nth-child(3),.card:nth-child(5) { background:var(--white); }
-  .card:nth-child(2) { background:var(--sunshine); }
-  .card:nth-child(4) { background:var(--rose); }
-  .card:nth-child(6) { background:var(--baby); }
-  .card-icon { font-size:28px; margin-bottom:16px; display:block; }
-  .card-title { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:18px; color:var(--deep); margin-bottom:10px; }
-  .card-desc { font-size:13px; line-height:1.75; color:var(--text-mid); font-weight:300; }
-
-  .productos-section { background:var(--deep); }
-  .prod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:60px; }
-  .prod-card { background:rgba(255,255,255,0.06); padding:32px 24px; border-top:3px solid rgba(255,255,255,0.1); transition:all 0.3s; }
-  .prod-card:hover { background:rgba(255,255,255,0.1); border-top-color:var(--sunshine); }
-  .prod-icon { font-size:28px; margin-bottom:14px; display:block; }
-  .prod-name { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:18px; color:var(--white); margin-bottom:8px; }
-  .prod-desc { font-size:12px; line-height:1.6; color:rgba(168,200,232,0.6); margin-bottom:16px; }
-  .prod-desde { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:700; font-size:13px; color:var(--sunshine); }
-
-  .proceso-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--sand); margin-top:60px; }
-  .paso { padding:40px 32px; border-right:1px solid var(--sand); }
-  .paso:last-child { border-right:none; }
-  .paso-num { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:900; font-size:64px; color:var(--sand); line-height:1; margin-bottom:14px; }
-  .paso-title { font-family:'Inter',sans-serif; font-weight:700; font-size:15px; color:var(--deep); margin-bottom:8px; }
-  .paso-desc { font-size:13px; line-height:1.7; color:var(--text-mid); font-weight:300; }
-
-  .sectores-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:60px; }
-  .sector { background:var(--white); padding:36px 28px; border-left:4px solid var(--sand); transition:border-color 0.2s; }
-  .sector:hover { border-left-color:var(--captain); }
-  .sector-icon { font-size:28px; margin-bottom:12px; }
-  .sector-name { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:18px; color:var(--deep); margin-bottom:8px; }
-  .sector-desc { font-size:13px; line-height:1.7; color:var(--text-mid); font-weight:300; }
-
-  .incluye-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:2px; margin-top:48px; }
-  .incluye-item { background:var(--white); padding:28px 32px; display:flex; gap:16px; align-items:flex-start; }
-  .check { width:24px; height:24px; background:var(--captain); display:flex; align-items:center; justify-content:center; color:white; font-size:12px; flex-shrink:0; margin-top:2px; }
-  .incluye-title { font-family:'Inter',sans-serif; font-weight:700; font-size:14px; color:var(--deep); margin-bottom:4px; }
-  .incluye-desc { font-size:12px; color:var(--text-mid); line-height:1.6; font-weight:300; }
-
-  .cta-section { background:var(--rose); padding:100px 0; text-align:center; }
-  .cta-section h2 { font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:900; font-size:clamp(40px,5vw,64px); color:var(--deep); line-height:0.9; margin-bottom:24px; }
-  .cta-section p { font-size:16px; color:var(--deep); line-height:1.8; max-width:520px; margin:0 auto 40px; }
-  .cta-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-  .btn-dark { background:var(--deep); color:var(--sunshine); font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:15px; letter-spacing:1px; padding:18px 36px; text-decoration:none; transition:all 0.2s; display:inline-block; }
-  .btn-dark:hover { background:var(--captain); color:white; }
-  .btn-wa { background:#25D366; color:white; font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:800; font-size:15px; letter-spacing:1px; padding:18px 36px; text-decoration:none; display:inline-block; transition:opacity 0.2s; }
-  .btn-wa:hover { opacity:0.85; }
-
-  footer { background:var(--deep); padding:40px 0; }
-  .footer-inner { max-width:1200px; margin:0 auto; padding:0 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; }
-  .footer-logo { height:36px; width:auto; filter:brightness(0) invert(1); }
-  .footer-links { display:flex; gap:20px; flex-wrap:wrap; }
-  .footer-links a { font-family:'Inter',sans-serif; font-size:13px; color:rgba(168,200,232,0.6); text-decoration:none; transition:color 0.2s; }
-  .footer-links a:hover { color:var(--cream); }
-  .footer-copy { font-family:'Inter',sans-serif; font-size:12px; color:rgba(168,200,232,0.3); }
-
-  .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.7s, transform 0.7s; }
-  .reveal.visible { opacity:1; transform:translateY(0); }
-
-  @media(max-width:900px) {
-    .hero { grid-template-columns:1fr; }
-    .hero-right { display:none; }
-    .two-col,.incluye-grid { grid-template-columns:1fr; }
-    .cards-grid,.sectores-grid { grid-template-columns:1fr; }
-    .prod-grid { grid-template-columns:repeat(2,1fr); }
-    .proceso-grid { grid-template-columns:1fr 1fr; }
-    .hero-left { padding:60px 24px; }
-    section { padding:60px 0; }
-  }
-
-  @media (max-width: 768px) {
-    .hero { grid-template-columns: 1fr !important; min-height: auto; }
-    .hero-left { padding: 48px 24px !important; }
-    .hero-right { display: none !important; }
-    .hero-title { font-size: 52px !important; }
-    .two-col { grid-template-columns: 1fr !important; gap: 40px !important; }
-    .cards-grid { grid-template-columns: 1fr !important; }
-    .prod-grid { grid-template-columns: 1fr 1fr !important; }
-    .proceso-grid { grid-template-columns: 1fr 1fr !important; }
-    .sectores-grid { grid-template-columns: 1fr !important; }
-    .incluye-grid { grid-template-columns: 1fr !important; }
-    section { padding: 60px 0 !important; }
-    .container { padding: 0 20px !important; }
-    .cta-btns { flex-direction: column; align-items: center; }
-    .btn-dark, .btn-wa { width: 100%; max-width: 320px; text-align: center; }
-  }
-  @media (max-width: 480px) {
-    .prod-grid { grid-template-columns: 1fr !important; }
-    .proceso-grid { grid-template-columns: 1fr !important; }
-    .hero-title { font-size: 42px !important; }
-  }
-
-  /* ─── ESTÉTICA CANVA: esquinas redondeadas ─── */
-  .hero-cta, .btn-dark, .btn-wa { border-radius: 8px; }
-  .hero-img, .hero-img-label, .card, .prod-card, .que-es-img { border-radius: 12px; }
-</style>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHM1133FL4"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-QHM1133FL4');
-  </script>
-  <meta name="theme-color" content="#93ACA7">
   <link rel="apple-touch-icon" href="/icon-web-180.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icon-web-16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icon-web-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-web-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-web-512.png">
   <link rel="manifest" href="/manifest.json">
-<link rel="stylesheet" href="/css/nav.css">
+<script src="/js/bl-api.js" defer></script>
 </head>
 <body>
 
-
-<header class="nav" id="nav">
-  <div class="nav-logo">
-    <a href="portada.html">
-      <img src="logo-bendito.png" alt="Bendito Lab">
-    </a>
-  </div>
-  <button class="nav-hamburger" id="nav-ham" onclick="toggleNav()" aria-label="Menú">
-    <span></span><span></span><span></span>
-  </button>
-  <nav class="nav-links" id="nav-links">
-    <a href="portada.html">Inicio</a>
-    <a href="dilo-bonito.html">Dilo Bonito</a>
-    <a href="bendito-lab.html">Bendito Lab</a>
-    <a href="colaboradores.html">Colaboradores</a>
-    <a href="portada.html#sec-cotizacion" onclick="closeMob()">Contacto</a>
-    <a href="/portal" class="nav-cta" onclick="closeMob()">Área cliente</a>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-tag">Artículos personalizados para empresas y eventos</div>
+  <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
+  <button class="nav-hamburger" onclick="toggleNav()" aria-label="Menú"><span></span><span></span><span></span></button>
+  <nav class="site-nav" id="site-nav">
+    <a class="navlink" href="portada.html">PORTADA→</a>
+    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
+    <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+    <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+    <a class="navlink" href="contacto.html">CONTACTO→</a>
+    <a class="navlink pill" href="area-clientes.html">ÁREA CLIENTE→</a>
   </nav>
 </header>
-<script>
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('.nav-item')) {
-    document.querySelectorAll('.nav-item.open').forEach(el => el.classList.remove('open'));
-  }
-});
-</script>
-
-
-<section class="hero">
-  <div class="hero-left">
-    <span class="hero-tag">Bendito Lab · Merchandising B2B</span>
-    <h1 class="hero-title" id="bl-h1">MERCHANDISING<br>QUE TU<br><span class="accent">EQUIPO USA</span></h1>
-    <p class="hero-sub" id="bl-sub">Camisetas, gorras, tote bags y regalos de empresa con tu logo. Desde 10 unidades, con diseño incluido y entrega en 7–10 días hábiles.</p>
-    <a href="/portada.html#sec-cotizacion" class="hero-cta">Pedir presupuesto →</a>
-  </div>
-  <div class="hero-right">
-    <div class="hero-img">
-      <img src="images/img-tote.jpg" alt="Tote bag personalizada">
-      <span class="hero-img-label">Tote Bags</span>
+<!-- PRODUCTS + INTRO -->
+<section class="intro">
+  <div class="intro-wrap">
+    <div class="product-grid">
+      <img src="images/b2b-1.jpg" alt="Producto personalizado 1">
+      <img src="images/b2b-2.jpg" alt="Producto personalizado 2">
+      <img src="images/b2b-3.jpg" alt="Producto personalizado 3">
+      <img src="images/img-gorra.jpg" alt="Producto personalizado 4">
+      <img src="images/img-neceser.jpg" alt="Producto personalizado 5">
+      <img src="images/img-tote.jpg" alt="Producto personalizado 6">
     </div>
-    <div class="hero-img">
-      <img src="images/img-neceser.jpg" alt="Neceser personalizado">
-      <span class="hero-img-label">Neceseres</span>
-    </div>
-    <div class="hero-img">
-      <img src="images/img-gorra.jpg" alt="Gorra personalizada">
-      <span class="hero-img-label">Gorras</span>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">+50</div>
-      <div class="hero-stat-lbl">Artículos</div>
+    <div class="intro-copy">
+      <h1>PERSONALIZAMOS LA IMAGEN DE TU EMPRESA.</h1>
+      <p>Ayudamos a empresas a potenciar su imagen de marca con soluciones de personalización adaptadas a sus necesidades.</p>
+      <p>Más que fabricar productos, nos convertimos en un proveedor de confianza que acompaña a cada cliente de principio a fin.</p>
     </div>
   </div>
 </section>
 
-<section style="background:var(--cream)">
-  <div class="container reveal">
-    <div class="two-col">
-      <div>
-        <span class="s-label">Producción propia · Trato directo</span>
-        <h2 class="s-title">PRODUCCIÓN<br>PROPIA.<br>TRATO DIRECTO.</h2>
-        <p class="s-body">Bendito Lab nació en Manzanares (Ciudad Real) para dar a las empresas locales acceso a merchandising de calidad sin tener que ir a grandes agencias.</p>
-        <p class="s-body">Fabricamos nosotros mismos con DTF, láser y sublimación. Eso significa que controlamos cada paso del proceso y podemos ajustarnos a pedidos pequeños sin encarecer el precio.</p>
-        <p class="s-body" style="margin-bottom:0">Hablas directamente conmigo, Silvia. Sin comerciales intermediarios. Si tienes una pregunta, la respondo yo.</p>
+<!-- QUE HACEMOS -->
+<section class="que-hacemos">
+  <h2>Qué hacemos</h2>
+  <div class="qh-grid">
+    <div class="qh-card">
+      <div class="qh-card-img"><img src="images/img-gorra.jpg" alt="Ropa laboral e imagen corporativa"><span>ROPA LABORAL E IMAGEN CORPORATIVA</span></div>
+      <div class="qh-card-body">
+        <p>Viste a tu equipo con una imagen profesional y coherente. Personalizamos camisetas, polos, sudaderas, chalecos, gorras y mucho más.</p>
+        <a href="mailto:contacto@benditolab.com">MÁS INFO→</a>
       </div>
-      <div class="que-es-img">
-        <img src="images/img-tote.jpg" alt="Productos Bendito Lab">
+    </div>
+    <div class="qh-card">
+      <div class="qh-card-img"><img src="images/img-neceser.jpg" alt="Merchandising y regalos de empresa"><span>MERCHANDISING Y REGALOS DE EMPRESA</span></div>
+      <div class="qh-card-body">
+        <p>Productos que refuerzan tu marca y crean recuerdo. Desde tazas y botellas hasta tote bags, libretas o regalos promocionales.</p>
+        <a href="mailto:contacto@benditolab.com">VER EJEMPLOS→</a>
+      </div>
+    </div>
+    <div class="qh-card">
+      <div class="qh-card-img"><img src="images/personalizacion.jpg" alt="Soluciones personalizadas"><span>SOLUCIONES PERSONALIZADAS</span></div>
+      <div class="qh-card-body">
+        <p>Cada empresa es diferente, por eso diseñamos soluciones a medida para ferias, inauguraciones, campañas y eventos corporativos.</p>
+        <a href="mailto:contacto@benditolab.com">¿CÓMO TRABAJAMOS?→</a>
       </div>
     </div>
   </div>
 </section>
 
-<section style="background:var(--baby)">
-  <div class="container reveal">
-    <span class="s-label">Por qué elegirnos</span>
-    <h2 class="s-title">POR QUÉ<br>BENDITO LAB</h2>
-    <div class="cards-grid">
-      <div class="card"><span class="card-icon">🎯</span><div class="card-title">Desde 10 unidades</div><p class="card-desc">Pedidos pequeños bienvenidos. Si necesitas 15 gorras para tu equipo, te las hacemos igual que si fueran 200.</p></div>
-      <div class="card"><span class="card-icon">⚡</span><div class="card-title">7–10 días hábiles</div><p class="card-desc">Ese es nuestro plazo habitual una vez aprobado el diseño. Si tienes urgencia, cuéntanoslo y buscamos solución.</p></div>
-      <div class="card"><span class="card-icon">🎨</span><div class="card-title">Adaptamos tu logo sin coste</div><p class="card-desc">Mándanos tu archivo y lo preparamos para cada producto. Sin sorpresas en la factura final.</p></div>
-      <div class="card"><span class="card-icon">✅</span><div class="card-title">DTF de alta definición</div><p class="card-desc">Colores sólidos y resistentes al lavado. Revisamos cada unidad antes de empaquetarla.</p></div>
-      <div class="card"><span class="card-icon">📦</span><div class="card-title">Envío a toda España o en mano</div><p class="card-desc">Si estás en Ciudad Real, puedes pasar a recogerlo. Si no, lo mandamos a donde necesites.</p></div>
-      <div class="card"><span class="card-icon">🤝</span><div class="card-title">Respondo en menos de 24h</div><p class="card-desc">Hablas siempre con la misma persona. Sin buzones automáticos, sin esperas de semanas.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="productos-section">
-  <div class="container reveal">
-    <span class="s-label" style="color:var(--baby)">Catálogo</span>
-    <h2 class="s-title" style="color:var(--white)">NUESTROS<br>PRODUCTOS</h2>
-    <p class="s-body" style="color:rgba(168,200,232,0.7)">Todo personalizable con tu logo, nombre o diseño. Técnica DTF textil de alta definición o grabado láser según el producto.</p>
-    <div class="prod-grid">
-      <div class="prod-card"><span class="prod-icon">👜</span><div class="prod-name">Tote Bags</div><p class="prod-desc">Algodón 100%, asa larga o corta. Perfectas para eventos, ferias y como detalle corporativo. Tu logo a todo color.</p><span class="prod-desde">Desde 4,50€/ud · mín. 20</span></div>
-      <div class="prod-card"><span class="prod-icon">🧢</span><div class="prod-name">Gorras</div><p class="prod-desc">Gorras de 6 paneles con tu logo en transfer o bordado. Varios colores disponibles, talla única ajustable.</p><span class="prod-desde">Desde 8€/ud · mín. 10</span></div>
-      <div class="prod-card"><span class="prod-icon">👝</span><div class="prod-name">Neceseres</div><p class="prod-desc">Neceser de tela 600D con cremallera. Muy pedidos para bodas corporativas, spa y centros de estética.</p><span class="prod-desde">Desde 6€/ud · mín. 15</span></div>
-      <div class="prod-card"><span class="prod-icon">👕</span><div class="prod-name">Camisetas</div><p class="prod-desc">100% algodón o mezcla. Personalizadas con DTF en pecho, espalda o manga. Para uniformes, eventos y equipos.</p><span class="prod-desde">Desde 10€/ud · mín. 10</span></div>
-      <div class="prod-card"><span class="prod-icon">📓</span><div class="prod-name">Libretas</div><p class="prod-desc">Tapa blanda o rígida con tu logo. Formato A5, papel rayado o liso. Regalo de empresa de uso diario.</p><span class="prod-desde">Desde 6€/ud · mín. 20</span></div>
-      <div class="prod-card"><span class="prod-icon">🪵</span><div class="prod-name">Bambú grabado</div><p class="prod-desc">Grabado láser sobre bambú o madera. Acabado natural y premium. Posavasos, abrebotellas y más.</p><span class="prod-desde">Desde 3€/ud · mín. 30</span></div>
-      <div class="prod-card"><span class="prod-icon">🎁</span><div class="prod-name">Kit regalo empresa</div><p class="prod-desc">3 productos a elegir, presentados en caja. Listo para regalar. Ideal para navidad, incorporaciones y agradecimientos.</p><span class="prod-desde">Desde 18€/kit · mín. 10</span></div>
-      <div class="prod-card"><span class="prod-icon">✨</span><div class="prod-name">Otros artículos</div><p class="prod-desc">¿Tienes algo concreto en mente? Dinos qué buscas y estudiamos si podemos hacerlo.</p><span class="prod-desde">Presupuesto a medida</span></div>
-    </div>
-  </div>
-</section>
-
-<section style="background:var(--cream)">
-  <div class="container reveal">
-    <span class="s-label">El proceso</span>
-    <h2 class="s-title">EN 4 PASOS<br>TIENES TU<br>PEDIDO LISTO</h2>
-    <div class="proceso-grid">
-      <div class="paso"><div class="paso-num">01</div><div class="paso-title">Cuéntanos tu proyecto</div><p class="paso-desc">Producto, cantidad, fecha y diseño. Puedes mandarnos tu logo o decirnos la idea, aunque sea a medias.</p></div>
-      <div class="paso"><div class="paso-num">02</div><div class="paso-title">Presupuesto en menos de 24h</div><p class="paso-desc">Recibes propuesta con precio unitario, plazo de producción y opciones de acabado. Sin compromiso.</p></div>
-      <div class="paso"><div class="paso-num">03</div><div class="paso-title">Apruebas y producimos</div><p class="paso-desc">Das el ok al diseño final y arrancamos. Te avisamos cuando esté listo y cuando salga de nuestras manos.</p></div>
-      <div class="paso"><div class="paso-num">04</div><div class="paso-title">Lo recibes donde quieras</div><p class="paso-desc">Entrega en mano en Manzanares o envío a cualquier punto de España. Bien embalado, sin sustos.</p></div>
-    </div>
-  </div>
-</section>
-
-<section style="background:var(--white)">
-  <div class="container reveal">
-    <span class="s-label">¿Para quién?</span>
-    <h2 class="s-title">TRABAJAMOS<br>CON TODO TIPO<br>DE EMPRESA</h2>
-    <div class="sectores-grid">
-      <div class="sector"><div class="sector-icon">🏢</div><div class="sector-name">Empresas y corporaciones</div><p class="sector-desc">Regalos de empresa para Navidad, incorporaciones o reconocimientos. También uniformidad para equipos de trabajo.</p></div>
-      <div class="sector"><div class="sector-icon">🍽️</div><div class="sector-name">Hostelería y restauración</div><p class="sector-desc">Uniformes con tu logo para sala y cocina, gorras, delantales y artículos de temporada. Trabajamos con restaurantes, bares y hoteles.</p></div>
-      <div class="sector"><div class="sector-icon">🎪</div><div class="sector-name">Eventos y festivales</div><p class="sector-desc">Merchandising para vender o regalar en tu evento. Tote bags, camisetas y artículos personalizados listos para el día.</p></div>
-      <div class="sector"><div class="sector-icon">🏥</div><div class="sector-name">Sector sanitario y social</div><p class="sector-desc">Uniformidad para clínicas, centros de día, asociaciones y entidades sociales. Con pedidos desde 10 unidades.</p></div>
-      <div class="sector"><div class="sector-icon">🏫</div><div class="sector-name">Colegios y academias</div><p class="sector-desc">Sudaderas de fin de curso, camisetas de equipo, mochilas y artículos de papelería con el logo del centro.</p></div>
-      <div class="sector"><div class="sector-icon">🛒</div><div class="sector-name">Retail y comercios</div><p class="sector-desc">Bolsas de tela para el punto de venta, packaging personalizado y artículos promocionales para tus clientes.</p></div>
-    </div>
-  </div>
-</section>
-
-<section style="background:var(--cream)">
-  <div class="container reveal">
-    <span class="s-label">Sin sorpresas</span>
-    <h2 class="s-title">TODO<br>INCLUIDO</h2>
-    <div class="incluye-grid">
-      <div class="incluye-item"><div class="check">✓</div><div><div class="incluye-title">Arte final y adaptación del diseño</div><p class="incluye-desc">Ajustamos tu logo al formato de cada producto. Si solo tienes una foto de baja resolución, intentamos resolverlo antes de decirte que no.</p></div></div>
-      <div class="incluye-item"><div class="check">✓</div><div><div class="incluye-title">Prueba de color digital</div><p class="incluye-desc">Te enviamos una prueba visual antes de producir para que apruebes el resultado.</p></div></div>
-      <div class="incluye-item"><div class="check">✓</div><div><div class="incluye-title">Control de calidad</div><p class="incluye-desc">Revisamos cada unidad antes de empacar. Garantizamos el resultado.</p></div></div>
-      <div class="incluye-item"><div class="check">✓</div><div><div class="incluye-title">Embalaje y presentación</div><p class="incluye-desc">Preparamos el pedido para que llegue en perfectas condiciones.</p></div></div>
-      <div class="incluye-item"><div class="check">✓</div><div><div class="incluye-title">Asesoramiento personalizado</div><p class="incluye-desc">Si no sabes qué producto elegir, te ayudo a decidir según tu presupuesto, el uso que le darán y la imagen que quieres transmitir.</p></div></div>
-      <div class="incluye-item"><div class="check">✓</div><div><div class="incluye-title">Seguimiento del pedido</div><p class="incluye-desc">Te informamos en cada fase hasta la entrega.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<div class="cta-section" id="contacto">
-  <div class="container">
-    <h2>¿TIENES UN<br>PEDIDO EN MENTE?</h2>
-    <p>Mándanos el producto, la cantidad aproximada y la fecha que necesitas. Te respondemos con un presupuesto cerrado en menos de 24 horas. Sin formularios complicados, sin esperas.</p>
-    <div class="cta-btns">
-      <a href="/portada.html#sec-cotizacion" class="btn-dark">SOLICITAR COTIZACIÓN →</a>
-      <a href="https://wa.me/34647444308?text=Hola%2C%20me%20interesa%20un%20pedido%20B2B%20de%20Bendito%20Lab" target="_blank" class="btn-wa">💬 WHATSAPP</a>
-    </div>
-    <p style="font-family:'Inter',sans-serif;font-size:13px;color:var(--deep);opacity:0.55;margin-top:20px">contacto@benditolab.com · 647 444 308</p>
+<!-- CARRUSEL -->
+<div class="bl-carrusel-wrap">
+  <div class="bl-carrusel" id="bl-carrusel">
+    <div class="bl-slide on"><img src="images/carrusel-1.jpg" alt="Producción 1" loading="eager"></div>
+    <div class="bl-slide"><img src="images/carrusel-2.jpg" alt="Producción 2" loading="lazy"></div>
+    <div class="bl-slide"><img src="images/carrusel-3.jpg" alt="Producción 3" loading="lazy"></div>
+    <div class="bl-slide"><img src="images/carrusel-4.jpg" alt="Producción 4" loading="lazy"></div>
+    <div class="bl-slide"><img src="images/carrusel-5.jpg" alt="Producción 5" loading="lazy"></div>
+    <div class="bl-dots" id="bl-dots"></div>
   </div>
 </div>
 
-<footer>
-  <div class="footer-inner">
-    <img src="logo-bendito.png" class="footer-logo" alt="Bendito Lab">
-    <div class="footer-links">
-      <a href="dilo-bonito.html">Dilo Bonito</a>
-      <a href="colaboradores.html">Colaboradores</a>
-      <a href="faq.html">F.A.Q.</a>
-      <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>
-      <a href="tel:647444308">647 444 308</a>
+<!-- POR QUE -->
+<section class="por-que">
+  <div class="por-que-wrap">
+    <div>
+      <h2>POR QUÉ BENDITO LAB.</h2>
+      <div class="por-que-item"><h3>ATENCIÓN PERSONALIZADA</h3><p>Siempre hablarás con la misma persona, desde la primera consulta hasta la entrega de tu pedido</p></div>
+      <div class="por-que-item"><h3>DISEÑOS LISTOS PARA PRODUCIR</h3><p>Adaptamos tu logotipo y revisamos cada diseño para conseguir el mejor resultado, sin costes ocultos.</p></div>
+      <div class="por-que-item"><h3>PEDIDOS A TU MEDIDA</h3><p>Desde pequeñas tiradas hasta grandes producciones, nos adaptamos a las necesidades de tu empresa.</p></div>
+      <div class="por-que-item"><h3>PLAZOS RÁPIDOS</h3><p>Trabajamos con tiempos de producción ágiles y buscamos soluciones cuando tu pedido es urgente.</p></div>
+      <div class="por-que-item"><h3>CALIDAD PROFESIONAL</h3><p>Utilizamos materiales y técnicas de personalización que garantizan un acabado duradero y una excelente imagen para tu marca.</p></div>
+      <div class="por-que-item"><h3>ENVÍOS A TODA ESPAÑA</h3><p>Recibe tu pedido donde lo necesites o recógelo en nuestras instalaciones si estás cerca.</p></div>
+      <div class="por-que-item"><h3>SIGUE TU PEDIDO EN TIEMPO REAL</h3><p>Dispondrás de un área privada donde gestionar presupuestos, pedidos, diseños, facturas y el estado de cada proyecto, con acceso siempre que lo necesites.</p></div>
     </div>
-    <span class="footer-copy">© 2026 Bendito Lab</span>
+    <div class="rafa-img"><img src="images/bl-foto-1.jpg" alt="Camiseta personalizada"></div>
+  </div>
+</section>
+
+<!-- COMO TRABAJAMOS -->
+<section class="trabajo">
+  <div class="trabajo-wrap">
+    <div class="workshop-img"><img src="images/bl-foto-2.jpg" alt="Taller de merchandising"></div>
+    <div>
+      <h2>Nuestra forma de trabajar</h2>
+      <div class="trabajo-item"><h3>CUÉNTANOS TU PROYECTO</h3><p>Nos adaptamos a tus necesidades y te ayudamos a elegir la mejor solución</p></div>
+      <div class="trabajo-item"><h3>PRESUPUESTO SIN SORPRESAS</h3><p>Te enviamos un presupuesto claro con las mejores opciones, plazos y precio, sin compromiso.</p></div>
+      <div class="trabajo-item"><h3>TÚ APRUEBAS, NOSOTROS NOS ENCARGAMOS</h3><p>Producción, control de calidad y seguimiento del pedido desde tu área de cliente.</p></div>
+      <div class="trabajo-item"><h3>RECÍBELO Y DESPREOCÚPATE</h3><p>Entregamos tu pedido listo para que puedas centrarte en lo importante: tu negocio.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<footer>
+  <div class="footer-cta">
+    <h2>¿Hablámos?</h2>
+    <div class="footer-cta-right">
+      <a href="contacto.html" class="btn-contacto">CONTACTO</a>
+      <div class="footer-socials">
+        <a href="https://instagram.com/bendito_lab" target="_blank" aria-label="Instagram">📸</a>
+        <a href="https://wa.me/34647444308" target="_blank" aria-label="WhatsApp">💬</a>
+        <a href="https://tiktok.com/@bendito_lab" target="_blank" aria-label="TikTok">🎵</a>
+        <a href="mailto:contacto@benditolab.com" aria-label="Email">✉️</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-bottom-links">
+      <img src="icon-web-32.png" alt="" style="height:26px;width:26px;">
+      <a href="dilo-bonito.html">Dilo bonito</a>
+      <a href="bendito-lab.html">Bendito lab.</a>
+      <a href="colaboradores.html">Colaboradores</a>
+      <a href="#" onclick="abrirModal('privacidad');return false;">Política de privacidad</a>
+      <a href="faq.html">F.A.Q.</a>
+    </div>
+    <span class="footer-copy">© 2026 Bendito lab.</span>
   </div>
 </footer>
-<script>
-const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:0.1});
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// ── NAV MOBILE ────────────────────────────────────────────
-function toggleNav(){
-  var nav=document.getElementById('nav');
-  var ham=document.getElementById('nav-ham');
-  if(document.body.classList.contains('nav-open')){closeMob();}
-  else{nav.classList.add('mob-open');ham.classList.add('open');document.body.classList.add('nav-open');document.body.style.overflow='hidden';}
-}
-function closeMob(){
-  var nav=document.getElementById('nav');
-  var ham=document.getElementById('nav-ham');
-  nav.classList.remove('mob-open');ham.classList.remove('open');
-  document.body.classList.remove('nav-open');document.body.style.overflow='';
-}
-document.querySelectorAll('.nav-links a').forEach(function(a){
-  a.addEventListener('click', closeMob);
+<!-- ====== MODAL LEGAL ====== -->
+<div id="modal-legal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;">
+  <div style="background:#fff;max-width:760px;margin:0 auto;border-radius:12px;padding:40px;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222;position:relative;">
+    <button onclick="cerrarModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;">✕</button>
+    <div id="modal-contenido"></div>
+  </div>
+</div>
+
+<script>
+// ── CARRUSEL (crossfade, 5 slides) ──
+(function(){
+  var wrap = document.getElementById('bl-carrusel');
+  var slides = wrap.querySelectorAll('.bl-slide');
+  var dotsEl = document.getElementById('bl-dots');
+  var n = slides.length, cur = 0;
+  for (var i = 0; i < n; i++) {
+    var d = document.createElement('span');
+    if (i === 0) d.className = 'on';
+    dotsEl.appendChild(d);
+  }
+  var dots = dotsEl.querySelectorAll('span');
+  setInterval(function(){
+    slides[cur].classList.remove('on');
+    dots[cur].classList.remove('on');
+    cur = (cur + 1) % n;
+    slides[cur].classList.add('on');
+    dots[cur].classList.add('on');
+  }, 3500);
+})();
+
+// ── NAV MOBILE ──
+function toggleNav(){ document.body.classList.toggle('nav-open'); }
+document.querySelectorAll('.site-nav a').forEach(function(a){
+  a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
 });
+
+// ── MODAL LEGAL ──
+var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Privacidad</h2>
+<p><strong>Responsable:</strong> Silvia G. M. · NIF 05931103-R · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
+<p><strong>Datos recabados:</strong> A través del formulario de contacto: nombre, email, teléfono (opcional) y mensaje. Finalidad: gestionar tu consulta o relación comercial.</p>
+<p><strong>Base legal:</strong> Consentimiento (art. 6.1.a RGPD) y ejecución de contrato (art. 6.1.b RGPD).</p>
+<p><strong>Conservación:</strong> Durante el tiempo necesario y los plazos legales (hasta 5 años).</p>
+<p><strong>Terceros:</strong> Google Analytics (Google LLC, adherida al Data Privacy Framework UE-EE.UU.).</p>
+<p><strong>Tus derechos:</strong> Acceso, rectificación, supresión, oposición, limitación y portabilidad. Escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a> o reclama ante la <a href="https://www.aepd.es" target="_blank">AEPD</a>.</p>`;
+function abrirModal(tipo) {
+  document.getElementById('modal-contenido').innerHTML = textoPrivacidad;
+  document.getElementById('modal-legal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function cerrarModal() {
+  document.getElementById('modal-legal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('modal-legal').addEventListener('click', function(e){ if(e.target===this) cerrarModal(); });
 </script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-  </script>
-  <!-- WhatsApp flotante -->
-  <a href="https://wa.me/34647444308?text=Hola%2C%20me%20interesa%20Dilo%20Bonito%20%F0%9F%91%8B"
-     target="_blank" rel="noopener"
-     style="position:fixed;bottom:24px;right:24px;z-index:9999;background:#25D366;color:#fff;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.25);text-decoration:none;transition:transform .2s,box-shadow .2s;"
-     onmouseover="this.style.transform='scale(1.1)'"
-     onmouseout="this.style.transform='scale(1)'"
-     aria-label="Contactar por WhatsApp">
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  </a>
-  <script>
-  function setT(id,v){var el=document.getElementById(id);if(el&&v)el.innerHTML=v.replace(/\n/g,'<br>');}
-  fetch('/api/proxy?scope=web&web=bendito-lab&t=' + Date.now())
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var c=d.data||{};
-      setT('bl-h1',  c['hero.h1']);
-      setT('bl-sub', c['hero.sub']);
-    }).catch(function(){});
-  </script>
-  <script>
-  (function(){
-    fetch('/api/proxy?scope=web&web=footer&t=' + Date.now())
-      .then(function(r){return r.json();})
-      .then(function(d){
-        var c=d.data||{};&t='+Date.now()))
-      .then(function(r){return r.json();})
-      .then(function(d){
-        var c=d.data||{};
-        function s(id,v){var el=document.getElementById(id);if(el&&v)el.innerHTML=v;}
-        function h(id,v){var el=document.getElementById(id);if(el&&v)el.href=v;}
-        s('footer-copy',   c['copy']);
-        s('footer-email',  c['email.texto']);
-        h('footer-email',  c['email.href']?'mailto:'+c['email.href']:null);
-        s('footer-tel',    c['tel.texto']);
-        h('footer-tel',    c['tel.href']?'tel:'+c['tel.href']:null);
-        s('footer-link1',  c['link1.texto']);
-        s('footer-link2',  c['link2.texto']);
-        s('footer-link3',  c['link3.texto']);
-      }).catch(function(){});
-  })();
-  </script>
-  <script src="js/bl-images.js" defer></script>
+<script src="js/bl-images.js" defer></script>
+
 </body>
 </html>

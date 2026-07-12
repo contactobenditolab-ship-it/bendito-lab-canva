@@ -26,6 +26,22 @@
       "dest": "/faq.html"
     },
     {
+      "src": "/contacto",
+      "dest": "/contacto.html"
+    },
+    {
+      "src": "/area-clientes",
+      "dest": "/area-clientes.html"
+    },
+    {
+      "src": "/portal",
+      "dest": "/area-clientes.html"
+    },
+    {
+      "src": "/link-bio",
+      "dest": "/link-bio.html"
+    },
+    {
       "src": "/admin",
       "dest": "/admin.html"
     },
