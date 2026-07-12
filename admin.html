@@ -19,6 +19,24 @@
 .login-btn:hover{background:#2F8FEA;}
 .login-err{color:#C0392B;font-size:12px;margin-top:10px;display:none;}
 
+/* EDITOR VISUAL */
+#editor{height:100vh;display:flex;font-family:'Inter',sans-serif;color:#17233F;}
+#editor-sidebar{width:260px;flex-shrink:0;background:#EDE9D9;border-right:1px solid #E3DFCF;padding:24px 14px;overflow-y:auto;}
+.navbtn{display:block;width:100%;text-align:left;border:none;background:transparent;cursor:pointer;padding:11px 16px;border-radius:8px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#17233F;margin-bottom:2px;}
+.navbtn:hover{background:rgba(255,255,255,.6);}
+#editor-main{flex:1;min-width:0;display:flex;flex-direction:column;}
+#editor-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 28px;border-bottom:1px solid #E3DFCF;background:#F4F1E6;flex-shrink:0;}
+#editor-dot{width:10px;height:10px;border-radius:50%;background:#E2704A;display:inline-block;flex-shrink:0;}
+#editor-pagename{margin:0;font-size:18px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;}
+.editor-hint{font-size:12px;color:#5A6470;white-space:nowrap;}
+#editor-frame{flex:1;width:100%;border:none;background:#fff;}
+@media(max-width:800px){
+  #editor-sidebar{width:76px;padding:16px 8px;}
+  #editor-sidebar .navbtn{font-size:0;padding:11px 4px;text-align:center;}
+  #editor-sidebar>div:first-child{display:none;}
+  .editor-hint{display:none;}
+}
+
 /* APP */
 #app{display:none;height:100vh;flex-direction:column;}
 .topbar{background:#17233F;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;flex-shrink:0;}
@@ -187,6 +205,35 @@ input[type="file"]{display:none;}
   </div>
 </div>
 
+<!-- EDITOR VISUAL (como Admin.dc.html): sidebar de páginas + la página real
+     cargada en un iframe, editable haciendo clic directamente sobre fotos y
+     textos. Es la vista por defecto tras entrar; "Panel avanzado" lleva al
+     dashboard clásico (#app) para precios, banners, etc. -->
+<div id="editor" style="display:none;">
+  <aside id="editor-sidebar">
+    <div style="padding:0 10px 20px;">
+      <div style="font-weight:800;font-size:15px;">Panel de administración</div>
+      <div style="font-size:12px;color:#5A6470;margin-top:2px;">Edita fotos y textos en vivo</div>
+    </div>
+    <div id="editor-pages"></div>
+    <div style="padding:16px 10px 0;margin-top:16px;border-top:1px solid #E3DFCF;">
+      <button class="navbtn" onclick="showPanelAvanzado()">⚙ Panel avanzado</button>
+      <button class="navbtn" onclick="logoutAdmin()">⎋ Cerrar sesión</button>
+    </div>
+  </aside>
+  <main id="editor-main">
+    <div id="editor-topbar">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <span id="editor-dot"></span>
+        <h1 id="editor-pagename">Portada</h1>
+        <span class="editor-hint">— haz clic en cualquier foto o texto para editarlo</span>
+      </div>
+      <a id="editor-open-tab" href="#" target="_blank" style="font-size:12px;font-weight:700;color:#2F8FEA;white-space:nowrap;">Ver en pestaña nueva↗</a>
+    </div>
+    <iframe id="editor-frame" title="Vista editable"></iframe>
+  </main>
+</div>
+
 <!-- APP -->
 <div id="app">
   <div class="topbar">
@@ -198,6 +245,7 @@ input[type="file"]{display:none;}
       <span class="saved" id="saved">✓ Guardado</span>
     </div>
     <div class="topbar-right">
+      <button class="prev-btn" onclick="backToEditor()" style="cursor:pointer;">✏️ Editor visual</button>
       <a href="index.html" target="_blank" class="prev-btn">👁 Portada</a>
       <a href="dilo-bonito.html" target="_blank" class="prev-btn">👁 Dilo Bonito</a>
       <a href="bendito-lab.html" target="_blank" class="prev-btn">👁 Bendito Lab</a>
@@ -1151,8 +1199,7 @@ async function checkLogin(){
     var ok=await BL_API.login(pwd);
     if(ok){
       document.getElementById('login').style.display='none';
-      document.getElementById('app').style.display='flex';
-      init();
+      enterEditor();
     }else{
       err.textContent='Contraseña incorrecta';
       err.style.display='block';
@@ -1171,11 +1218,79 @@ async function checkLogin(){
   if(BL_API.getToken()){
     document.addEventListener('DOMContentLoaded',function(){
       document.getElementById('login').style.display='none';
-      document.getElementById('app').style.display='flex';
-      init();
+      enterEditor();
     });
   }
 })();
+
+// ══ EDITOR VISUAL (sidebar + página real en iframe, como Admin.dc.html) ═══
+var EDITOR_PAGINAS = [
+  {archivo:'portada.html',      nombre:'Portada',           color:'#E2704A'},
+  {archivo:'bendito-lab.html',  nombre:'Bendito Lab',       color:'#93ACA7'},
+  {archivo:'colaboradores.html',nombre:'Colaboradores',     color:'#2F8FEA'},
+  {archivo:'dilo-bonito.html',  nombre:'Dilo Bonito',       color:'#B6A8DB'},
+  {archivo:'faq.html',          nombre:'FAQ',               color:'#9AB791'},
+  {archivo:'contacto.html',     nombre:'Contacto',          color:'#E2704A'},
+  {archivo:'link-bio.html',     nombre:'Link Bio (móvil)',  color:'#E2704A'},
+  {archivo:'area-clientes.html',nombre:'Área Clientes',     color:'#E2704A'},
+];
+var editorActiveIdx=0;
+
+function enterEditor(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('editor').style.display='flex';
+  renderEditorSidebar();
+  var params=new URLSearchParams(location.search);
+  var next=params.get('next');
+  if(next){ location.href=decodeURIComponent(next); return; }
+  var startFile=params.get('pagina');
+  var idx=startFile?EDITOR_PAGINAS.findIndex(function(p){return p.archivo===startFile;}):0;
+  selectPagina(idx>=0?idx:0);
+}
+
+function renderEditorSidebar(){
+  var c=document.getElementById('editor-pages');
+  c.innerHTML='';
+  EDITOR_PAGINAS.forEach(function(p,i){
+    var btn=document.createElement('button');
+    btn.className='navbtn';
+    btn.textContent=p.nombre;
+    btn.id='editor-nav-'+i;
+    btn.onclick=function(){selectPagina(i);};
+    c.appendChild(btn);
+  });
+}
+
+function selectPagina(i){
+  editorActiveIdx=i;
+  var p=EDITOR_PAGINAS[i];
+  EDITOR_PAGINAS.forEach(function(pp,ii){
+    var btn=document.getElementById('editor-nav-'+ii);
+    if(!btn)return;
+    btn.style.background=ii===i?pp.color:'transparent';
+    btn.style.color=ii===i?'#FBF4E9':'#17233F';
+  });
+  document.getElementById('editor-dot').style.background=p.color;
+  document.getElementById('editor-pagename').textContent=p.nombre;
+  document.getElementById('editor-frame').src=p.archivo+'?admin=1';
+  document.getElementById('editor-open-tab').href=p.archivo;
+}
+
+function showPanelAvanzado(){
+  document.getElementById('editor').style.display='none';
+  document.getElementById('app').style.display='flex';
+  init();
+}
+
+function backToEditor(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('editor').style.display='flex';
+}
+
+function logoutAdmin(){
+  BL_API.setToken(null);
+  location.href='admin.html';
+}
 
 // ══ NAV ════════════════════════════════════════════════════
 function show(id,el){
