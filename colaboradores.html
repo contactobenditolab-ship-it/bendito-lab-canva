@@ -337,7 +337,7 @@ footer{background:var(--poppy);}
       <a href="dilo-bonito.html">Dilo bonito</a>
       <a href="bendito-lab.html">Bendito lab.</a>
       <a href="colaboradores.html">Colaboradores</a>
-      <a href="#" onclick="abrirModal();return false;">Política de privacidad</a>
+      <a href="#" onclick="abrirModal('privacidad');return false;">Política de privacidad</a>
       <a href="faq.html">F.A.Q.</a>
     </div>
     <span class="footer-copy">© 2026 Bendito lab.</span>
@@ -351,11 +351,40 @@ footer{background:var(--poppy);}
   </div>
 </div>
 
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#fff;padding:16px 24px;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 12px rgba(0,0,0,0.3);align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <span style="flex:1;min-width:200px;">
+    🍪 Usamos cookies propias y de Google Analytics para mejorar tu experiencia.
+    <a href="#" onclick="abrirModal('privacidad');return false;" style="color:#E8C24A;text-decoration:underline;">Privacidad</a> ·
+    <a href="#" onclick="abrirModal('cookies');return false;" style="color:#E8C24A;text-decoration:underline;">Cookies</a>
+  </span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="rechazarCookies()" style="background:transparent;border:1px solid #E8C24A;color:#E8C24A;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;">Rechazar</button>
+    <button onclick="aceptarCookies()" style="background:#E8C24A;border:none;color:#17233F;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">Aceptar</button>
+  </div>
+</div>
+
 <script>
 function toggleNav(){ document.body.classList.toggle('nav-open'); }
 document.querySelectorAll('.site-nav a').forEach(function(a){
   a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
 });
+
+var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso Legal</h2>
+<ul>
+<li><strong>Titular:</strong> Silvia G. M. · NIF: 05931103-R</li>
+<li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares, Ciudad Real</li>
+<li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+<li><strong>Actividad:</strong> Personalización y merchandising (Bendito Lab · Dilo Bonito)</li>
+</ul>
+<p>Todos los contenidos del sitio son propiedad de la titular o de terceros autorizados. Queda prohibida su reproducción sin autorización escrita. Legislación española aplicable — Juzgados de Manzanares, Ciudad Real.</p>`;
+
+var textoCookies = `<h2 style="color:#17233F;margin-top:0">Política de Cookies</h2>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<tr style="background:#f5f5f5;"><th style="padding:8px;border:1px solid #ddd;text-align:left;">Cookie</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Tipo</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Finalidad</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Duración</th></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">bl_cookie_consent</td><td style="padding:8px;border:1px solid #ddd;">Técnica propia</td><td style="padding:8px;border:1px solid #ddd;">Guardar tu preferencia</td><td style="padding:8px;border:1px solid #ddd;">1 año</td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">_ga, _gid, _gat</td><td style="padding:8px;border:1px solid #ddd;">Analítica (Google)</td><td style="padding:8px;border:1px solid #ddd;">Análisis anónimo del tráfico</td><td style="padding:8px;border:1px solid #ddd;">Hasta 2 años</td></tr>
+</table>
+<p style="margin-top:16px;">Puedes rechazar o retirar el consentimiento en cualquier momento. Desactivar Analytics: <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">tools.google.com/dlpage/gaoptout</a></p>`;
 
 var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Privacidad</h2>
 <p><strong>Responsable:</strong> Silvia G. M. · NIF 05931103-R · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
@@ -364,8 +393,8 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Priva
 <p><strong>Conservación:</strong> Durante el tiempo necesario y los plazos legales (hasta 5 años).</p>
 <p><strong>Terceros:</strong> Google Analytics (Google LLC, adherida al Data Privacy Framework UE-EE.UU.).</p>
 <p><strong>Tus derechos:</strong> Acceso, rectificación, supresión, oposición, limitación y portabilidad. Escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a> o reclama ante la <a href="https://www.aepd.es" target="_blank">AEPD</a>.</p>`;
-function abrirModal() {
-  document.getElementById('modal-contenido').innerHTML = textoPrivacidad;
+function abrirModal(tipo) {
+  document.getElementById('modal-contenido').innerHTML = tipo==='aviso'?textoAviso:tipo==='cookies'?textoCookies:textoPrivacidad;
   document.getElementById('modal-legal').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -374,6 +403,27 @@ function cerrarModal() {
   document.body.style.overflow = '';
 }
 document.getElementById('modal-legal').addEventListener('click', function(e){ if(e.target===this) cerrarModal(); });
+
+function aceptarCookies() {
+  localStorage.setItem('bl_cookie_consent','accepted');
+  document.getElementById('cookie-banner').style.display = 'none';
+  activarAnalytics();
+}
+function rechazarCookies() {
+  localStorage.setItem('bl_cookie_consent','rejected');
+  document.getElementById('cookie-banner').style.display = 'none';
+}
+function activarAnalytics() {
+  if(window._gaActivado) return; window._gaActivado=true;
+  var s=document.createElement('script'); s.src='https://www.googletagmanager.com/gtag/js?id=G-QHM1133FL4'; s.async=true; document.head.appendChild(s);
+  window.dataLayer=window.dataLayer||[]; function gtag(){dataLayer.push(arguments);} window.gtag=gtag;
+  gtag('js',new Date()); gtag('config','G-QHM1133FL4');
+}
+window.addEventListener('DOMContentLoaded', function(){
+  var consent = localStorage.getItem('bl_cookie_consent');
+  if (!consent) { var b=document.getElementById('cookie-banner'); if(b) b.style.display='flex'; }
+  if (consent==='accepted') activarAnalytics();
+});
 
 // ── ÚNETE FORM ──
 var UNETE_FISICOS = ['Finca', 'Restaurante', 'Hotel', 'Espacio de eventos'];
@@ -390,42 +440,62 @@ document.querySelectorAll('#tipos-grid .tipbtn').forEach(function(btn){
   });
 });
 
-document.getElementById('unete-form-el').addEventListener('submit', function(e){
+document.getElementById('unete-form-el').addEventListener('submit', async function(e){
   e.preventDefault();
   if (!unTipo) { alert('Selecciona un tipo de colaborador'); return; }
-  var f = new FormData(e.target);
+  var form = e.target;
+  var f = new FormData(form);
   var esFisico = UNETE_FISICOS.indexOf(unTipo) !== -1;
-  var lines = [
-    'Nombre: ' + f.get('nombre'),
-    'Espacio/empresa: ' + f.get('espacio'),
-    'Email: ' + f.get('email'),
-    'Teléfono: ' + f.get('telefono'),
-    'Instagram: ' + (f.get('instagram') || '-'),
-    'Web: ' + (f.get('web') || '-'),
-    'Tipo: ' + unTipo
-  ];
+  var data = {
+    nombre: f.get('nombre'),
+    espacio: f.get('espacio'),
+    email: f.get('email'),
+    telefono: f.get('telefono'),
+    instagram: f.get('instagram') || '-',
+    web: f.get('web') || '-',
+    tipo: unTipo
+  };
   if (esFisico) {
-    lines.push('Dirección: ' + f.get('direccion'));
-    lines.push('Aforo: ' + f.get('aforo'));
-    lines.push('Zona stand: ' + f.get('zona_stand'));
-    lines.push('Medidas: ' + (f.get('medidas') || '-'));
-    lines.push('Corriente: ' + f.get('corriente'));
-    lines.push('Acceso: ' + f.get('acceso'));
-    lines.push('Aparcamiento: ' + f.get('aparcamiento'));
-    lines.push('Observaciones: ' + (f.get('obs_espacio') || '-'));
+    Object.assign(data, {
+      direccion: f.get('direccion'),
+      aforo: f.get('aforo'),
+      zona_stand: f.get('zona_stand'),
+      medidas: f.get('medidas') || '-',
+      corriente: f.get('corriente'),
+      acceso: f.get('acceso'),
+      aparcamiento: f.get('aparcamiento'),
+      observaciones: f.get('obs_espacio') || '-'
+    });
   } else {
-    lines.push('Eventos/año: ' + f.get('eventos_anio'));
-    lines.push('Zona de trabajo: ' + f.get('zona_trabajo'));
-    lines.push('Portfolio: ' + (f.get('portfolio') || '-'));
-    lines.push('Forma de recomendación: ' + f.get('forma_recomendacion'));
-    lines.push('Lista de proveedores: ' + f.get('lista_proveedores'));
-    lines.push('Observaciones: ' + (f.get('obs_servicios') || '-'));
+    Object.assign(data, {
+      eventos_anio: f.get('eventos_anio'),
+      zona_trabajo: f.get('zona_trabajo'),
+      portfolio: f.get('portfolio') || '-',
+      forma_recomendacion: f.get('forma_recomendacion'),
+      lista_proveedores: f.get('lista_proveedores'),
+      observaciones: f.get('obs_servicios') || '-'
+    });
   }
-  var body = encodeURIComponent(lines.join('\n'));
-  var subject = encodeURIComponent('Solicitud de colaborador - ' + unTipo);
-  window.location.href = 'mailto:colaboradores@benditolab.com?subject=' + subject + '&body=' + body;
-  document.getElementById('unete-form-visible').style.display = 'none';
-  document.getElementById('unete-form-success').style.display = 'block';
+  var submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true; submitBtn.textContent = 'Enviando...';
+  try {
+    var r = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'colaborador', data: data })
+    });
+    var d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Error al enviar');
+    document.getElementById('unete-form-visible').style.display = 'none';
+    document.getElementById('unete-form-success').style.display = 'block';
+  } catch (err) {
+    var body = encodeURIComponent(JSON.stringify(data, null, 2));
+    var subject = encodeURIComponent('Solicitud de colaborador - ' + unTipo);
+    alert(err.message + '. Te abrimos tu email para que nos escribas directamente.');
+    window.location.href = 'mailto:colaboradores@benditolab.com?subject=' + subject + '&body=' + body;
+  } finally {
+    submitBtn.disabled = false; submitBtn.textContent = 'ENVIAR SOLICITUD→';
+  }
 });
 </script>
 <script src="js/bl-images.js" defer></script>
