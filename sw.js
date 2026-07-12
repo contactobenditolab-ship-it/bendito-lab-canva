@@ -6,8 +6,6 @@ const STATIC_CACHE = 'bendito-static-v5';
 
 // Solo cachear assets estáticos (imágenes, fuentes, iconos)
 const STATIC_ASSETS = [
-  '/styles.css',
-  '/precios.json',
   '/manifest.json',
   '/logo-bendito.png',
 ];
