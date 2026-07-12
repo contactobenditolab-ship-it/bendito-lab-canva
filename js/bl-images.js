@@ -1,14 +1,15 @@
 // js/bl-images.js — Lee el contenido guardado en /api/content (imágenes
-// subidas a Vercel Blob + textos editados) y lo aplica sobre la página
-// estática. En modo edición (?admin=1 con sesión de admin activa) además
-// convierte las fotos y los bloques de texto marcados con data-edit en
-// controles clicables para cambiarlos ahí mismo, sobre la propia página.
+// subidas a Vercel Blob, encuadres, colores y textos editados) y lo aplica
+// sobre la página estática. En modo edición (?admin=1 con sesión de admin
+// activa) además convierte fotos, colores y bloques de texto marcados con
+// data-edit en controles clicables para cambiarlos ahí mismo, sobre la
+// propia página.
 (function () {
   function normalize(src) {
     return (src || '').replace(/^\.?\//, '').split('?')[0];
   }
 
-  var CONTENT = { images: {}, texts: {} };
+  var CONTENT = { images: {}, imageView: {}, colors: {}, texts: {} };
 
   function applyImages(images) {
     document.querySelectorAll('img[src]').forEach(function (img) {
@@ -19,6 +20,45 @@
     document.querySelectorAll('[data-bg-slot]').forEach(function (el) {
       var key = el.getAttribute('data-bg-slot');
       if (images[key]) el.style.backgroundImage = "url('" + images[key] + "')";
+    });
+  }
+
+  // Un elemento solo puede recibir zoom/pan de forma segura si algún
+  // ancestro recorta el desbordamiento (si no, la foto ampliada se saldría
+  // de su hueco y taparía el contenido de al lado).
+  function hasClippingAncestor(el) {
+    var node = el.parentElement;
+    while (node && node !== document.body) {
+      var cs = getComputedStyle(node);
+      if (cs.overflow === 'hidden' || cs.overflowX === 'hidden' || cs.overflowY === 'hidden' || cs.overflow === 'clip') {
+        return true;
+      }
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function applyViewTransform(img, view) {
+    img.style.transformOrigin = 'center center';
+    img.style.transform = 'scale(' + view.s + ') translate(' + view.x + '%, ' + view.y + '%)';
+  }
+
+  function applyImageViews(views) {
+    document.querySelectorAll('img[data-slot]').forEach(function (img) {
+      var key = img.getAttribute('data-slot');
+      var view = views[key];
+      if (view && hasClippingAncestor(img)) applyViewTransform(img, view);
+    });
+  }
+
+  function applyColors(colors) {
+    document.querySelectorAll('[data-color-bg]').forEach(function (el) {
+      var id = el.getAttribute('data-color-bg');
+      if (colors[id]) el.style.backgroundColor = colors[id];
+    });
+    document.querySelectorAll('[data-color-text]').forEach(function (el) {
+      var id = el.getAttribute('data-color-text');
+      if (colors[id]) el.style.color = colors[id];
     });
   }
 
@@ -33,8 +73,12 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
       CONTENT.images = (data && data.images) || {};
+      CONTENT.imageView = (data && data.imageView) || {};
+      CONTENT.colors = (data && data.colors) || {};
       CONTENT.texts = (data && data.texts) || {};
       applyImages(CONTENT.images);
+      applyImageViews(CONTENT.imageView);
+      applyColors(CONTENT.colors);
       applyTexts(CONTENT.texts);
     })
     .catch(function () {});
@@ -46,7 +90,6 @@
 
   loaded.then(function () {
     if (!window.BL_API || !BL_API.getToken()) {
-      // No hay sesión: manda a iniciar sesión y volver aquí.
       var back = encodeURIComponent(location.pathname + '?admin=1');
       location.href = '/admin.html?next=' + back;
       return;
@@ -100,23 +143,32 @@
     if (!inIframe) injectExitPill();
     wireImages();
     wireTexts();
+    wireColors();
   }
 
   function injectStyles() {
     var s = document.createElement('style');
     s.textContent =
       (inIframe ? '' : 'body{padding-top:44px!important;}') +
-      '[data-edit]{outline-offset:2px;cursor:text;}' +
+      '[data-edit]{outline-offset:2px;cursor:text;position:relative;}' +
       '[data-edit]:hover{outline:2px dashed #2F8FEA;}' +
       '[data-edit][contenteditable="true"]{outline:2px solid #2F8FEA;background:rgba(47,143,234,.08);}' +
-      'img[data-slot]{cursor:pointer;}' +
-      'img[data-slot]:hover{outline:2px dashed #2F8FEA;outline-offset:-2px;}';
+      '[data-color-bg],[data-color-text]{position:relative;}' +
+      '.bl-img-wrap{position:relative;display:inline-block;}' +
+      '.bl-toolbar{position:absolute;top:6px;right:6px;display:none;gap:4px;z-index:100;}' +
+      '.bl-toolbar.on{display:flex;}' +
+      '.bl-toolbar button{background:rgba(23,35,63,.85);color:#fff;border:none;border-radius:6px;' +
+      'padding:5px 8px;font-size:12px;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;}' +
+      '.bl-toolbar button:hover{background:#2F8FEA;}' +
+      '.bl-color-btn{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;' +
+      'border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);cursor:pointer;display:none;z-index:100;' +
+      'background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);}' +
+      '[data-color-bg]:hover>.bl-color-btn,[data-color-text]:hover>.bl-color-btn{display:block;}' +
+      'img[data-slot][data-reframing]{cursor:grab;}' +
+      'img[data-slot][data-reframing][data-panning]{cursor:grabbing;}';
     document.head.appendChild(s);
   }
 
-  // Visitar una página directamente con ?admin=1 (sin pasar por el panel):
-  // deja editar igual, solo con una píldora para salir. La navegación entre
-  // páginas en modo edición vive en la barra lateral de admin.html.
   function injectExitPill() {
     var bar = document.createElement('div');
     bar.id = 'bl-edit-bar';
@@ -125,17 +177,19 @@
       'font:600 12px/1 Inter,sans-serif;';
     bar.innerHTML =
       '<strong style="color:#E8C24A;">✏️ MODO EDICIÓN</strong>' +
-      '<span style="opacity:.8;">haz clic en cualquier foto o texto para cambiarlo</span>' +
+      '<span style="opacity:.8;">haz clic en cualquier foto, texto o color para cambiarlo</span>' +
       '<span style="flex:1;"></span>' +
       '<a href="admin.html" style="color:#FBF4E9;border:1px solid #FBF4E9;padding:6px 12px;border-radius:14px;">Ir al panel→</a>';
     document.body.prepend(bar);
   }
 
+  // ── TEXTOS ───────────────────────────────────────────────────────────
   function wireTexts() {
     document.querySelectorAll('[data-edit]').forEach(function (el) {
       el.title = 'Clic para editar';
       el.addEventListener('click', function (e) {
         if (el.getAttribute('contenteditable') === 'true') return;
+        if (e.target.closest('.bl-color-btn')) return;
         e.preventDefault();
         e.stopPropagation();
         el.setAttribute('contenteditable', 'true');
@@ -170,26 +224,110 @@
       .catch(function () { toast('Error de conexión', false); });
   }
 
+  // ── COLORES ──────────────────────────────────────────────────────────
+  function wireColors() {
+    document.querySelectorAll('[data-color-bg], [data-color-text]').forEach(function (el) {
+      if (el.querySelector(':scope > .bl-color-btn')) return;
+      var btn = document.createElement('input');
+      btn.type = 'color';
+      btn.className = 'bl-color-btn';
+      var bgId = el.getAttribute('data-color-bg');
+      var textId = el.getAttribute('data-color-text');
+      btn.value = toHex(getComputedStyle(el)[bgId ? 'backgroundColor' : 'color']) || '#000000';
+      btn.addEventListener('click', function (e) { e.stopPropagation(); });
+      btn.addEventListener('input', function () {
+        if (bgId) el.style.backgroundColor = btn.value;
+        if (textId) el.style.color = btn.value;
+      });
+      btn.addEventListener('change', function () {
+        if (bgId) saveColor(bgId, btn.value);
+        if (textId) saveColor(textId, btn.value);
+      });
+      el.appendChild(btn);
+    });
+  }
+
+  function toHex(rgbStr) {
+    var m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(rgbStr || '');
+    if (!m) return null;
+    return '#' + [m[1], m[2], m[3]].map(function (n) {
+      return ('0' + parseInt(n, 10).toString(16)).slice(-2);
+    }).join('');
+  }
+
+  function saveColor(id, value) {
+    fetch('/api/save-color', {
+      method: 'POST',
+      headers: BL_API.authHeaders(),
+      body: JSON.stringify({ id: id, value: value })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { toast(d.ok ? 'Color guardado ✓' : ('Error: ' + d.error), d.ok); })
+      .catch(function () { toast('Error de conexión', false); });
+  }
+
+  // ── IMÁGENES: cambiar foto + encuadre (zoom/posición) ──────────────────
   function wireImages() {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.style.display = 'none';
-    document.body.appendChild(input);
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
     var targetImg = null;
 
     document.querySelectorAll('img[data-slot]').forEach(function (img) {
-      img.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+      img.draggable = false;
+      var canReframe = hasClippingAncestor(img);
+
+      var toolbar = document.createElement('div');
+      toolbar.className = 'bl-toolbar';
+      var replaceBtn = document.createElement('button');
+      replaceBtn.type = 'button';
+      replaceBtn.textContent = '📤 Cambiar';
+      toolbar.appendChild(replaceBtn);
+      var reframeBtn = null;
+      if (canReframe) {
+        reframeBtn = document.createElement('button');
+        reframeBtn.type = 'button';
+        reframeBtn.textContent = '⤢ Encuadre';
+        toolbar.appendChild(reframeBtn);
+      }
+
+      // El toolbar se posiciona con position:absolute respecto al contenedor
+      // más cercano; si la imagen no tiene un contenedor con position, se le
+      // envuelve en un span relative sin cambiar su layout.
+      var host = img.parentElement;
+      if (getComputedStyle(host).position === 'static') {
+        var wrap = document.createElement('span');
+        wrap.className = 'bl-img-wrap';
+        host.insertBefore(wrap, img);
+        wrap.appendChild(img);
+        host = wrap;
+      } else {
+        host.style.position = host.style.position || 'relative';
+      }
+      host.appendChild(toolbar);
+      host.addEventListener('mouseenter', function () { toolbar.classList.add('on'); });
+      host.addEventListener('mouseleave', function () { if (!img.hasAttribute('data-reframing')) toolbar.classList.remove('on'); });
+
+      replaceBtn.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
         targetImg = img;
-        input.click();
+        fileInput.click();
       });
+
+      if (reframeBtn) {
+        reframeBtn.addEventListener('click', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          if (img.hasAttribute('data-reframing')) exitReframe(img, true);
+          else enterReframe(img);
+        });
+      }
     });
 
-    input.addEventListener('change', async function () {
-      var file = input.files && input.files[0];
-      input.value = '';
+    fileInput.addEventListener('change', async function () {
+      var file = fileInput.files && fileInput.files[0];
+      fileInput.value = '';
       if (!file || !targetImg) return;
       var img = targetImg;
       var slot = img.getAttribute('data-slot');
@@ -213,5 +351,84 @@
         img.style.opacity = '';
       }
     });
+  }
+
+  var reframeState = {};
+  function enterReframe(img) {
+    var slot = img.getAttribute('data-slot');
+    var saved = CONTENT.imageView[slot];
+    var view = saved ? { s: saved.s, x: saved.x, y: saved.y } : { s: 1, x: 0, y: 0 };
+    reframeState[slot] = view;
+    img.setAttribute('data-reframing', '');
+    applyViewTransform(img, view);
+
+    var rect;
+    var start;
+    function onWheel(e) {
+      e.preventDefault();
+      var v = reframeState[slot];
+      v.s = Math.max(1, Math.min(3, v.s * Math.pow(1.0015, -e.deltaY)));
+      applyViewTransform(img, v);
+    }
+    function onDown(e) {
+      e.preventDefault();
+      img.setAttribute('data-panning', '');
+      rect = img.getBoundingClientRect();
+      start = { px: e.clientX, py: e.clientY, x: reframeState[slot].x, y: reframeState[slot].y };
+      img.setPointerCapture(e.pointerId);
+    }
+    function onMove(e) {
+      if (!start) return;
+      var v = reframeState[slot];
+      v.x = Math.max(-60, Math.min(60, start.x + (e.clientX - start.px) / rect.width * 100));
+      v.y = Math.max(-60, Math.min(60, start.y + (e.clientY - start.py) / rect.height * 100));
+      applyViewTransform(img, v);
+    }
+    function onUp(e) {
+      start = null;
+      img.removeAttribute('data-panning');
+      try { img.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+    function onKey(e) { if (e.key === 'Escape') exitReframe(img, true); }
+    function onOutside(e) { if (e.target !== img) exitReframe(img, true); }
+
+    img._reframeHandlers = { onWheel: onWheel, onDown: onDown, onMove: onMove, onUp: onUp, onKey: onKey, onOutside: onOutside };
+    img.addEventListener('wheel', onWheel, { passive: false });
+    img.addEventListener('pointerdown', onDown);
+    img.addEventListener('pointermove', onMove);
+    img.addEventListener('pointerup', onUp);
+    document.addEventListener('keydown', onKey);
+    setTimeout(function () { document.addEventListener('pointerdown', onOutside, true); }, 0);
+    toast('Arrastra para mover, rueda del ratón para hacer zoom · Esc para salir', true);
+  }
+
+  function exitReframe(img, commit) {
+    var slot = img.getAttribute('data-slot');
+    var h = img._reframeHandlers;
+    if (h) {
+      img.removeEventListener('wheel', h.onWheel);
+      img.removeEventListener('pointerdown', h.onDown);
+      img.removeEventListener('pointermove', h.onMove);
+      img.removeEventListener('pointerup', h.onUp);
+      document.removeEventListener('keydown', h.onKey);
+      document.removeEventListener('pointerdown', h.onOutside, true);
+      img._reframeHandlers = null;
+    }
+    img.removeAttribute('data-reframing');
+    img.removeAttribute('data-panning');
+    var toolbar = img.parentElement && img.parentElement.querySelector('.bl-toolbar');
+    if (toolbar) toolbar.classList.remove('on');
+    if (commit && reframeState[slot]) {
+      var v = reframeState[slot];
+      CONTENT.imageView[slot] = v;
+      fetch('/api/save-image-view', {
+        method: 'POST',
+        headers: BL_API.authHeaders(),
+        body: JSON.stringify({ path: slot, s: v.s, x: v.x, y: v.y })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { toast(d.ok ? 'Encuadre guardado ✓' : ('Error: ' + d.error), d.ok); })
+        .catch(function () { toast('Error de conexión', false); });
+    }
   }
 })();

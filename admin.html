@@ -206,18 +206,16 @@ input[type="file"]{display:none;}
 </div>
 
 <!-- EDITOR VISUAL (como Admin.dc.html): sidebar de páginas + la página real
-     cargada en un iframe, editable haciendo clic directamente sobre fotos y
-     textos. Es la vista por defecto tras entrar; "Panel avanzado" lleva al
-     dashboard clásico (#app) para precios, banners, etc. -->
+     cargada en un iframe, editable haciendo clic directamente sobre fotos,
+     textos y colores. Es la única vista del panel. -->
 <div id="editor" style="display:none;">
   <aside id="editor-sidebar">
     <div style="padding:0 10px 20px;">
       <div style="font-weight:800;font-size:15px;">Panel de administración</div>
-      <div style="font-size:12px;color:#5A6470;margin-top:2px;">Edita fotos y textos en vivo</div>
+      <div style="font-size:12px;color:#5A6470;margin-top:2px;">Edita fotos, textos y colores en vivo</div>
     </div>
     <div id="editor-pages"></div>
     <div style="padding:16px 10px 0;margin-top:16px;border-top:1px solid #E3DFCF;">
-      <button class="navbtn" onclick="showPanelAvanzado()">⚙ Panel avanzado</button>
       <button class="navbtn" onclick="logoutAdmin()">⎋ Cerrar sesión</button>
     </div>
   </aside>
@@ -226,7 +224,7 @@ input[type="file"]{display:none;}
       <div style="display:flex;align-items:center;gap:10px;min-width:0;">
         <span id="editor-dot"></span>
         <h1 id="editor-pagename">Portada</h1>
-        <span class="editor-hint">— haz clic en cualquier foto o texto para editarlo</span>
+        <span class="editor-hint">— haz clic en cualquier foto, texto o color para editarlo</span>
       </div>
       <a id="editor-open-tab" href="#" target="_blank" style="font-size:12px;font-weight:700;color:#2F8FEA;white-space:nowrap;">Ver en pestaña nueva↗</a>
     </div>
