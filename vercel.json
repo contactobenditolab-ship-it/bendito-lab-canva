@@ -42,6 +42,10 @@
       "dest": "/link-bio.html"
     },
     {
+      "src": "/bio",
+      "dest": "/link-bio.html"
+    },
+    {
       "src": "/admin",
       "dest": "/admin.html"
     },
