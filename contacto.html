@@ -108,6 +108,10 @@ footer{background:var(--rose);}
       <input class="field" name="asunto" type="text" placeholder="Asunto">
       <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
       <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;">
+        <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
+        <span>Acepto que Bendito Lab guarde mis datos para responder a mi consulta. Consulta nuestra <a href="#" onclick="abrirModal('privacidad');return false;" style="text-decoration:underline;">política de privacidad</a>.</span>
+      </label>
       <button type="submit" class="btn-send">ENVIAR→</button>
       <p id="contacto-error" style="display:none;color:#B3261E;font-size:13px;margin:4px 0 0;"></p>
     </form>
@@ -145,7 +149,9 @@ footer{background:var(--rose);}
       <a href="dilo-bonito.html">Dilo bonito</a>
       <a href="bendito-lab.html">Bendito lab.</a>
       <a href="colaboradores.html">Colaboradores</a>
+      <a href="#" onclick="abrirModal('aviso');return false;">Aviso legal</a>
       <a href="#" onclick="abrirModal('privacidad');return false;">Política de privacidad</a>
+      <a href="#" onclick="abrirModal('cookies');return false;">Política de cookies</a>
       <a href="faq.html">F.A.Q.</a>
     </div>
     <span class="footer-copy">© 2026 Bendito lab.</span>
