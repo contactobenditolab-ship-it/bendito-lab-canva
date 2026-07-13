@@ -6,6 +6,8 @@
 //   email a colaboradores@benditolab.com. Así la solicitud queda guardada
 //   en su apartado dentro de OS, no solo como un email suelto.
 // Público (sin auth): lo llaman formularios de visitantes, no el admin.
+const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const OS_COLABORADOR_URL = 'https://portal.benditolab.com/api/public/colaborador-solicitud';
 
@@ -102,6 +104,10 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!dentroDelLimite('contact:' + ipDesdeRequest(req), 8, 15 * 60 * 1000)) {
+    return res.status(429).json({ error: 'Demasiadas solicitudes, inténtalo más tarde' });
   }
 
   let body = req.body;

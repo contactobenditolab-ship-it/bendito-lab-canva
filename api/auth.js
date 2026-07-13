@@ -1,11 +1,16 @@
 // POST /api/auth — login del panel admin. Body: { password }.
 const crypto = require('crypto');
 const { issueToken } = require('../lib/auth');
+const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!dentroDelLimite('auth:' + ipDesdeRequest(req), 10, 15 * 60 * 1000)) {
+    return res.status(429).json({ error: 'Demasiados intentos, inténtalo más tarde' });
   }
 
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
