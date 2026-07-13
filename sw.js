@@ -4,10 +4,12 @@
 const CACHE_NAME = 'bendito-lab-v5';
 const STATIC_CACHE = 'bendito-static-v5';
 
-// Solo cachear assets estáticos (imágenes, fuentes, iconos)
+// Solo cachear assets estáticos (imágenes, fuentes, iconos) + la portada,
+// que es el único HTML que se sirve como fallback offline.
 const STATIC_ASSETS = [
   '/manifest.json',
   '/logo-bendito.png',
+  '/portada.html',
 ];
 
 self.addEventListener('install', event => {
@@ -52,9 +54,14 @@ self.addEventListener('fetch', event => {
       url.pathname.endsWith('.html') || 
       url.pathname === '/') {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        // Solo offline: intentar cache como fallback
-        return caches.match('/portada.html') || caches.match('/index.html');
+      fetch(event.request).catch(async () => {
+        // Solo offline: intentar cache como fallback. caches.match()
+        // devuelve una promesa, así que hay que esperarla (un "||" entre dos
+        // promesas siempre es truthy y se queda con la primera, nunca prueba
+        // la segunda) y, si tampoco hay nada en caché, devolver una
+        // Response real en vez de undefined (si no, respondWith lanza error).
+        const cached = await caches.match('/portada.html');
+        return cached || new Response('Sin conexión', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
       })
     );
     return;
