@@ -78,8 +78,13 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify(emailPayload),
     });
-    if (!r.ok) throw new Error('Resend respondió ' + r.status);
+    if (!r.ok) {
+      const detalle = await r.text().catch(() => '');
+      console.error('Resend error', r.status, detalle);
+      throw new Error('Resend respondió ' + r.status + ': ' + detalle);
+    }
   } catch (e) {
+    console.error('Fallo al enviar email vía Resend:', e.message);
     return res.status(502).json({ error: 'No se pudo enviar. Escríbenos a contacto@benditolab.com' });
   }
 
