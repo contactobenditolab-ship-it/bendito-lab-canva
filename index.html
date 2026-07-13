@@ -183,7 +183,7 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
       <img src="logo-bendito.png" alt="Bendito Lab">
     </a>
   </div>
-  <button class="nav-hamburger" id="nav-ham" onclick="toggleNav()" aria-label="Menú">
+  <button class="nav-hamburger" id="nav-ham" aria-label="Menú">
     <span></span><span></span><span></span>
   </button>
   <nav class="nav-links" id="nav-links">
@@ -191,8 +191,8 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
     <a href="dilo-bonito.html">Dilo Bonito</a>
     <a href="bendito-lab.html">Bendito Lab</a>
     <a href="colaboradores.html">Colaboradores</a>
-    <a href="contacto.html" onclick="closeMob()">Contacto</a>
-    <a href="area-clientes.html" class="nav-cta" onclick="closeMob()">Área cliente</a>
+    <a href="contacto.html" class="mob-close-link">Contacto</a>
+    <a href="area-clientes.html" class="nav-cta mob-close-link">Área cliente</a>
   </nav>
 </header>
 
@@ -205,8 +205,8 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
     <div class="c-slide"><img src="images/carrusel-4.jpg" alt="Gorras personalizadas" loading="lazy"></div>
     <div class="c-slide"><img src="images/carrusel-5.jpg" alt="Tote bags" loading="lazy"></div>
   </div>
-  <button class="c-arrow prev" onclick="cPrev()" aria-label="Anterior">&#8592;</button>
-  <button class="c-arrow next" onclick="cNext()" aria-label="Siguiente">&#8594;</button>
+  <button class="c-arrow prev" id="c-arrow-prev" aria-label="Anterior">&#8592;</button>
+  <button class="c-arrow next" id="c-arrow-next" aria-label="Siguiente">&#8594;</button>
   <div class="c-dots" id="c-dots"></div>
 </div>
 
@@ -320,7 +320,7 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
           <label>Cuéntanos más</label>
           <textarea id="f-msg" placeholder="Tipo de evento, fecha aproximada, número de personas, productos que te interesan..."></textarea>
         </div>
-        <button class="cot-submit" onclick="enviarCotizacion()">ENVIAR SOLICITUD →</button>
+        <button class="cot-submit" id="btn-enviar-cotizacion">ENVIAR SOLICITUD →</button>
       </div>
       <div class="cot-ok" id="cot-ok">
         <div class="cot-ok-icon">✓</div>
@@ -367,229 +367,40 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
   <p>© 2026 Bendito Lab · Ciudad Real · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
   <p><a href="dilo-bonito.html">Dilo Bonito</a> · <a href="bendito-lab.html">Bendito Lab</a> · <a href="colaboradores.html">Colaboradores</a> · <a href="faq.html">F.A.Q.</a></p>
   <p>
-    <a href="#" onclick="abrirModal('aviso');return false;">Aviso Legal</a> ·
-    <a href="#" onclick="abrirModal('privacidad');return false;">Privacidad</a> ·
-    <a href="#" onclick="abrirModal('cookies');return false;">Cookies</a>
+    <a href="#" data-modal="aviso">Aviso Legal</a> ·
+    <a href="#" data-modal="privacidad">Privacidad</a> ·
+    <a href="#" data-modal="cookies">Cookies</a>
   </p>
 </footer>
 
-<script>
-// ── CARRUSEL ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function(){
-(function(){
-  var track = document.getElementById('c-track');
-  var dotsEl = document.getElementById('c-dots');
-  if (!track || !dotsEl) return;
-  var slides = track.children;
-  var n = slides.length;
-  var cur = 0;
-  var timer;
-
-  // Crear dots
-  for(var i=0;i<n;i++){
-    var d = document.createElement('button');
-    d.className = 'c-dot' + (i===0?' on':'');
-    d.setAttribute('data-i', i);
-    d.onclick = (function(idx){ return function(){ clearInterval(timer); go(idx); start(); }; })(i);
-    dotsEl.appendChild(d);
-  }
-
-  function go(idx){
-    cur = (idx+n)%n;
-    track.style.transform = 'translateX(-'+cur*100+'%)';
-    document.querySelectorAll('.c-dot').forEach(function(d,j){ d.classList.toggle('on',j===cur); });
-  }
-  window.cPrev = function(){ clearInterval(timer); go(cur-1); start(); };
-  window.cNext = function(){ clearInterval(timer); go(cur+1); start(); };
-  function start(){ timer = setInterval(function(){ go(cur+1); }, 4500); }
-
-  // Swipe
-  var sx=0;
-  var el=document.getElementById('carousel');
-  el.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
-  el.addEventListener('touchend',function(e){
-    var dx=sx-e.changedTouches[0].clientX;
-    if(Math.abs(dx)>50){ dx>0?cNext():cPrev(); }
-  },{passive:true});
-
-  start();
-})();
-}); // end DOMContentLoaded carrusel
-
-// ── NAV MOBILE ────────────────────────────────────────────
-function toggleNav(){
-  var isOpen=document.body.classList.contains('nav-open');
-  if(isOpen){closeMob();}else{
-    document.getElementById('nav').classList.add('mob-open');
-    document.getElementById('nav-ham').classList.add('open');
-    document.body.classList.add('nav-open');
-    document.body.style.overflow='hidden';
-  }
-}
-function closeMob(){
-  document.getElementById('nav').classList.remove('mob-open');
-  document.getElementById('nav-ham').classList.remove('open');
-  document.body.classList.remove('nav-open');
-  document.body.style.overflow='';
-}
-document.querySelectorAll('.nav-links a').forEach(function(a){a.addEventListener('click',closeMob);});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMob();});
-
-
-// ── FORMULARIO COTIZACIÓN ─────────────────────────────────
-async function enviarCotizacion(){
-  var nombre = document.getElementById('f-nombre').value.trim();
-  var tel    = document.getElementById('f-tel').value.trim();
-  var email  = document.getElementById('f-email').value.trim();
-  var tipo   = document.getElementById('f-tipo').value;
-  var msg    = document.getElementById('f-msg').value.trim();
-
-  if(!nombre||!tel||!email){
-    alert('Por favor rellena nombre, teléfono y email.');
-    return;
-  }
-
-  var btn = document.querySelector('.cot-submit');
-  btn.disabled=true; btn.textContent='Enviando...';
-
-  try{
-    await fetch('https://hook.eu1.make.com/mq9p9vhujumqorqyoy72fgce79jhp2op',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        tipo_formulario:'cotizacion_portada',
-        nombre, telefono:tel, email, servicio:tipo, mensaje:msg
-      })
-    });
-    document.getElementById('cot-form').style.display='none';
-    document.getElementById('cot-ok').style.display='block';
-  }catch(e){
-    btn.disabled=false; btn.textContent='ENVIAR SOLICITUD →';
-    alert('Error al enviar. Escríbenos directamente a contacto@benditolab.com');
-  }
-}
-</script>
+<script src="js/index-1.js"></script>
 
 
 
-<script>
-// Cargar colores personalizados desde localStorage (admin) y Sheets
-(function() {
-  var COLOR_VARS = ['cream','deep','captain','baby','sunshine','poppy','white','mid','gray'];
-  var root = document.documentElement;
-
-  // 1. Primero aplicar desde localStorage (guardado por el admin)
-  try {
-    var stored = localStorage.getItem('bl-portada-v1');
-    if (stored) {
-      var data = JSON.parse(stored);
-      COLOR_VARS.forEach(function(id) {
-        var val = data['color-' + id];
-        if (val && val.startsWith('#')) {
-          root.style.setProperty('--' + id, val);
-        }
-      });
-    }
-  } catch(e) {}
-
-  // 2. Luego intentar Sheets (sobreescribe si hay datos más recientes)
-  setTimeout(async function() {
-    try {
-      var r = await fetch('/api/proxy?scope=web&web=portada&t=' + Date.now());
-      var d = await r.json();
-      if (!d.ok || !d.data) return;
-      var data = d.data;
-      // Formato Sheets: colores.cream → --cream
-      COLOR_VARS.forEach(function(id) {
-        var val = data['colores.' + id] || data['color-' + id];
-        if (val && val.startsWith('#')) {
-          root.style.setProperty('--' + id, val);
-        }
-      });
-    } catch(e) { /* sin conexión — se usan los del localStorage o los por defecto */ }
-  }, 300);
-})();
-</script>
+<script src="js/index-2.js"></script>
 
 <!-- ====== BANNER COOKIES ====== -->
 <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#fff;padding:16px 24px;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 12px rgba(0,0,0,0.3);align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <span style="flex:1;min-width:200px;">
     🍪 Usamos cookies propias y de Google Analytics para mejorar tu experiencia.
-    <a href="#" onclick="abrirModal('privacidad');return false;" style="color:#E8C24A;text-decoration:underline;">Privacidad</a> ·
-    <a href="#" onclick="abrirModal('cookies');return false;" style="color:#E8C24A;text-decoration:underline;">Cookies</a>
+    <a href="#" data-modal="privacidad" style="color:#E8C24A;text-decoration:underline;">Privacidad</a> ·
+    <a href="#" data-modal="cookies" style="color:#E8C24A;text-decoration:underline;">Cookies</a>
   </span>
   <div style="display:flex;gap:8px;flex-shrink:0;">
-    <button onclick="rechazarCookies()" style="background:transparent;border:1px solid #E8C24A;color:#E8C24A;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;">Rechazar</button>
-    <button onclick="aceptarCookies()" style="background:#E8C24A;border:none;color:#17233F;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">Aceptar</button>
+    <button id="btn-rechazar-cookies" style="background:transparent;border:1px solid #E8C24A;color:#E8C24A;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;">Rechazar</button>
+    <button id="btn-aceptar-cookies" style="background:#E8C24A;border:none;color:#17233F;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">Aceptar</button>
   </div>
 </div>
 
 <!-- ====== MODAL LEGAL ====== -->
 <div id="modal-legal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;">
   <div style="background:#fff;max-width:760px;margin:0 auto;border-radius:12px;padding:40px;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222;position:relative;">
-    <button onclick="cerrarModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;">✕</button>
+    <button id="btn-cerrar-modal" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;">✕</button>
     <div id="modal-contenido"></div>
   </div>
 </div>
 
-<script>
-var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso Legal</h2>
-<ul>
-<li><strong>Titular:</strong> Silvia G. M. · NIF: 05931103-R</li>
-<li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares, Ciudad Real</li>
-<li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
-<li><strong>Actividad:</strong> Personalización y merchandising (Bendito Lab · Dilo Bonito)</li>
-</ul>
-<p>Todos los contenidos del sitio son propiedad de la titular o de terceros autorizados. Queda prohibida su reproducción sin autorización escrita. Legislación española aplicable — Juzgados de Manzanares, Ciudad Real.</p>`;
-
-var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de Privacidad</h2>
-<p><strong>Responsable:</strong> Silvia G. M. · NIF 05931103-R · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
-<p><strong>Datos recabados:</strong> A través de los formularios de contacto y colaboradores: nombre, email, teléfono, empresa/espacio y el resto de datos indicados en el formulario. Finalidad: gestionar tu consulta o solicitud de colaboración.</p>
-<p><strong>Base legal:</strong> Consentimiento (art. 6.1.a RGPD) y ejecución de contrato (art. 6.1.b RGPD).</p>
-<p><strong>Conservación:</strong> Durante el tiempo necesario y los plazos legales (hasta 5 años).</p>
-<p><strong>Terceros:</strong> Google Analytics (Google LLC, analítica web), Resend (envío de emails transaccionales) y Bendito OS / Supabase (gestión de solicitudes de colaboración).</p>
-<p><strong>Tus derechos:</strong> Acceso, rectificación, supresión, oposición, limitación y portabilidad. Escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a> o reclama ante la <a href="https://www.aepd.es" target="_blank">AEPD</a>.</p>`;
-
-var textoCookies = `<h2 style="color:#17233F;margin-top:0">Política de Cookies</h2>
-<table style="width:100%;border-collapse:collapse;font-size:13px;">
-<tr style="background:#f5f5f5;"><th style="padding:8px;border:1px solid #ddd;text-align:left;">Cookie</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Tipo</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Finalidad</th><th style="padding:8px;border:1px solid #ddd;text-align:left;">Duración</th></tr>
-<tr><td style="padding:8px;border:1px solid #ddd;">bl_cookie_consent</td><td style="padding:8px;border:1px solid #ddd;">Técnica propia</td><td style="padding:8px;border:1px solid #ddd;">Guardar tu preferencia</td><td style="padding:8px;border:1px solid #ddd;">1 año</td></tr>
-<tr><td style="padding:8px;border:1px solid #ddd;">_ga, _gid, _gat</td><td style="padding:8px;border:1px solid #ddd;">Analítica (Google)</td><td style="padding:8px;border:1px solid #ddd;">Análisis anónimo del tráfico</td><td style="padding:8px;border:1px solid #ddd;">Hasta 2 años</td></tr>
-</table>
-<p style="margin-top:16px;">Puedes rechazar o retirar el consentimiento en cualquier momento. Desactivar Analytics: <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">tools.google.com/dlpage/gaoptout</a></p>`;
-
-function abrirModal(tipo) {
-  document.getElementById('modal-contenido').innerHTML = tipo==='aviso'?textoAviso:tipo==='privacidad'?textoPrivacidad:textoCookies;
-  document.getElementById('modal-legal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-function cerrarModal() {
-  document.getElementById('modal-legal').style.display = 'none';
-  document.body.style.overflow = '';
-}
-document.getElementById('modal-legal').addEventListener('click', function(e){ if(e.target===this) cerrarModal(); });
-
-function aceptarCookies() {
-  localStorage.setItem('bl_cookie_consent','accepted');
-  document.getElementById('cookie-banner').style.display = 'none';
-  activarAnalytics();
-}
-function rechazarCookies() {
-  localStorage.setItem('bl_cookie_consent','rejected');
-  document.getElementById('cookie-banner').style.display = 'none';
-}
-function activarAnalytics() {
-  if(window._gaActivado) return; window._gaActivado=true;
-  var s=document.createElement('script'); s.src='https://www.googletagmanager.com/gtag/js?id=G-QHM1133FL4'; s.async=true; document.head.appendChild(s);
-  window.dataLayer=window.dataLayer||[]; function gtag(){dataLayer.push(arguments);} window.gtag=gtag;
-  gtag('js',new Date()); gtag('config','G-QHM1133FL4');
-}
-window.addEventListener('DOMContentLoaded', function(){
-  var consent = localStorage.getItem('bl_cookie_consent');
-  if (!consent) { var b=document.getElementById('cookie-banner'); b.style.display='flex'; }
-  if (consent==='accepted') activarAnalytics();
-});
-</script>
+<script src="js/index-3.js"></script>
 <script src="/js/bl-api.js" defer></script>
 <script src="js/bl-images.js" defer></script>
 
