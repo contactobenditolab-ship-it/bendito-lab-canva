@@ -12,6 +12,24 @@ var SEC_STYLES = [
   {id:'sec-redes',      name:'Síguenos en redes',           bgDef:'#17233F', colorDef:'#FBF4E9'},
 ];
 
+function showToast(msg) {
+  var t = document.getElementById('bl-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'bl-toast';
+    t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:#17233F;color:#E8C24A;padding:10px 22px;border-radius:20px;font-size:13px;font-family:'Inter',sans-serif;opacity:0;transition:all .25s;z-index:9999;white-space:nowrap;pointer-events:none;";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(function () {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(16px)';
+  }, 2500);
+}
+
 function uploadImgData(el) { uploadImg(el, el.dataset.path, el.dataset.grp); }
 
 function anadirImgData(el) { anadirImg(el, el.dataset.grp); }
