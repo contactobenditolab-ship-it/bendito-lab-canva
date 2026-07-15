@@ -10,6 +10,7 @@ const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const OS_COLABORADOR_URL = 'https://portal.benditolab.com/api/public/colaborador-solicitud';
+const OS_COTIZACION_URL = 'https://portal.benditolab.com/api/public/cotizacion';
 
 const FISICOS = ['Finca', 'Restaurante', 'Hotel', 'Espacio de eventos'];
 
@@ -100,6 +101,26 @@ async function enviarColaboradorAOS(data) {
   }
 }
 
+async function enviarCotizacionAOS(data) {
+  const payload = {
+    nombre: data.nombre,
+    telefono: data.telefono,
+    email: data.email,
+    servicio: valorUtil(data.servicio) || undefined,
+    mensaje: valorUtil(data.mensaje) || undefined,
+  };
+
+  const r = await fetch(OS_COTIZACION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!r.ok) {
+    const detalle = await r.text().catch(() => '');
+    throw new Error('Bendito OS respondió ' + r.status + ': ' + detalle);
+  }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -120,16 +141,21 @@ module.exports = async function handler(req, res) {
   if (typeof body?.website === 'string' && body.website.trim()) {
     return res.status(200).json({ ok: true });
   }
-  if (type !== 'contacto' && type !== 'colaborador') {
+  if (type !== 'contacto' && type !== 'colaborador' && type !== 'cotizacion') {
     return res.status(400).json({ error: 'Tipo de formulario desconocido' });
   }
   if (typeof data.nombre !== 'string' || !data.nombre.trim() || typeof data.email !== 'string' || !data.email.trim()) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+  if (type === 'cotizacion' && (typeof data.telefono !== 'string' || !data.telefono.trim())) {
     return res.status(400).json({ error: 'Faltan datos obligatorios' });
   }
 
   try {
     if (type === 'colaborador') {
       await enviarColaboradorAOS(data);
+    } else if (type === 'cotizacion') {
+      await enviarCotizacionAOS(data);
     } else {
       await enviarContactoEmail(data);
     }
