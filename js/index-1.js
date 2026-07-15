@@ -78,13 +78,16 @@ async function enviarCotizacion(){
   btn.disabled=true; btn.textContent='Enviando...';
 
   try{
-    await fetch('https://app.benditolab.com/api/public/cotizacion',{
+    var r = await fetch('/api/contact',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        nombre, telefono:tel, email, servicio:tipo, mensaje:msg
+        type: 'cotizacion',
+        data: { nombre, telefono:tel, email, servicio:tipo, mensaje:msg }
       })
     });
+    var d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Error al enviar');
     document.getElementById('cot-form').style.display='none';
     document.getElementById('cot-ok').style.display='block';
   }catch(e){
