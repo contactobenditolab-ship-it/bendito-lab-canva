@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /produccion
+Disallow: /area-clientes
+Disallow: /portal
+Disallow: /api/
+
+Sitemap: https://www.benditolab.com/sitemap.xml
