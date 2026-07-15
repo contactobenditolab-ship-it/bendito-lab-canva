@@ -78,11 +78,10 @@ async function enviarCotizacion(){
   btn.disabled=true; btn.textContent='Enviando...';
 
   try{
-    await fetch('https://hook.eu1.make.com/mq9p9vhujumqorqyoy72fgce79jhp2op',{
+    await fetch('https://app.benditolab.com/api/public/cotizacion',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        tipo_formulario:'cotizacion_portada',
         nombre, telefono:tel, email, servicio:tipo, mensaje:msg
       })
     });
