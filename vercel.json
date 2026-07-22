@@ -44,7 +44,8 @@
     },
     {
       "src": "/unete",
-      "dest": "/unete.html"
+      "status": 301,
+      "headers": { "Location": "/colaboradores#unete-form" }
     },
     {
       "src": "/faq",
