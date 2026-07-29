@@ -106,6 +106,8 @@ async function enviarContactoAOS(data) {
   const payload = {
     nombre: data.nombre,
     email: data.email,
+    telefono: valorUtil(data.telefono) || undefined,
+    contactoPreferido: valorUtil(data.contacto_preferido) || undefined,
     asunto: valorUtil(data.asunto) || undefined,
     mensaje: valorUtil(data.mensaje) || undefined,
   };
