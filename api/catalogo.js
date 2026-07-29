@@ -1,8 +1,10 @@
 // GET /api/catalogo — lista pública de artículos activos del catálogo de
 // Bendito Lab (mismo proyecto Supabase que usa Bendito OS). Solo se
 // seleccionan columnas seguras de mostrar a un visitante: nada de coste,
-// proveedor, notas internas ni stock. Sin autenticación (uso: página
-// catalogo.html), de solo lectura.
+// proveedor, notas internas ni stock. Sin autenticación, de solo lectura.
+// Usado por catalogo.html (grid completo, filtrable por categoría) y
+// coleccion.html (sub-páginas filtradas por etiqueta — negocio, temporada,
+// campaña...).
 const { createClient } = require('@supabase/supabase-js');
 
 let cachedClient = null;
@@ -18,7 +20,7 @@ function client() {
 }
 
 const CAMPOS_PUBLICOS = [
-  'id', 'nombre', 'categoria', 'subcategoria',
+  'id', 'nombre', 'categoria', 'subcategoria', 'etiquetas',
   'descripcion', 'descripcion_corta',
   'material', 'colores', 'medidas', 'capacidad', 'formato', 'acabados',
   'tecnicas_personalizacion', 'guia_tallas',
