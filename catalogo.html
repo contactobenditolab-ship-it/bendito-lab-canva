@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contacto · Bendito Lab</title>
-<meta name="description" content="Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.benditolab.com/contacto">
-<meta property="og:title" content="Contacto · Bendito Lab">
-<meta property="og:description" content="Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.">
-<meta property="og:url" content="https://www.benditolab.com/contacto">
+<title>Catálogo · Bendito Lab</title>
+<meta name="description" content="Explora nuestro catálogo de artículos personalizables para empresas y eventos. Pide presupuesto sin compromiso, sin tienda online.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://www.benditolab.com/catalogo">
+<meta property="og:title" content="Catálogo · Bendito Lab">
+<meta property="og:description" content="Explora nuestro catálogo de artículos personalizables para empresas y eventos. Pide presupuesto sin compromiso.">
+<meta property="og:url" content="https://www.benditolab.com/catalogo">
 <meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Contacto · Bendito Lab">
-<meta name="twitter:description" content="Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.">
+<meta name="twitter:title" content="Catálogo · Bendito Lab">
+<meta name="twitter:description" content="Explora nuestro catálogo de artículos personalizables para empresas y eventos. Pide presupuesto sin compromiso.">
 <meta name="twitter:image" content="https://www.benditolab.com/logo-bendito.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{ --cream:#F4F1E6; --deep:#17233F; --white:#FBF4E9; --poppy:#E2704A; --sage:#9AB791; --captain:#2F8FEA; --rose:#E3A29C; }
+:root{ --cream:#F4F1E6; --deep:#17233F; --white:#FBF4E9; --poppy:#E2704A; --sage:#9AB791; --captain:#2F8FEA; --rose:#E3A29C; --baby:#93ACA7; --sunshine:#E8C24A; }
 *{box-sizing:border-box;}
 body{margin:0;background:var(--cream);font-family:'Inter',sans-serif;color:var(--deep);overflow-x:hidden;}
 a{color:inherit;text-decoration:none;}
@@ -42,30 +42,33 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .intro h1{font-weight:800;font-size:clamp(32px,5vw,48px);margin:0 0 16px;}
 .intro p{max-width:640px;margin:0 auto;font-size:17px;line-height:1.6;}
 
-.form-wrap{max-width:1100px;margin:0 auto;padding:32px 5vw 80px;display:grid;grid-template-columns:1.2fr 1fr;gap:56px;}
-.form-wrap form{display:flex;flex-direction:column;gap:16px;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.field{padding:14px 18px;border-radius:8px;border:1px solid #D9D3C0;background:#fff;font-size:15px;color:var(--deep);}
-textarea.field{resize:vertical;}
-.btn-send{background:var(--captain);color:var(--white);font-weight:700;font-size:14px;padding:16px 32px;border-radius:8px;border:none;cursor:pointer;align-self:flex-start;}
-.info-card{background:var(--sage);border-radius:14px;padding:32px;}
-.info-card h2{font-weight:800;font-size:20px;margin:0 0 24px;}
-.info-block{margin-bottom:20px;}
-.info-block:last-of-type{margin-bottom:28px;}
-.info-label{font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;opacity:.8;margin-bottom:4px;}
-.info-value{font-size:15px;font-weight:600;}
-.social-row{display:flex;align-items:center;gap:14px;font-size:20px;}
+.categorias{max-width:1200px;margin:32px auto 0;padding:0 5vw;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.cat-btn{border:1px solid var(--deep);background:var(--cream);color:var(--deep);font-weight:700;font-size:12px;letter-spacing:.5px;padding:9px 18px;border-radius:22px;cursor:pointer;}
+.cat-btn.activo{background:var(--deep);color:var(--white);}
 
-footer{background:var(--rose);}
-.footer-bottom{max-width:1200px;margin:0 auto;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-.footer-bottom-links{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
-.footer-bottom-links img{height:26px;width:26px;display:block;}
-.footer-bottom-links a{color:var(--white);font-weight:600;font-size:14px;}
-.footer-copy{color:var(--white);font-size:13px;}
+.catalogo-grid{max-width:1200px;margin:40px auto 0;padding:0 5vw 80px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.prod-card{background:var(--white);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #E4DEC9;}
+.prod-card-img{height:200px;background:var(--baby);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.prod-card-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.prod-card-img span{color:var(--white);font-size:12px;font-weight:700;}
+.prod-card-body{padding:18px;flex:1;display:flex;flex-direction:column;}
+.prod-cat{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
+.prod-nombre{font-size:15px;font-weight:700;margin:0 0 8px;}
+.prod-desc{font-size:13px;line-height:1.5;color:var(--deep);opacity:.8;margin:0 0 16px;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.btn-presupuesto{background:var(--captain);color:var(--white);font-weight:700;font-size:12px;padding:11px 16px;border-radius:20px;border:none;cursor:pointer;text-align:center;}
+.catalogo-vacio,.catalogo-cargando{text-align:center;padding:60px 20px;font-size:14px;color:var(--deep);opacity:.7;grid-column:1/-1;}
+
+#modal-presupuesto{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;}
+.mp-box{background:#fff;max-width:480px;margin:0 auto;border-radius:12px;padding:32px;position:relative;}
+.mp-box .btn-cerrar{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
+.mp-box h3{font-size:19px;margin:0 0 4px;}
+.mp-box .mp-producto{font-size:13px;color:var(--baby);font-weight:700;margin:0 0 20px;}
+.mp-box form{display:flex;flex-direction:column;gap:12px;}
+.field{padding:12px 16px;border-radius:8px;border:1px solid #D9D3C0;background:#fff;font-size:14px;color:var(--deep);width:100%;}
+textarea.field{resize:vertical;}
 
 @media(max-width:900px){
-  .form-wrap{grid-template-columns:1fr;gap:32px;}
-  .grid2{grid-template-columns:1fr;}
+  .catalogo-grid{grid-template-columns:repeat(2,1fr);}
   .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
   .site-nav a{font-size:20px;color:var(--white)!important;}
   .nav-hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;position:absolute;top:28px;right:5vw;z-index:1001;}
@@ -76,6 +79,17 @@ footer{background:var(--rose);}
   .footer-bottom{flex-direction:column;text-align:center;}
   .footer-bottom-links{justify-content:center;}
 }
+@media(max-width:560px){
+  .catalogo-grid{grid-template-columns:1fr 1fr;gap:14px;}
+  .prod-card-img{height:150px;}
+}
+
+footer{background:var(--rose);}
+.footer-bottom{max-width:1200px;margin:0 auto;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-bottom-links{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.footer-bottom-links img{height:26px;width:26px;display:block;}
+.footer-bottom-links a{color:var(--white);font-weight:600;font-size:14px;}
+.footer-copy{color:var(--white);font-size:13px;}
 </style>
   <link rel="apple-touch-icon" href="/icon-web-180.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icon-web-16.png">
@@ -86,7 +100,7 @@ footer{background:var(--rose);}
 </head>
 <body>
 
-<header class="site-header" data-color-bg="contacto.header.bg">
+<header class="site-header">
   <div class="header-tag">Artículos personalizados para empresas y eventos</div>
   <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
@@ -102,61 +116,14 @@ footer{background:var(--rose);}
 </header>
 
 <section class="intro">
-  <h1 data-edit="contacto.hero.h1" data-color-text="contacto.hero.h1">¿Hablamos?</h1>
-  <p>Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.</p>
+  <h1>Catálogo</h1>
+  <p>Todavía no tenemos tienda online — explora los artículos que trabajamos y pide presupuesto sin compromiso. Te lo preparamos a medida para tu marca o evento.</p>
 </section>
 
-<section class="form-wrap">
-  <div>
-    <form id="contacto-form">
-      <div class="grid2">
-        <input class="field" name="nombre" type="text" placeholder="Nombre" required>
-        <input class="field" name="email" type="email" placeholder="Email" required>
-      </div>
-      <div class="grid2">
-        <input class="field" name="telefono" type="tel" placeholder="Teléfono (opcional)">
-        <select class="field" name="contacto_preferido">
-          <option value="">¿Cómo prefieres que te contactemos?</option>
-          <option value="email">Email</option>
-          <option value="telefono">Teléfono</option>
-          <option value="whatsapp">WhatsApp</option>
-        </select>
-      </div>
-      <input class="field" name="asunto" type="text" placeholder="Asunto">
-      <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
-      <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
-      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;">
-        <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
-        <span>Acepto que Bendito Lab guarde mis datos para responder a mi consulta. Consulta nuestra <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
-      </label>
-      <button type="submit" class="btn-send">ENVIAR→</button>
-      <p id="contacto-error" style="display:none;color:#B3261E;font-size:13px;margin:4px 0 0;"></p>
-    </form>
-    <div id="contacto-success" style="display:none;text-align:center;padding:40px 20px;">
-      <div style="font-size:40px;margin-bottom:12px;">✓</div>
-      <h2 style="font-size:22px;margin:0 0 8px;">¡Mensaje enviado!</h2>
-      <p style="font-size:14px;color:var(--deep);">Te responderemos en menos de 24 horas.</p>
-    </div>
-  </div>
+<div class="categorias" id="categorias" style="display:none;"></div>
 
-  <div class="info-card">
-    <h2 data-edit="contacto.info.title">También puedes escribirnos por</h2>
-    <div class="info-block">
-      <div class="info-label">Email</div>
-      <a class="info-value" href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>
-    </div>
-    <div class="info-block">
-      <div class="info-label">WhatsApp</div>
-      <a class="info-value" href="https://wa.me/34647444308" target="_blank">+34 647 44 43 08</a>
-    </div>
-    <div class="info-label">Redes sociales</div>
-    <div class="social-row">
-      <a href="https://instagram.com/bendito_lab" target="_blank" aria-label="Instagram"><img src="images/social-instagram.svg" alt="Instagram" width="28" height="28"></a>
-      <a href="https://wa.me/34647444308" target="_blank" aria-label="WhatsApp"><img src="images/social-whatsapp.svg" alt="WhatsApp" width="28" height="28"></a>
-      <a href="https://tiktok.com/@bendito_lab" target="_blank" aria-label="TikTok"><img src="images/social-tiktok.svg" alt="TikTok" width="28" height="28"></a>
-      <a href="mailto:contacto@benditolab.com" aria-label="Email"><img src="images/social-email.svg" alt="Email" width="28" height="28"></a>
-    </div>
-  </div>
+<section class="catalogo-grid" id="catalogo-grid">
+  <p class="catalogo-cargando">Cargando catálogo…</p>
 </section>
 
 <footer>
@@ -182,6 +149,31 @@ footer{background:var(--rose);}
   </div>
 </div>
 
+<div id="modal-presupuesto">
+  <div class="mp-box">
+    <button class="btn-cerrar" id="btn-cerrar-presupuesto">✕</button>
+    <h3>Pedir presupuesto</h3>
+    <p class="mp-producto" id="mp-producto-nombre"></p>
+    <form id="presupuesto-form">
+      <input class="field" name="nombre" type="text" placeholder="Nombre" required>
+      <input class="field" name="email" type="email" placeholder="Email" required>
+      <input class="field" name="telefono" type="tel" placeholder="Teléfono" required>
+      <textarea class="field" name="mensaje" rows="3" placeholder="Cantidad, personalización u otros detalles (opcional)"></textarea>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;">
+        <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
+        <span>Acepto que Bendito Lab guarde mis datos para gestionar esta solicitud. Consulta la <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
+      </label>
+      <button type="submit" class="btn-presupuesto">ENVIAR SOLICITUD→</button>
+      <p id="presupuesto-error" style="display:none;color:#B3261E;font-size:13px;margin:0;"></p>
+    </form>
+    <div id="presupuesto-success" style="display:none;text-align:center;padding:20px 0;">
+      <div style="font-size:34px;margin-bottom:10px;">✓</div>
+      <h3 style="margin:0 0 6px;">¡Solicitud enviada!</h3>
+      <p style="font-size:13px;">Te contactaremos pronto con tu presupuesto.</p>
+    </div>
+  </div>
+</div>
+
 <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#fff;padding:16px 24px;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 12px rgba(0,0,0,0.3);align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <span style="flex:1;min-width:200px;">
     🍪 Usamos cookies propias y de Google Analytics para mejorar tu experiencia.
@@ -194,8 +186,7 @@ footer{background:var(--rose);}
   </div>
 </div>
 
-<script src="js/contacto-1.js"></script>
-<script src="js/contacto-2.js"></script>
-<script src="js/bl-images.js" defer></script>
+<script src="js/catalogo-1.js"></script>
+<script src="js/catalogo-2.js"></script>
 </body>
 </html>
