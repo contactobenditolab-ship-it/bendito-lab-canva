@@ -112,6 +112,15 @@ footer{background:var(--rose);}
         <input class="field" name="nombre" type="text" placeholder="Nombre" required>
         <input class="field" name="email" type="email" placeholder="Email" required>
       </div>
+      <div class="grid2">
+        <input class="field" name="telefono" type="tel" placeholder="Teléfono (opcional)">
+        <select class="field" name="contacto_preferido">
+          <option value="">¿Cómo prefieres que te contactemos?</option>
+          <option value="email">Email</option>
+          <option value="telefono">Teléfono</option>
+          <option value="whatsapp">WhatsApp</option>
+        </select>
+      </div>
       <input class="field" name="asunto" type="text" placeholder="Asunto">
       <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
       <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
