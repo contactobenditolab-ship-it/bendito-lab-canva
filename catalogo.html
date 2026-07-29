@@ -52,13 +52,14 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .prod-card-img img{width:100%;height:100%;object-fit:cover;display:block;}
 .prod-card-img span{color:var(--white);font-size:12px;font-weight:700;}
 .prod-card-body{padding:18px;flex:1;display:flex;flex-direction:column;}
+.prod-clicable{cursor:pointer;display:block;}
 .prod-cat{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
 .prod-nombre{font-size:15px;font-weight:700;margin:0 0 8px;}
 .prod-desc{font-size:13px;line-height:1.5;color:var(--deep);opacity:.8;margin:0 0 16px;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .btn-presupuesto{background:var(--captain);color:var(--white);font-weight:700;font-size:12px;padding:11px 16px;border-radius:20px;border:none;cursor:pointer;text-align:center;}
 .catalogo-vacio,.catalogo-cargando{text-align:center;padding:60px 20px;font-size:14px;color:var(--deep);opacity:.7;grid-column:1/-1;}
 
-#modal-presupuesto{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;}
+#modal-presupuesto,#modal-detalle{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;}
 .mp-box{background:#fff;max-width:480px;margin:0 auto;border-radius:12px;padding:32px;position:relative;}
 .mp-box .btn-cerrar{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
 .mp-box h3{font-size:19px;margin:0 0 4px;}
@@ -66,6 +67,21 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .mp-box form{display:flex;flex-direction:column;gap:12px;}
 .field{padding:12px 16px;border-radius:8px;border:1px solid #D9D3C0;background:#fff;font-size:14px;color:var(--deep);width:100%;}
 textarea.field{resize:vertical;}
+
+.md-box{background:#fff;max-width:760px;margin:0 auto;border-radius:12px;padding:32px;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.md-box .btn-cerrar{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;z-index:1;}
+.md-img{aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--baby);display:flex;align-items:center;justify-content:center;}
+.md-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.md-img span{color:var(--white);font-size:13px;font-weight:700;}
+.md-cat{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
+.md-box h3{font-size:22px;margin:0 0 14px;}
+.md-desc{font-size:14px;line-height:1.6;color:var(--deep);opacity:.85;margin:0 0 18px;}
+.md-atributos{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:0 0 22px;font-size:13px;}
+.md-atributos dt{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0;}
+.md-atributos dd{margin:2px 0 0;}
+@media(max-width:640px){
+  .md-box{grid-template-columns:1fr;padding:24px;}
+}
 
 @media(max-width:900px){
   .catalogo-grid{grid-template-columns:repeat(2,1fr);}
@@ -172,6 +188,10 @@ footer{background:var(--rose);}
       <p style="font-size:13px;">Te contactaremos pronto con tu presupuesto.</p>
     </div>
   </div>
+</div>
+
+<div id="modal-detalle">
+  <div class="md-box" id="md-contenido"></div>
 </div>
 
 <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#fff;padding:16px 24px;z-index:99999;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 -2px 12px rgba(0,0,0,0.3);align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">

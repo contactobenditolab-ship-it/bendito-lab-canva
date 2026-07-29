@@ -53,10 +53,12 @@ function renderGrid() {
     var desc = a.descripcion_corta || a.descripcion || '';
     return (
       '<div class="prod-card">' +
-        '<div class="prod-card-img">' + img + '</div>' +
+        '<div class="prod-clicable" data-detalle-id="' + escapeHtml(a.id) + '">' +
+          '<div class="prod-card-img">' + img + '</div>' +
+        '</div>' +
         '<div class="prod-card-body">' +
           (a.categoria ? '<p class="prod-cat">' + escapeHtml(a.categoria) + '</p>' : '') +
-          '<p class="prod-nombre">' + escapeHtml(a.nombre) + '</p>' +
+          '<p class="prod-nombre prod-clicable" data-detalle-id="' + escapeHtml(a.id) + '">' + escapeHtml(a.nombre) + '</p>' +
           (desc ? '<p class="prod-desc">' + escapeHtml(desc) + '</p>' : '') +
           '<button type="button" class="btn-presupuesto" data-articulo-id="' + escapeHtml(a.id) + '">Pedir presupuesto</button>' +
         '</div>' +
@@ -66,6 +68,9 @@ function renderGrid() {
 
   cont.querySelectorAll('.btn-presupuesto').forEach(function(btn){
     btn.addEventListener('click', function(){ abrirModalPresupuesto(btn.dataset.articuloId); });
+  });
+  cont.querySelectorAll('.prod-clicable').forEach(function(el){
+    el.addEventListener('click', function(){ abrirModalDetalle(el.dataset.detalleId); });
   });
 }
 
@@ -140,4 +145,62 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
   } finally {
     btn.disabled = false; btn.textContent = 'ENVIAR SOLICITUD→';
   }
+});
+
+// ── Modal de detalle de producto ──────────────────────────
+function abrirModalDetalle(articuloId) {
+  var a = TODOS_LOS_ARTICULOS.find(function(x){ return x.id === articuloId; });
+  if (!a) return;
+
+  var img = a.imagen_principal_url
+    ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '">'
+    : '<span>Sin imagen</span>';
+
+  var atributos = [
+    ['Material', a.material],
+    ['Colores', a.colores && a.colores.length ? a.colores.join(', ') : null],
+    ['Medidas', a.medidas],
+    ['Capacidad', a.capacidad],
+    ['Formato', a.formato],
+    ['Acabados', a.acabados],
+    ['Personalización', a.tecnicas_personalizacion && a.tecnicas_personalizacion.length ? a.tecnicas_personalizacion.join(', ') : null],
+    ['Guía de tallas', a.guia_tallas],
+  ].filter(function(par){ return !!par[1]; });
+
+  var atributosHtml = atributos.length
+    ? '<dl class="md-atributos">' + atributos.map(function(par){
+        return '<div><dt>' + escapeHtml(par[0]) + '</dt><dd>' + escapeHtml(par[1]) + '</dd></div>';
+      }).join('') + '</dl>'
+    : '';
+
+  var desc = a.descripcion || a.descripcion_corta || '';
+
+  document.getElementById('md-contenido').innerHTML =
+    '<button class="btn-cerrar" id="btn-cerrar-detalle">✕</button>' +
+    '<div class="md-img">' + img + '</div>' +
+    '<div>' +
+      (a.categoria ? '<p class="md-cat">' + escapeHtml(a.categoria) + (a.subcategoria ? ' · ' + escapeHtml(a.subcategoria) : '') + '</p>' : '') +
+      '<h3>' + escapeHtml(a.nombre) + '</h3>' +
+      (desc ? '<p class="md-desc">' + escapeHtml(desc) + '</p>' : '') +
+      atributosHtml +
+      '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
+    '</div>';
+
+  document.getElementById('btn-cerrar-detalle').addEventListener('click', cerrarModalDetalle);
+  document.getElementById('btn-presupuesto-desde-detalle').addEventListener('click', function(){
+    cerrarModalDetalle();
+    abrirModalPresupuesto(a.id);
+  });
+
+  document.getElementById('modal-detalle').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalDetalle() {
+  document.getElementById('modal-detalle').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modal-detalle').addEventListener('click', function(e){
+  if (e.target === this) cerrarModalDetalle();
 });
