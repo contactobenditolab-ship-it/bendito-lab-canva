@@ -3,20 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo · Bendito Lab</title>
-<meta name="description" content="Explora nuestro catálogo de artículos personalizables para empresas y eventos. Pide presupuesto sin compromiso, sin tienda online.">
+<title id="page-title">Colección · Bendito Lab</title>
+<meta name="description" content="Catálogo de artículos personalizables para empresas y eventos, por temporada, negocio o campaña.">
 <meta name="robots" content="noindex, nofollow">
-<link rel="canonical" href="https://www.benditolab.com/catalogo">
-<meta property="og:title" content="Catálogo · Bendito Lab">
-<meta property="og:description" content="Explora nuestro catálogo de artículos personalizables para empresas y eventos. Pide presupuesto sin compromiso.">
-<meta property="og:url" content="https://www.benditolab.com/catalogo">
-<meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
-<meta property="og:type" content="website">
-<meta property="og:locale" content="es_ES">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Catálogo · Bendito Lab">
-<meta name="twitter:description" content="Explora nuestro catálogo de artículos personalizables para empresas y eventos. Pide presupuesto sin compromiso.">
-<meta name="twitter:image" content="https://www.benditolab.com/logo-bendito.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -38,13 +27,12 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .site-nav a.pill{border:1px solid var(--white);padding:9px 18px;border-radius:22px;}
 .nav-hamburger{display:none;}
 
-.intro{max-width:1200px;margin:0 auto;padding:64px 5vw 16px;text-align:center;}
-.intro h1{font-weight:800;font-size:clamp(32px,5vw,48px);margin:0 0 16px;}
-.intro p{max-width:640px;margin:0 auto;font-size:17px;line-height:1.6;}
-
-.categorias{max-width:1200px;margin:32px auto 0;padding:0 5vw;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-.cat-btn{border:1px solid var(--deep);background:var(--cream);color:var(--deep);font-weight:700;font-size:12px;letter-spacing:.5px;padding:9px 18px;border-radius:22px;cursor:pointer;}
-.cat-btn.activo{background:var(--deep);color:var(--white);}
+.coleccion-hero{position:relative;height:320px;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--baby);}
+.coleccion-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.coleccion-hero::after{content:'';position:absolute;inset:0;background:rgba(23,35,63,.45);}
+.coleccion-hero-texto{position:relative;z-index:1;max-width:640px;padding:0 5vw;color:var(--white);}
+.coleccion-hero-texto h1{font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 12px;}
+.coleccion-hero-texto p{font-size:15px;line-height:1.6;margin:0;}
 
 .catalogo-grid{max-width:1200px;margin:40px auto 0;padding:0 5vw 80px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
 .prod-card{background:var(--white);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #E4DEC9;}
@@ -131,15 +119,15 @@ footer{background:var(--rose);}
   </nav>
 </header>
 
-<section class="intro">
-  <h1>Catálogo</h1>
-  <p>Todavía no tenemos tienda online — explora los artículos que trabajamos y pide presupuesto sin compromiso. Te lo preparamos a medida para tu marca o evento.</p>
+<section class="coleccion-hero" id="coleccion-hero">
+  <div class="coleccion-hero-texto">
+    <h1 id="coleccion-titulo">Cargando…</h1>
+    <p id="coleccion-subtitulo"></p>
+  </div>
 </section>
 
-<div class="categorias" id="categorias" style="display:none;"></div>
-
-<section class="catalogo-grid" id="catalogo-grid">
-  <p class="catalogo-cargando">Cargando catálogo…</p>
+<section class="catalogo-grid" id="coleccion-grid">
+  <p class="catalogo-cargando">Cargando…</p>
 </section>
 
 <footer>
@@ -206,8 +194,9 @@ footer{background:var(--rose);}
   </div>
 </div>
 
-<script src="js/catalogo-1.js"></script>
+<script src="js/colecciones-data.js"></script>
+<script src="js/coleccion-1.js"></script>
 <script src="js/catalogo-comun.js"></script>
-<script src="js/catalogo-2.js"></script>
+<script src="js/coleccion-2.js"></script>
 </body>
 </html>
