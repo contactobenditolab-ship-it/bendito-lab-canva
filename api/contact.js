@@ -147,7 +147,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!dentroDelLimite('contact:' + ipDesdeRequest(req), 8, 15 * 60 * 1000)) {
+  if (!(await dentroDelLimite('contact:' + ipDesdeRequest(req), 8, 15 * 60 * 1000))) {
     return res.status(429).json({ error: 'Demasiadas solicitudes, inténtalo más tarde' });
   }
 
