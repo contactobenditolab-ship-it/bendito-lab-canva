@@ -271,6 +271,7 @@ input[type="file"]{display:none;}
       <div class="sb-lbl">Bendito Lab</div>
       <div class="sb-item" data-action="show" data-panel="bl-textos"><span>✏️</span> Textos</div>
       <div class="sb-item" data-action="show" data-panel="bl-productos"><span>📦</span> Productos</div>
+      <div class="sb-item" data-action="show" data-panel="colecciones"><span>🗂️</span> Colecciones catálogo</div>
       <hr class="sb-div">
       <div class="sb-lbl">Contenido Web</div>
       <div class="sb-item" data-action="show" data-panel="web-editor"><span>🌐</span> Editor de textos</div>
@@ -645,6 +646,29 @@ input[type="file"]{display:none;}
         </div>
       </div>
 
+      <!-- ══════════ COLECCIONES DEL CATÁLOGO ══════════ -->
+      <div class="panel" id="panel-colecciones">
+        <div class="panel-title">Colecciones del catálogo público</div>
+        <div class="panel-desc">
+          Sub-páginas de <code>/catalogo</code> por tipo de negocio, temporada o campaña (ej. <code>/coleccion/verano</code>). Cada una
+          filtra los artículos que tengan su etiqueta puesta en la ficha del producto en Bendito OS (campo "Etiquetas").
+        </div>
+
+        <div class="card">
+          <div class="card-title">Categorías y etiquetas ya usadas en el catálogo</div>
+          <p style="font-size:12px;color:#888;margin-bottom:10px;">
+            Referencia para no escribir la etiqueta a ciegas al crear una colección — solo los artículos <b>activos</b>.
+          </p>
+          <div id="meta-categorias" style="font-size:12px;color:#444;margin-bottom:6px;">Cargando…</div>
+          <div id="meta-etiquetas" style="font-size:12px;color:#444;"></div>
+        </div>
+
+        <div id="colecciones-list"></div>
+        <button data-action="add-coleccion" style="width:100%;margin-top:4px;padding:10px;background:#F4F1E6;border:1.5px dashed #ccc;color:#666;cursor:pointer;font-size:12px;">+ Añadir colección</button>
+        <button data-action="save-colecciones" class="btn btn-primary" style="margin-top:16px;">💾 Guardar colecciones</button>
+        <div id="colecciones-status" style="font-size:12px;margin-top:8px;"></div>
+      </div>
+
       <!-- ══════════ COLORES ══════════ -->
       <div class="panel" id="panel-colores">
         <div class="panel-title">Colores y estilos</div>
@@ -934,5 +958,6 @@ input[type="file"]{display:none;}
 
 <script src="/js/bl-api.js"></script>
 <script src="/js/admin-1.js"></script>
+<script src="/js/admin-colecciones.js"></script>
 </body>
 </html>
