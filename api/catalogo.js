@@ -1,10 +1,15 @@
-// GET /api/catalogo — lista pública de artículos activos del catálogo de
-// Bendito Lab (mismo proyecto Supabase que usa Bendito OS). Solo se
-// seleccionan columnas seguras de mostrar a un visitante: nada de coste,
-// proveedor, notas internas ni stock. Sin autenticación, de solo lectura.
+// GET /api/catalogo — lista pública del catálogo de Bendito Lab (mismo
+// proyecto Supabase que usa Bendito OS). Solo se seleccionan columnas
+// seguras de mostrar a un visitante: nada de coste, proveedor, notas
+// internas ni stock. Sin autenticación, de solo lectura.
 // Usado por catalogo.html (grid completo, filtrable por categoría) y
 // coleccion.html (sub-páginas filtradas por etiqueta — negocio, temporada,
 // campaña...).
+//
+// Filtra por `visible_web`, NO por `activo`: `activo` rige si el artículo
+// puede usarse en presupuestos/packs dentro de Bendito OS, es un concepto
+// distinto de "se muestra en la web pública" (un artículo puede estar
+// activo para uso interno sin querer anunciarlo todavía, o viceversa).
 const { createClient } = require('@supabase/supabase-js');
 
 let cachedClient = null;
@@ -38,14 +43,14 @@ module.exports = async function handler(req, res) {
     const { data, error } = await supabase
       .from('catalogo_articulos')
       .select(CAMPOS_PUBLICOS)
-      .eq('activo', true)
+      .eq('visible_web', true)
       .order('categoria', { ascending: true, nullsFirst: false })
       .order('nombre', { ascending: true });
 
     if (error) throw error;
 
     // Cacheable un rato corto: el catálogo no cambia cada minuto, pero
-    // tampoco queremos que un cambio de activo/inactivo tarde en verse.
+    // tampoco queremos que un cambio de visibilidad tarde en verse.
     res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     return res.status(200).json({ articulos: data || [] });
   } catch (e) {
