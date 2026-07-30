@@ -1,8 +1,10 @@
 
 // js/coleccion-2.js — Específico de coleccion.html: lee el slug de la
-// colección de la URL (?c=slug), pinta la cabecera propia y filtra el
-// catálogo por la etiqueta configurada en colecciones-data.js. El render
-// del grid y los modales viven en catalogo-comun.js (compartido).
+// colección de la URL (?c=slug), carga su configuración (título, imagen,
+// etiqueta a filtrar) desde /api/colecciones —gestionada en admin.html,
+// panel "Colecciones catálogo"— pinta la cabecera y filtra el catálogo por
+// esa etiqueta. El render del grid y los modales viven en
+// catalogo-comun.js (compartido con catalogo.html).
 
 function slugActual() {
   return new URLSearchParams(window.location.search).get('c') || '';
@@ -10,8 +12,18 @@ function slugActual() {
 
 async function cargarColeccion() {
   var slug = slugActual();
-  var coleccion = COLECCIONES[slug];
   var grid = document.getElementById('coleccion-grid');
+
+  var coleccion;
+  try {
+    var rc = await fetch('/api/colecciones');
+    var dc = await rc.json();
+    coleccion = (dc.colecciones || {})[slug];
+  } catch (e) {
+    document.getElementById('coleccion-titulo').textContent = 'Error al cargar la colección';
+    grid.innerHTML = '<p class="catalogo-vacio">No se ha podido cargar. Prueba de nuevo o escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>.</p>';
+    return;
+  }
 
   if (!coleccion) {
     document.getElementById('coleccion-titulo').textContent = 'Colección no encontrada';

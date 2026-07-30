@@ -379,6 +379,7 @@ function show(id,el){
   if(p)p.classList.add('active');
   if(el)el.classList.add('active');
   if(id==='db-precios') loadPreciosPortal();
+  if(id==='colecciones'){ cargarColecciones(); cargarMetaCatalogo(); }
 }
 
 // ══ DIRTY ══════════════════════════════════════════════════
@@ -1867,6 +1868,9 @@ function handleClick(e){
     case 'add-tramo':            addTramo(i); break;
     case 'guardar-precio-portal':  guardarPrecioPortal(el.dataset.id); break;
     case 'eliminar-precio-portal': eliminarPrecioPortal(el.dataset.id); break;
+    case 'add-coleccion':        addColeccion(); break;
+    case 'rm-coleccion':         rmColeccion(el.dataset.slug); break;
+    case 'save-colecciones':     guardarColecciones(); break;
   }
 }
 document.addEventListener('click', handleClick);
@@ -1892,6 +1896,7 @@ function handleChange(e){
     case 'anadir-img-data':  anadirImgData(el); break;
     case 'subir-img-banner': subirImgBanner(el, i); break;
     case 'web-campo-change': webCampoChange(el.dataset.key, el.value); break;
+    case 'subir-hero-coleccion': subirHeroColeccion(el, el.dataset.slug); break;
   }
 }
 document.addEventListener('change', handleChange);
@@ -1917,6 +1922,10 @@ function handleInput(e){
     case 'upd-tramo-desde':  updTramoDesde(i, ti, el.value); break;
     case 'upd-tramo-hasta':  updTramoHasta(i, ti, el.value); break;
     case 'upd-tramo-precio': updTramoPrecio(i, ti, el.value); break;
+    case 'upd-coleccion-slug':      updColeccionSlug(el.dataset.slug, el.value); break;
+    case 'upd-coleccion-titulo':    updColeccionCampo(el.dataset.slug, 'titulo', el.value); break;
+    case 'upd-coleccion-subtitulo': updColeccionCampo(el.dataset.slug, 'subtitulo', el.value); break;
+    case 'upd-coleccion-tag':       updColeccionCampo(el.dataset.slug, 'tag', el.value); break;
   }
 }
 document.addEventListener('input', handleInput);
