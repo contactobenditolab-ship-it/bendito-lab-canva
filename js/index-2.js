@@ -23,7 +23,7 @@
     try {
       var r = await fetch('/api/content?pagina=portada&t=' + Date.now());
       var d = await r.json();
-      if (!d.ok || !d.data) return;
+      if (!d.data) return;
       var data = d.data;
       // Formato Sheets: colores.cream → --cream
       COLOR_VARS.forEach(function(id) {
