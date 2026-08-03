@@ -29,8 +29,8 @@
 .editor-hint{font-size:12px;color:#5A6470;white-space:nowrap;}
 #editor-frame{flex:1;width:100%;border:none;background:#fff;}
 @media(max-width:800px){
-  #editor-sidebar{width:76px;padding:16px 8px;}
-  #editor-sidebar .navbtn{font-size:0;padding:11px 4px;text-align:center;}
+  #editor-sidebar{width:108px;padding:14px 6px;}
+  #editor-sidebar .navbtn{font-size:10.5px;padding:9px 4px;text-align:center;line-height:1.25;}
   #editor-sidebar>div:first-child{display:none;}
   .editor-hint{display:none;}
 }
@@ -214,6 +214,8 @@ input[type="file"]{display:none;}
     </div>
     <div id="editor-pages"></div>
     <div style="padding:16px 10px 0;margin-top:16px;border-top:1px solid #E3DFCF;">
+      <button class="navbtn" data-action="show-panel-avanzado" style="font-weight:800;">⚙️ Panel avanzado</button>
+      <div style="font-size:11px;color:#5A6470;padding:2px 16px 12px;">Calculadora, precios, colores globales…</div>
       <button class="navbtn" data-action="logout-admin">⎋ Cerrar sesión</button>
     </div>
   </aside>
