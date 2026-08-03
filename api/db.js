@@ -49,6 +49,15 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ data: data ? data.contenido : {} });
       }
 
+      if (tabla === 'contenido_web') {
+        const pagina = req.query.pagina;
+        if (!pagina) return res.status(400).json({ error: 'Falta pagina' });
+        const { data, error } = await supabase
+          .from('contenido_web').select('contenido').eq('pagina', pagina).maybeSingle();
+        if (error) throw error;
+        return res.status(200).json({ data: data ? data.contenido : {} });
+      }
+
       return res.status(400).json({ error: 'Tabla desconocida' });
     }
 
@@ -87,6 +96,16 @@ module.exports = async function handler(req, res) {
         const id = body.id;
         if (!id) return res.status(400).json({ error: 'Falta id' });
         const { error } = await supabase.from('precios_portal').delete().eq('id', id);
+        if (error) throw error;
+        return res.status(200).json({ ok: true });
+      }
+
+      if (accion === 'guardarContenidoWeb') {
+        const { pagina, contenido } = body;
+        if (!pagina) return res.status(400).json({ error: 'Falta pagina' });
+        const { error } = await supabase.from('contenido_web').upsert({
+          pagina, contenido: contenido || {}, updated_at: new Date().toISOString(),
+        });
         if (error) throw error;
         return res.status(200).json({ ok: true });
       }
