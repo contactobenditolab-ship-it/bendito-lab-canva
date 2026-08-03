@@ -386,8 +386,8 @@ function show(id,el){
 function markDirty(){dirty=true;document.getElementById('dirty').classList.add('on');document.getElementById('saved').classList.remove('on');}
 
 // ══ STORAGE ════════════════════════════════════════════════
-function getData(){try{return JSON.parse(localStorage.getItem(STORE)||'{}');}catch(e){return{};}}
-function setData(d){localStorage.setItem(STORE,JSON.stringify(d));}
+function getData(){try{return JSON.parse(sessionStorage.getItem(STORE)||'{}');}catch(e){return{};}}
+function setData(d){sessionStorage.setItem(STORE,JSON.stringify(d));}
 
 var TEXT_IDS=['t-eyebrow','t-h1','t-sub','t-cta1','t-cta2','t-db-tag','t-db-title','t-db-desc','t-db-cta','t-bl-tag','t-bl-title','t-bl-desc','t-bl-cta','t-cot-title','t-redes-sub','dt-tag','dt-h1','dt-sub','dt-tel','dt-email','bt-tag','bt-h1','bt-sub','bt-ctat','bt-ctas','p-mini','p-intima','p-clasica','p-premium','e-hora','e-dis','e-nin','e-mon','e-max','e-km','gh-user','gh-repo'];
 
@@ -400,7 +400,7 @@ function loadAll(){
   if(d.redes)redes=d.redes;
   if(d.productos)productos=d.productos;
   loadCalcPrecios();
-  // Cargar precios de calculadora desde Supabase (prevalecen sobre localStorage)
+  // Cargar precios de calculadora desde Supabase (prevalecen sobre sessionStorage)
   BL_API.dbGet({ tabla: 'calc_precios' })
     .then(function(d){
       var calc = d && d.data;
@@ -413,7 +413,7 @@ function loadAll(){
       }
     })
     .catch(function(e){ console.warn('No se pudieron cargar precios desde Supabase:', e); });
-  if(localStorage.getItem('bl-gh-token')){document.getElementById('gh-token').value='••••••••••••';document.getElementById('gh-token-2').value='••••••••••••';}
+  if(sessionStorage.getItem('bl-gh-token')){document.getElementById('gh-token').value='••••••••••••';document.getElementById('gh-token-2').value='••••••••••••';}
   renderSecciones();
   renderRedes();
   renderProductos();
@@ -477,8 +477,8 @@ function broadcastToPortada(data){
   try{
     if(window.opener)window.opener.postMessage({type:'bl-update',data:data},'*');
   }catch(e){}
-  // También guardar en localStorage para que la portada lo recoja al cargar
-  localStorage.setItem('bl-portada-v1',JSON.stringify(data));
+  // También guardar en sessionStorage para que la portada lo recoja al cargar
+  sessionStorage.setItem('bl-portada-v1',JSON.stringify(data));
 }
 
 // ══ COLORES ════════════════════════════════════════════════
@@ -975,8 +975,8 @@ async function webGuardar() {
   }
   btn.textContent = '💾 Guardar'; btn.disabled = false;
 }
-function saveToken(){var v=document.getElementById('gh-token').value;if(v&&!v.startsWith('••')){localStorage.setItem('bl-gh-token',v);document.getElementById('gh-token').value='••••••••••••';var ok=document.getElementById('tok-ok');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
-function saveToken2(){var v=document.getElementById('gh-token-2').value;if(v&&!v.startsWith('••')){localStorage.setItem('bl-gh-token',v);document.getElementById('gh-token-2').value='••••••••••••';var ok=document.getElementById('tok-ok-2');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
+function saveToken(){var v=document.getElementById('gh-token').value;if(v&&!v.startsWith('••')){sessionStorage.setItem('bl-gh-token',v);document.getElementById('gh-token').value='••••••••••••';var ok=document.getElementById('tok-ok');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
+function saveToken2(){var v=document.getElementById('gh-token-2').value;if(v&&!v.startsWith('••')){sessionStorage.setItem('bl-gh-token',v);document.getElementById('gh-token-2').value='••••••••••••';var ok=document.getElementById('tok-ok-2');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
 
 // ══ INIT ═════════════════════════════════════════════════════
 var IMAGE_CONTENT = {}; // slot path -> URL en Vercel Blob (sustituciones subidas desde el admin)
@@ -1044,7 +1044,7 @@ const DB_DEFAULTS = {
   '--baby':'#93ACA7','--sunshine':'#E8C24A','--rose':'#E3A29C','--poppy':'#E2704A'
 };
 function dbApplyColor(input) {
-  localStorage.setItem('db-color-' + input.dataset.var, input.value);
+  sessionStorage.setItem('db-color-' + input.dataset.var, input.value);
   // Guardar también en Sheets para que la web lo lea
   var key = 'colores.' + input.dataset.var.replace('--','');
   var obj = {};
@@ -1054,12 +1054,12 @@ function dbApplyColor(input) {
     .catch(function(e){ console.warn('Error guardando color:', e); });
 }
 function dbApplyFont(type, value) {
-  localStorage.setItem('db-font-' + type, value);
+  sessionStorage.setItem('db-font-' + type, value);
 }
 function dbExportCSS() {
   let css = ':root {\n';
   Object.keys(DB_DEFAULTS).forEach(function(k) {
-    const saved = localStorage.getItem('db-color-' + k);
+    const saved = sessionStorage.getItem('db-color-' + k);
     if (saved) css += '  ' + k + ': ' + saved + ';\n';
   });
   css += '}';
@@ -1072,8 +1072,8 @@ function dbExportCSS() {
   setTimeout(function(){ msg.style.display='none'; area.style.display='none'; }, 4000);
 }
 function dbResetAll() {
-  Object.keys(DB_DEFAULTS).forEach(function(k){ localStorage.removeItem('db-color-' + k); });
-  ['title','body'].forEach(function(t){ localStorage.removeItem('db-font-' + t); });
+  Object.keys(DB_DEFAULTS).forEach(function(k){ sessionStorage.removeItem('db-color-' + k); });
+  ['title','body'].forEach(function(t){ sessionStorage.removeItem('db-font-' + t); });
   alert('Restaurado. Recarga la página de Dilo Bonito para ver los cambios.');
 }
 
@@ -1150,7 +1150,7 @@ function dbcEliminar(idx) {
 }
 
 async function publicarCarruselDB() {
-  var token = localStorage.getItem('bl-gh-token');
+  var token = sessionStorage.getItem('bl-gh-token');
   if (!token) { alert('Añade el token de GitHub en Ajustes.'); return; }
   var imgs = IMG_GROUPS['db_carrusel'];
   if (!imgs || imgs.length === 0) { alert('No hay fotos en el carrusel.'); return; }
@@ -1207,7 +1207,7 @@ async function publicarCarruselDB() {
 }
 
 // ══ BANNERS PERSONALIZADOS ══════════════════════════════════
-var BANNERS = JSON.parse(localStorage.getItem('bl-banners') || '[]');
+var BANNERS = JSON.parse(sessionStorage.getItem('bl-banners') || '[]');
 
 function renderBanners() {
   var c = document.getElementById('banners-list');
@@ -1243,7 +1243,7 @@ function crearBanner() {
   var pagina = prompt('¿En qué página va? (portada / dilo-bonito / bendito-lab / colaboradores):', 'dilo-bonito');
   var altura = prompt('Altura en px (ej: 400 para medio, 600 para grande, 200 para pequeño):', '400');
   BANNERS.push({ nombre: nombre, pagina: pagina || 'dilo-bonito', altura: altura || '400', imagen: '', texto: '', cta: '' });
-  localStorage.setItem('bl-banners', JSON.stringify(BANNERS));
+  sessionStorage.setItem('bl-banners', JSON.stringify(BANNERS));
   renderBanners();
   editarBanner(BANNERS.length - 1);
 }
@@ -1301,7 +1301,7 @@ function guardarBanner(i) {
   BANNERS[i].texto = document.getElementById('bm-texto').value;
   BANNERS[i].cta = document.getElementById('bm-cta').value;
   BANNERS[i].ctaUrl = document.getElementById('bm-cta-url').value;
-  localStorage.setItem('bl-banners', JSON.stringify(BANNERS));
+  sessionStorage.setItem('bl-banners', JSON.stringify(BANNERS));
   document.getElementById('banner-modal').style.display = 'none';
   renderBanners();
   showToast('Banner guardado ✓');
@@ -1310,7 +1310,7 @@ function guardarBanner(i) {
 async function subirImgBanner(input, i) {
   var file = input.files[0];
   if (!file) return;
-  var token = localStorage.getItem('bl-gh-token');
+  var token = sessionStorage.getItem('bl-gh-token');
   if (!token) { alert('Añade el token de GitHub en Ajustes.'); return; }
   var ext = file.name.split('.').pop().toLowerCase() || 'jpg';
   var newPath = 'images/banner-' + Date.now() + '.' + ext;
@@ -1326,7 +1326,7 @@ async function subirImgBanner(input, i) {
       });
       if (!put.ok) throw new Error((await put.json()).message);
       BANNERS[i].imagen = newPath;
-      localStorage.setItem('bl-banners', JSON.stringify(BANNERS));
+      sessionStorage.setItem('bl-banners', JSON.stringify(BANNERS));
       showToast('✓ Imagen subida. Edita el banner para verla.');
       editarBanner(i);
     } catch(err) { showToast('Error: ' + err.message); }
@@ -1363,7 +1363,7 @@ function verCodigoBanner(i) {
 function eliminarBanner(i) {
   if (!confirm('¿Eliminar este banner?')) return;
   BANNERS.splice(i, 1);
-  localStorage.setItem('bl-banners', JSON.stringify(BANNERS));
+  sessionStorage.setItem('bl-banners', JSON.stringify(BANNERS));
   renderBanners();
   showToast('Banner eliminado');
 }
@@ -1415,7 +1415,7 @@ function gcReset() {
 }
 
 async function gcPublicar() {
-  var token = localStorage.getItem('bl-gh-token');
+  var token = sessionStorage.getItem('bl-gh-token');
   if (!token) { alert('Añade el token de GitHub en Ajustes primero.'); return; }
 
   var colors = {
@@ -1491,13 +1491,13 @@ async function gcPublicar() {
     status.innerHTML = '⚠ ' + ok + ' páginas OK, ' + fail + ' con error. Revisa el token de GitHub en Ajustes.';
   }
 
-  // Guardar en localStorage para recordar la paleta
-  localStorage.setItem('bl-global-colors', JSON.stringify(colors));
+  // Guardar en sessionStorage para recordar la paleta
+  sessionStorage.setItem('bl-global-colors', JSON.stringify(colors));
 }
 
 // Cargar colores guardados al abrir el panel
 document.addEventListener('DOMContentLoaded', function() {
-  var saved = localStorage.getItem('bl-global-colors');
+  var saved = sessionStorage.getItem('bl-global-colors');
   if (saved) {
     try {
       var c = JSON.parse(saved);
