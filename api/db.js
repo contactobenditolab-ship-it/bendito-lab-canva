@@ -3,8 +3,9 @@
 //
 // Backend Supabase para las tablas de precios del panel /admin (mismo
 // proyecto Supabase que Bendito OS). Alcance limitado a lo que usa
-// admin-1.js: precios_bendito (documento único), precios_portal (lista)
-// y calc_precios (documento único, calculadora de márgenes).
+// admin-1.js: precios_portal (lista) y calc_precios (documento único,
+// calculadora interna B2B). Las técnicas/extras públicas del catálogo
+// (api/catalogo.js) salen de fichas_costes, gestionadas en la app.
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth } = require('../lib/auth');
 
@@ -27,13 +28,6 @@ module.exports = async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const tabla = req.query.tabla;
-
-      if (tabla === 'precios_bendito') {
-        const { data, error } = await supabase
-          .from('precios_bendito').select('articulos, servicios, extras, tecnicas').eq('id', 1).single();
-        if (error) throw error;
-        return res.status(200).json({ data });
-      }
 
       if (tabla === 'precios_portal') {
         const { data, error } = await supabase
@@ -67,18 +61,6 @@ module.exports = async function handler(req, res) {
         try { body = JSON.parse(body); } catch { body = {}; }
       }
       const accion = body && body.accion;
-
-      if (accion === 'guardarPreciosBendito') {
-        const { seccion, datos } = body;
-        if (!['articulos', 'servicios', 'extras', 'tecnicas'].includes(seccion)) {
-          return res.status(400).json({ error: 'Sección desconocida' });
-        }
-        const update = { updated_at: new Date().toISOString() };
-        update[seccion] = datos;
-        const { error } = await supabase.from('precios_bendito').update(update).eq('id', 1);
-        if (error) throw error;
-        return res.status(200).json({ ok: true });
-      }
 
       if (accion === 'guardarPrecio') {
         const d = body.datos;
