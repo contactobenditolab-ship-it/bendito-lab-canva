@@ -32,11 +32,14 @@ const CAMPOS_PUBLICOS = [
   'material', 'colores', 'medidas', 'capacidad', 'formato', 'acabados',
   'tecnicas_personalizacion', 'guia_tallas',
   'imagen_principal_url',
+  'personalizacion_incluida', 'personalizacion_medidas',
 ].join(', ');
 
 // ── Fórmula de precios (copia fiel de src/lib/catalogo/pricing.ts en bendito-os) ──
 const MARGEN_MINIMO = 0.45;
-const TRAMOS_MARGEN = [
+// Tabla por defecto, solo si el artículo no tiene grupo de tramos asignado
+// (ver catalogo_grupos_tramos / resolverTramos en pricing.ts).
+const TRAMOS_MARGEN_DEFECTO = [
   { cantidadMin: 1, margen: 0.7 },
   { cantidadMin: 10, margen: 0.68 },
   { cantidadMin: 20, margen: 0.65 },
@@ -47,16 +50,28 @@ const TRAMOS_MARGEN = [
   { cantidadMin: 300, margen: MARGEN_MINIMO },
 ];
 
-function calcularCosteReal(a) {
+// Coste de envío por unidad: override manual del artículo (coste_envio no
+// nulo, incluido 0) o, si no hay, el coste de envío típico del proveedor
+// repartido entre sus unidades típicas por pedido.
+function resolverCosteEnvioUnitario(articulo, proveedor) {
+  if (articulo.coste_envio !== null && articulo.coste_envio !== undefined) return articulo.coste_envio;
+  if (proveedor && proveedor.unidades_tipicas_pedido > 0) {
+    return proveedor.coste_envio / proveedor.unidades_tipicas_pedido;
+  }
+  return 0;
+}
+
+function calcularCosteReal(a, proveedor) {
+  const costeEnvio = resolverCosteEnvioUnitario(a, proveedor);
   const subtotalFijo =
-    (a.precio_coste || 0) + (a.pack_coste || 0) + (a.coste_envio || 0) +
+    (a.precio_coste || 0) + (a.pack_coste || 0) + costeEnvio +
     (a.coste_manipulacion || 0) + (a.coste_personalizacion || 0) +
     (a.coste_diseno || 0) + (a.coste_mano_obra || 0) + (a.coste_electricidad || 0);
   const pctTotal = (a.coste_mermas_pct || 0) + (a.coste_comisiones_pct || 0) + (a.costes_generales_pct || 0);
   const divisor = 1 - Math.min(pctTotal, 90) / 100;
   return {
     costeReal: subtotalFijo / divisor,
-    costeRealSinEnvio: (subtotalFijo - (a.coste_envio || 0)) / divisor,
+    costeRealSinEnvio: (subtotalFijo - costeEnvio) / divisor,
   };
 }
 
@@ -67,39 +82,61 @@ function redondearPsicologico(precio) {
   return conDecimal >= precio ? conDecimal : entero + 1 + 0.95;
 }
 
-function margenPorTramo(cantidad) {
-  let margen = TRAMOS_MARGEN[0].margen;
-  for (const t of TRAMOS_MARGEN) {
+function margenPorTramo(cantidad, tramos) {
+  let margen = tramos[0].margen;
+  for (const t of tramos) {
     if (cantidad >= t.cantidadMin) margen = t.margen;
   }
   return Math.max(margen, MARGEN_MINIMO);
 }
 
+// Precio unitario según el override manual de tramos B2C del artículo (si
+// existe), buscando el tramo aplicable para la cantidad pedida.
+function precioDesdeOverride(overrideTramos, cantidad, costeReal) {
+  const ordenados = [...overrideTramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
+  let tramo = ordenados[0];
+  for (const t of ordenados) {
+    if (cantidad >= t.cantidadMin) tramo = t;
+  }
+  if (tramo.precioUnitario !== null && tramo.precioUnitario !== undefined) return tramo.precioUnitario;
+  const margen = Math.min(Math.max(tramo.margenPct || 0, 0), 99) / 100;
+  return redondearPsicologico(costeReal / (1 - margen));
+}
+
 // Precio unitario del producto en blanco (sin personalizar) para una cantidad dada.
-function precioUnitarioProducto(articulo, cantidad) {
-  const { costeReal, costeRealSinEnvio } = calcularCosteReal(articulo);
+function precioUnitarioProducto(articulo, cantidad, contexto) {
+  const { costeReal, costeRealSinEnvio } = calcularCosteReal(articulo, contexto.proveedor);
+  if (contexto.overrideB2c && contexto.overrideB2c.length) {
+    return precioDesdeOverride(contexto.overrideB2c, cantidad, costeReal);
+  }
   if (articulo.margen_pct_b2b !== null && articulo.margen_pct_b2b !== undefined) {
     const margen = Math.min(Math.max(articulo.margen_pct_b2b, 0), 99) / 100;
     return redondearPsicologico(costeRealSinEnvio / (1 - margen));
   }
-  const margen = margenPorTramo(cantidad);
+  const tramos = contexto.tramos || TRAMOS_MARGEN_DEFECTO;
+  const margen = margenPorTramo(cantidad, tramos);
   return redondearPsicologico(costeReal / (1 - margen));
 }
 
 // Info de tramos por cantidad para mostrar al cliente (nunca el margen en
 // sí, solo cantidades y precios ya calculados — ver cabecera del fichero).
-// Si el artículo tiene margen_pct_b2b fijo, no hay tramos: precio plano.
-function infoTramos(articulo, cantidad) {
-  if (articulo.margen_pct_b2b !== null && articulo.margen_pct_b2b !== undefined) {
+// Si el artículo tiene margen_pct_b2b fijo (y no hay override de tramos),
+// no hay tramos: precio plano.
+function infoTramos(articulo, cantidad, contexto) {
+  const tieneOverride = contexto.overrideB2c && contexto.overrideB2c.length;
+  if (!tieneOverride && articulo.margen_pct_b2b !== null && articulo.margen_pct_b2b !== undefined) {
     return { tiene_tramos: false, tabla: [] };
   }
-  const tabla = TRAMOS_MARGEN.map((t) => ({
+  const tramos = tieneOverride
+    ? [...contexto.overrideB2c].sort((a, b) => a.cantidadMin - b.cantidadMin)
+    : (contexto.tramos || TRAMOS_MARGEN_DEFECTO);
+  const tabla = tramos.map((t) => ({
     cantidad_min: t.cantidadMin,
-    precio_unitario: precioUnitarioProducto(articulo, t.cantidadMin),
+    precio_unitario: precioUnitarioProducto(articulo, t.cantidadMin, contexto),
   }));
   const precioSinDescuento = tabla[0].precio_unitario;
-  const precioActual = precioUnitarioProducto(articulo, cantidad);
-  const tramoActual = [...TRAMOS_MARGEN].reverse().find((t) => cantidad >= t.cantidadMin) || TRAMOS_MARGEN[0];
+  const precioActual = precioUnitarioProducto(articulo, cantidad, contexto);
+  const tramoActual = [...tramos].reverse().find((t) => cantidad >= t.cantidadMin) || tramos[0];
   const descuentoPct = precioSinDescuento > 0
     ? Math.round((1 - precioActual / precioSinDescuento) * 100)
     : 0;
@@ -127,10 +164,10 @@ function costeMedioFicha(ficha) {
 // Técnicas: SÍ llevan tramos por cantidad — se reutiliza el mismo calendario
 // de márgenes (TRAMOS_MARGEN) que ya aplica al producto base, para que la
 // técnica se abarate igual que el artículo al pedir más unidades.
-function precioTecnicaDesdeFicha(ficha, cantidad) {
+function precioTecnicaDesdeFicha(ficha, cantidad, tramos) {
   const coste = costeMedioFicha(ficha);
   if (!coste) return 0;
-  return coste / (1 - margenPorTramo(cantidad));
+  return coste / (1 - margenPorTramo(cantidad, tramos || TRAMOS_MARGEN_DEFECTO));
 }
 // Extras: precio fijo (no dependen de la cantidad, igual que antes), usando
 // el margen propio de cada línea de coste de la ficha.
@@ -180,10 +217,21 @@ module.exports = async function handler(req, res) {
         .order('nombre', { ascending: true });
       if (error) throw error;
 
+      const ids = (data || []).map((a) => a.id);
+      const { data: variantesTalla } = ids.length
+        ? await supabase.from('catalogo_variantes').select('articulo_id, valor').eq('tipo', 'talla').in('articulo_id', ids).order('orden')
+        : { data: [] };
+      const tallasPorArticulo = new Map();
+      (variantesTalla || []).forEach((v) => {
+        if (!tallasPorArticulo.has(v.articulo_id)) tallasPorArticulo.set(v.articulo_id, []);
+        tallasPorArticulo.get(v.articulo_id).push(v.valor);
+      });
+
       const articulos = await Promise.all(
         (data || []).map(async (a) => ({
           ...a,
           colores_resueltos: a.colores && a.colores.length ? await resolverColores(a.colores) : [],
+          tallas: tallasPorArticulo.get(a.id) || [],
         }))
       );
 
@@ -213,6 +261,7 @@ module.exports = async function handler(req, res) {
           'precio_coste', 'pack_coste', 'coste_envio', 'coste_manipulacion',
           'coste_personalizacion', 'coste_diseno', 'coste_mano_obra', 'coste_electricidad',
           'coste_mermas_pct', 'coste_comisiones_pct', 'costes_generales_pct', 'margen_pct_b2b',
+          'proveedor_id', 'grupo_tramos_id',
         ].join(', ');
 
         const [{ data: articulo, error: e1 }, { data: fichaTecnica }, { data: fichasExtra }] = await Promise.all([
@@ -226,12 +275,30 @@ module.exports = async function handler(req, res) {
         ]);
         if (e1 || !articulo) return res.status(404).json({ error: 'Artículo no encontrado' });
 
-        const precioProducto = precioUnitarioProducto(articulo, cantidad);
-        const tramos = infoTramos(articulo, cantidad);
+        const [{ data: proveedor }, { data: grupo }, { data: overrideRows }] = await Promise.all([
+          articulo.proveedor_id
+            ? supabase.from('catalogo_proveedores').select('coste_envio, unidades_tipicas_pedido').eq('id', articulo.proveedor_id).maybeSingle()
+            : Promise.resolve({ data: null }),
+          articulo.grupo_tramos_id
+            ? supabase.from('catalogo_grupos_tramos').select('tramos').eq('id', articulo.grupo_tramos_id).maybeSingle()
+            : Promise.resolve({ data: null }),
+          // El sitio público vende a particulares/empresas como cliente final: se
+          // usa el override del canal B2C (ver catalogo_precios_override).
+          supabase.from('catalogo_precios_override').select('tramos').eq('articulo_id', articuloId).eq('canal', 'b2c').maybeSingle(),
+        ]);
+
+        const contexto = {
+          proveedor: proveedor || null,
+          tramos: (grupo && grupo.tramos && grupo.tramos.length) ? grupo.tramos : TRAMOS_MARGEN_DEFECTO,
+          overrideB2c: (overrideRows && overrideRows.tramos) || [],
+        };
+
+        const precioProducto = precioUnitarioProducto(articulo, cantidad, contexto);
+        const tramos = infoTramos(articulo, cantidad, contexto);
 
         let precioTecnica = 0;
         let tecnicaNombre = null;
-        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad); tecnicaNombre = fichaTecnica.categoria; }
+        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad, contexto.tramos); tecnicaNombre = fichaTecnica.categoria; }
 
         const extrasDisponibles = fichasExtra || [];
         let extrasTotal = 0;

@@ -60,12 +60,16 @@ function renderGridEn(containerId, lista, mensajeVacio) {
 // ── Modal de presupuesto ──────────────────────────────────
 var articuloSeleccionado = null;
 
-function abrirModalPresupuesto(articuloId) {
+function abrirModalPresupuesto(articuloId, detallesPrefill) {
   articuloSeleccionado = ARTICULOS_MOSTRADOS.find(function(a){ return a.id === articuloId; }) || null;
   document.getElementById('mp-producto-nombre').textContent = articuloSeleccionado ? articuloSeleccionado.nombre : '';
   document.getElementById('presupuesto-form').style.display = 'flex';
   document.getElementById('presupuesto-success').style.display = 'none';
   document.getElementById('presupuesto-form').reset();
+  if (detallesPrefill) {
+    var mensajeEl = document.querySelector('#presupuesto-form [name="mensaje"]');
+    if (mensajeEl) mensajeEl.value = detallesPrefill;
+  }
   document.getElementById('presupuesto-error').style.display = 'none';
   document.getElementById('modal-presupuesto').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -132,10 +136,16 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
 // bicolores tipo "Celeste/Blanco" (se pintan partidos en diagonal), 1 para
 // el resto. hex null (estampados o nombres sin match en la carta de
 // colores) cae en el estilo .color-swatch--sin-match.
+// Los cuadrados de color funcionan como el "desplegable" de color: son
+// seleccionables (rol de radio) y la selección se guarda en
+// COLOR_SELECCIONADO para prefijar el mensaje al pedir presupuesto.
+var COLOR_SELECCIONADO = null;
+var TALLA_SELECCIONADA = null;
+
 function renderColoresSwatches(coloresResueltos) {
   if (!coloresResueltos || !coloresResueltos.length) return '';
 
-  var swatches = coloresResueltos.map(function(c) {
+  var swatches = coloresResueltos.map(function(c, i) {
     var segmentos = c.segmentos || [];
     var sinMatch = segmentos.some(function(s){ return !s.hex; });
     var estampado = segmentos.some(function(s){ return s.esEstampado; });
@@ -150,10 +160,40 @@ function renderColoresSwatches(coloresResueltos) {
     }
 
     var clase = 'color-swatch' + (sinMatch ? ' color-swatch--sin-match' : '') + (estampado ? ' color-swatch--estampado' : '');
-    return '<span class="' + clase + '" style="' + estiloExtra + '" title="' + escapeHtml(c.nombre) + '"></span>';
+    return '<span class="' + clase + '" style="' + estiloExtra + '" title="' + escapeHtml(c.nombre) + '"' +
+      ' role="radio" aria-checked="false" tabindex="0" data-color-nombre="' + escapeHtml(c.nombre) + '"></span>';
   }).join('');
 
-  return '<div class="md-colores"><span class="md-colores-label">Colores</span><div class="md-colores-lista">' + swatches + '</div></div>';
+  return '<div class="md-colores"><span class="md-colores-label">Color</span><div class="md-colores-lista" id="md-colores-lista">' + swatches + '</div></div>';
+}
+
+function activarSelectorColores() {
+  var lista = document.getElementById('md-colores-lista');
+  if (!lista) return;
+  lista.addEventListener('click', function(e){
+    var swatch = e.target.closest('[data-color-nombre]');
+    if (!swatch) return;
+    var yaActivo = swatch.classList.contains('color-swatch--activo');
+    Array.prototype.forEach.call(lista.querySelectorAll('.color-swatch'), function(s){
+      s.classList.remove('color-swatch--activo');
+      s.setAttribute('aria-checked', 'false');
+    });
+    if (yaActivo) {
+      COLOR_SELECCIONADO = null;
+    } else {
+      swatch.classList.add('color-swatch--activo');
+      swatch.setAttribute('aria-checked', 'true');
+      COLOR_SELECCIONADO = swatch.dataset.colorNombre;
+    }
+  });
+}
+
+function renderTallaSelect(tallas) {
+  if (!tallas || !tallas.length) return '';
+  var options = '<option value="">Selecciona talla</option>' +
+    tallas.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('');
+  return '<div class="md-talla"><label class="md-colores-label" for="md-talla-select">Talla</label>' +
+    '<select id="md-talla-select">' + options + '</select></div>';
 }
 
 // ── Modal de detalle de producto ──────────────────────────
@@ -182,6 +222,9 @@ function abrirModalDetalle(articuloId) {
     : '';
 
   var coloresHtml = renderColoresSwatches(a.colores_resueltos);
+  var tallaHtml = renderTallaSelect(a.tallas);
+  COLOR_SELECCIONADO = null;
+  TALLA_SELECCIONADA = null;
 
   var desc = a.descripcion || a.descripcion_corta || '';
 
@@ -193,15 +236,23 @@ function abrirModalDetalle(articuloId) {
       '<h3>' + escapeHtml(a.nombre) + '</h3>' +
       (desc ? '<p class="md-desc">' + escapeHtml(desc) + '</p>' : '') +
       coloresHtml +
+      tallaHtml +
       atributosHtml +
       '<div class="md-calc" id="md-calc"></div>' +
       '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
     '</div>';
 
   document.getElementById('btn-cerrar-detalle').addEventListener('click', cerrarModalDetalle);
+  activarSelectorColores();
+  var tallaSelect = document.getElementById('md-talla-select');
+  if (tallaSelect) {
+    tallaSelect.addEventListener('change', function(){ TALLA_SELECCIONADA = tallaSelect.value || null; });
+  }
   document.getElementById('btn-presupuesto-desde-detalle').addEventListener('click', function(){
     cerrarModalDetalle();
-    abrirModalPresupuesto(a.id);
+    var detalles = [COLOR_SELECCIONADO ? 'Color: ' + COLOR_SELECCIONADO : null, TALLA_SELECCIONADA ? 'Talla: ' + TALLA_SELECCIONADA : null]
+      .filter(Boolean).join(' · ');
+    abrirModalPresupuesto(a.id, detalles);
   });
 
   renderCalculadora(a);
@@ -306,11 +357,26 @@ async function ejecutarCalculo(articuloId) {
         '</tbody></table>';
     }
 
+    // El precio del producto en blanco (sin técnica elegida) es "desde": no
+    // incluye personalización salvo que la ficha del artículo aclare cuál
+    // lleva incluida y sus medidas (personalizacion_incluida/_medidas).
+    var personalizacionLinea = '';
+    if (!tecnica) {
+      var art = ARTICULOS_MOSTRADOS.find(function(x){ return x.id === articuloId; });
+      if (art && art.personalizacion_incluida) {
+        personalizacionLinea = '<div class="md-calc-personalizacion">Incluye: ' + escapeHtml(art.personalizacion_incluida) +
+          (art.personalizacion_medidas ? ' (' + escapeHtml(art.personalizacion_medidas) + ')' : '') + '</div>';
+      } else {
+        personalizacionLinea = '<div class="md-calc-personalizacion">Precio desde, no incluye personalización.</div>';
+      }
+    }
+
     resEl.innerHTML =
       '<div class="md-calc-total">Total aprox.: ' + d.total.toFixed(2) + '€ <span>(' + d.precio_unitario.toFixed(2) + '€/ud × ' + d.cantidad + ')</span></div>' +
       descuentoLinea +
       extrasLinea +
       tablaLinea +
+      personalizacionLinea +
       '<div class="md-calc-aviso">' + escapeHtml(d.aviso) + '</div>';
     resEl.style.display = 'block';
   } catch (e) {
