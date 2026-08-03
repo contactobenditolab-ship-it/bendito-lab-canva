@@ -1826,6 +1826,7 @@ function handleClick(e){
     case 'logout-admin':         logoutAdmin(); break;
     case 'toggle-sidebar':       toggleSidebar(); break;
     case 'back-to-editor':       backToEditor(); break;
+    case 'show-panel-avanzado':  showPanelAvanzado(); break;
     case 'save-all':             saveAll(); break;
     case 'add-seccion':          addSeccion(); break;
     case 'db-export-css':        dbExportCSS(); break;
