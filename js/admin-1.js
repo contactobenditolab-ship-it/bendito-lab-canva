@@ -400,19 +400,19 @@ function loadAll(){
   if(d.redes)redes=d.redes;
   if(d.productos)productos=d.productos;
   loadCalcPrecios();
-  // Cargar precios de calculadora desde Sheets (prevalecen sobre localStorage)
-  BL_API.gsWeb({ web: 'calc-precios', t: Date.now() })
+  // Cargar precios de calculadora desde Supabase (prevalecen sobre localStorage)
+  BL_API.dbGet({ tabla: 'calc_precios' })
     .then(function(d){
-      var calc = (d && d.data !== undefined) ? d.data : d;
-      if (calc && typeof calc === 'object' && !calc.error) {
+      var calc = d && d.data;
+      if (calc && typeof calc === 'object' && Object.keys(calc).length) {
         var d2 = getData();
         d2.calcPrecios = calc;
         setData(d2);
         loadCalcPrecios();
-        console.log('Precios calculadora cargados desde Sheets ✓');
+        console.log('Precios calculadora cargados desde Supabase ✓');
       }
     })
-    .catch(function(e){ console.warn('No se pudieron cargar precios desde Sheets:', e); });
+    .catch(function(e){ console.warn('No se pudieron cargar precios desde Supabase:', e); });
   if(localStorage.getItem('bl-gh-token')){document.getElementById('gh-token').value='••••••••••••';document.getElementById('gh-token-2').value='••••••••••••';}
   renderSecciones();
   renderRedes();
@@ -440,12 +440,12 @@ function saveAll(){
   // Mandar datos a la portada si está abierta (postMessage)
   broadcastToPortada(buildPortadaData());
 
-  // Guardar precios de calculadora en Google Sheets
+  // Guardar precios de calculadora en Supabase
   var calcP = getCalcPrecios();
-  BL_API.gsPost('web', { accion: 'guardarContenidoWeb', pagina: 'calc-precios', contenido: calcP }).then(function(d){
-    if (d.ok) console.log('Precios calculadora guardados en Sheets ✓');
+  BL_API.dbPost({ accion: 'guardarCalcPrecios', datos: calcP }).then(function(d){
+    if (d.ok) console.log('Precios calculadora guardados en Supabase ✓');
     else console.warn('Error guardando precios calculadora:', d.error);
-  }).catch(function(e){ console.warn('Error Sheets calc-precios:', e); });
+  }).catch(function(e){ console.warn('Error Supabase calc-precios:', e); });
 
   dirty=false;
   document.getElementById('dirty').classList.remove('on');
