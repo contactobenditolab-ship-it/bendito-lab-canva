@@ -81,8 +81,18 @@ document.getElementById('modal-presupuesto').addEventListener('click', function(
   if (e.target === this) cerrarModalPresupuesto();
 });
 
+// Guard contra doble envío: en móvil un doble-tap (o Enter del teclado +
+// tap casi simultáneo) puede disparar dos eventos "submit" antes de que
+// btn.disabled surta efecto visualmente. btn.disabled por sí solo no basta
+// porque ambos handlers ya están en cola cuando eso pasa; este flag corta
+// el segundo en seco nada más entrar.
+var enviandoPresupuesto = false;
+
 document.getElementById('presupuesto-form').addEventListener('submit', async function(e){
   e.preventDefault();
+  if (enviandoPresupuesto) return;
+  enviandoPresupuesto = true;
+
   var form = e.target;
   var f = new FormData(form);
   var errEl = document.getElementById('presupuesto-error');
@@ -112,6 +122,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
     errEl.style.display = 'block';
   } finally {
     btn.disabled = false; btn.textContent = 'ENVIAR SOLICITUD→';
+    enviandoPresupuesto = false;
   }
 });
 
