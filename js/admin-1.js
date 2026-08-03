@@ -1158,7 +1158,7 @@ async function publicarCarruselDB() {
   // Leer dilo-bonito.html actual
   showToast('Publicando carrusel...');
   try {
-    var r = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/dossier-dilo-bonito/contents/dilo-bonito.html',
+    var r = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/dilo-bonito.html',
       { headers: { 'Authorization': 'token ' + token, 'User-Agent': 'BenditoAdmin' } });
     var fd = await r.json();
     var html = atob(fd.content.replace(/\n/g,''));
@@ -1194,7 +1194,7 @@ async function publicarCarruselDB() {
 
     // Subir
     var b64 = btoa(unescape(encodeURIComponent(html)));
-    var put = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/dossier-dilo-bonito/contents/dilo-bonito.html', {
+    var put = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/dilo-bonito.html', {
       method: 'PUT',
       headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'BenditoAdmin' },
       body: JSON.stringify({ message: 'Admin: actualizar carrusel Dilo Bonito', content: b64, sha: fd.sha })
@@ -1319,7 +1319,7 @@ async function subirImgBanner(input, i) {
   reader.onload = async function(e) {
     var b64 = e.target.result.split(',')[1];
     try {
-      var put = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/dossier-dilo-bonito/contents/' + newPath, {
+      var put = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/' + newPath, {
         method: 'PUT',
         headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'BenditoAdmin' },
         body: JSON.stringify({ message: 'Admin: imagen banner', content: b64 })
@@ -1449,7 +1449,7 @@ async function gcPublicar() {
     try {
       // Obtener SHA y contenido
       var r = await fetch(
-        'https://api.github.com/repos/contactobenditolab-ship-it/dossier-dilo-bonito/contents/' + filename,
+        'https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/' + filename,
         { headers: { 'Authorization': 'token ' + token, 'User-Agent': 'BenditoAdmin' } }
       );
       if (!r.ok) throw new Error('No se pudo leer ' + filename);
@@ -1466,7 +1466,7 @@ async function gcPublicar() {
       // Subir
       var b64 = btoa(unescape(encodeURIComponent(html)));
       var put = await fetch(
-        'https://api.github.com/repos/contactobenditolab-ship-it/dossier-dilo-bonito/contents/' + filename,
+        'https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/' + filename,
         {
           method: 'PUT',
           headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'BenditoAdmin' },
