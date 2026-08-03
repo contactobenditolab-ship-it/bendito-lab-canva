@@ -229,6 +229,10 @@ async function renderCalculadora(articulo) {
     '<div class="md-calc-resultado" id="calc-resultado" style="display:none;"></div>';
 
   document.getElementById('btn-calcular').addEventListener('click', function(){ ejecutarCalculo(articulo.id); });
+  // Se calcula ya con la cantidad por defecto (25) al abrir el modal, para
+  // que el cliente vea de entrada el precio y el descuento por cantidad sin
+  // tener que pulsar nada.
+  ejecutarCalculo(articulo.id);
 }
 
 async function ejecutarCalculo(articuloId) {
@@ -255,9 +259,26 @@ async function ejecutarCalculo(articuloId) {
     var extrasLinea = d.extras && d.extras.length
       ? '<div class="md-calc-linea">Extras: +' + d.extras_total.toFixed(2) + '€</div>' : '';
 
+    var descuentoLinea = '';
+    var tablaLinea = '';
+    if (d.tramos && d.tramos.tiene_tramos) {
+      if (d.tramos.descuento_pct > 0) {
+        descuentoLinea = '<div class="md-calc-descuento">Ahorras ' + d.tramos.descuento_pct + '% por comprar ' + d.cantidad + ' uds</div>';
+      }
+      tablaLinea =
+        '<table class="md-calc-tramos"><thead><tr><th>Cantidad</th><th>Precio/ud</th></tr></thead><tbody>' +
+        d.tramos.tabla.map(function(t){
+          var activo = t.cantidad_min === d.tramos.cantidad_min_tramo_actual ? ' class="tramo-activo"' : '';
+          return '<tr' + activo + '><td>' + (t.cantidad_min === 1 ? '1+' : t.cantidad_min + '+') + '</td><td>' + t.precio_unitario.toFixed(2) + '€</td></tr>';
+        }).join('') +
+        '</tbody></table>';
+    }
+
     resEl.innerHTML =
       '<div class="md-calc-total">Total aprox.: ' + d.total.toFixed(2) + '€ <span>(' + d.precio_unitario.toFixed(2) + '€/ud × ' + d.cantidad + ')</span></div>' +
+      descuentoLinea +
       extrasLinea +
+      tablaLinea +
       '<div class="md-calc-aviso">' + escapeHtml(d.aviso) + '</div>';
     resEl.style.display = 'block';
   } catch (e) {

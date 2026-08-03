@@ -85,6 +85,31 @@ function precioUnitarioProducto(articulo, cantidad) {
   return redondearPsicologico(costeReal / (1 - margen));
 }
 
+// Info de tramos por cantidad para mostrar al cliente (nunca el margen en
+// sí, solo cantidades y precios ya calculados — ver cabecera del fichero).
+// Si el artículo tiene margen_pct_b2b fijo, no hay tramos: precio plano.
+function infoTramos(articulo, cantidad) {
+  if (articulo.margen_pct_b2b !== null && articulo.margen_pct_b2b !== undefined) {
+    return { tiene_tramos: false, tabla: [] };
+  }
+  const tabla = TRAMOS_MARGEN.map((t) => ({
+    cantidad_min: t.cantidadMin,
+    precio_unitario: precioUnitarioProducto(articulo, t.cantidadMin),
+  }));
+  const precioSinDescuento = tabla[0].precio_unitario;
+  const precioActual = precioUnitarioProducto(articulo, cantidad);
+  const tramoActual = [...TRAMOS_MARGEN].reverse().find((t) => cantidad >= t.cantidadMin) || TRAMOS_MARGEN[0];
+  const descuentoPct = precioSinDescuento > 0
+    ? Math.round((1 - precioActual / precioSinDescuento) * 100)
+    : 0;
+  return {
+    tiene_tramos: true,
+    tabla,
+    cantidad_min_tramo_actual: tramoActual.cantidadMin,
+    descuento_pct: descuentoPct,
+  };
+}
+
 // Precio unitario de una técnica de personalización según tramo de cantidad.
 // ── Precios derivados de fichas_costes (Bendito OS: /catalogo/fichas-tecnicas
 // y /catalogo/fichas-extras) — una sola fuente de datos, sin duplicar en
@@ -193,6 +218,7 @@ module.exports = async function handler(req, res) {
         if (e1 || !articulo) return res.status(404).json({ error: 'Artículo no encontrado' });
 
         const precioProducto = precioUnitarioProducto(articulo, cantidad);
+        const tramos = infoTramos(articulo, cantidad);
 
         let precioTecnica = 0;
         let tecnicaNombre = null;
@@ -219,6 +245,7 @@ module.exports = async function handler(req, res) {
           ok: true,
           cantidad,
           precio_producto_unitario: precioProducto,
+          tramos,
           tecnica: tecnicaNombre,
           precio_tecnica_unitario: precioTecnica,
           precio_unitario: precioUnitario,
