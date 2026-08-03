@@ -1,5 +1,5 @@
 // js/bl-api.js — Cliente compartido para APIs seguras de Bendito Lab
-// v2: datos → /api/db (Supabase), Drive y web → /api/proxy (Apps Script)
+// v2: todos los datos van a /api/db (Supabase). No hay backend de Apps Script.
 (function (global) {
   const TOKEN_KEY = 'bl_session_token';
 
@@ -50,96 +50,6 @@
     return d;
   }
 
-  // ── APPS SCRIPT (Drive, web content, carpetas, archivos) ─
-  async function gsGet(scope, params) {
-    const qs = new URLSearchParams(Object.assign({ scope: scope || 'app' }, params || {}));
-    const r = await fetch('/api/proxy?' + qs.toString(), { headers: authHeaders() });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d;
-  }
-
-  async function gsPost(scope, body) {
-    const r = await fetch('/api/proxy?scope=' + encodeURIComponent(scope || 'app'), {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify(body),
-    });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d;
-  }
-
-  // ── Helpers de datos (ahora → Supabase) ─────────────────
-  // Tablas de datos puros
-  const TABLAS_DB = new Set([
-    'presupuestos','colaboradores','recordatorios',
-    'gastos','articulos','catalogoCompras','produccion'
-  ]);
-
-  // Acciones que se quedan en Apps Script (Drive)
-  const ACCIONES_GS = new Set([
-    'crearCarpeta','subirArchivo','listarArchivos','subirFacturaGasto',
-    'guardarContenidoWeb'
-  ]);
-
-  async function gsGetTabla(tabla) {
-    if (TABLAS_DB.has(tabla)) {
-      const d = await dbGet({ tabla });
-      return d.data || [];
-    }
-    const d = await gsGet('app', { tabla });
-    return d.data || [];
-  }
-
-  async function gsGuardar(tabla, datos) {
-    if (TABLAS_DB.has(tabla)) {
-      return dbPost({ accion: 'guardar', tabla, datos });
-    }
-    return gsPost('app', { accion: 'guardar', tabla, datos });
-  }
-
-  async function gsEliminar(tabla, id) {
-    if (TABLAS_DB.has(tabla)) {
-      return dbPost({ accion: 'eliminar', tabla, datos: { id } });
-    }
-    return gsPost('app', { accion: 'eliminar', tabla, datos: { id } });
-  }
-
-  // Router inteligente para gsPost — redirige según accion
-  async function gsPostRouter(scope, body) {
-    const accion = body && body.accion;
-
-    // Drive y web siempre van a Apps Script
-    if (ACCIONES_GS.has(accion)) {
-      return gsPost(scope, body);
-    }
-
-    // Datos van a Supabase
-    if (accion === 'guardar' && body.tabla && TABLAS_DB.has(body.tabla)) {
-      return dbPost(body);
-    }
-    if (accion === 'eliminar' && body.tabla && TABLAS_DB.has(body.tabla)) {
-      return dbPost(body);
-    }
-    if (accion === 'guardarArticulos') return dbPost(body);
-    if (accion === 'guardarProduccion') return dbPost(body);
-    if (accion === 'guardarPedidoProd') return dbPost(body);
-    if (accion === 'guardarSuscripcionPush') return dbPost(body);
-    if (accion === 'eliminarSuscripcionPush') return dbPost(body);
-    if (accion === 'listarSuscripciones') return dbPost(body);
-
-    // Fallback: Apps Script
-    return gsPost(scope, body);
-  }
-
-  async function gsWeb(params) {
-    return gsGet('web', params);
-  }
-
-  async function gsProd(params) {
-    return gsGet('prod', params);
-  }
 
   async function enviarEmail(to, subject, html, from) {
     const body = { to, subject, html };
@@ -206,15 +116,6 @@
     // Supabase
     dbGet,
     dbPost,
-    // Apps Script (Drive, web)
-    gsGet,
-    gsPost: gsPostRouter,   // ← router inteligente, misma firma que antes
-    // Helpers (ahora enrutan solos)
-    gsGetTabla,
-    gsGuardar,
-    gsEliminar,
-    gsWeb,
-    gsProd,
     // Comunicaciones
     enviarEmail,
     enviarPush,
