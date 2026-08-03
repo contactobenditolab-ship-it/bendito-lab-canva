@@ -21,7 +21,7 @@
   // 2. Luego intentar Sheets (sobreescribe si hay datos más recientes)
   setTimeout(async function() {
     try {
-      var r = await fetch('/api/proxy?scope=web&web=portada&t=' + Date.now());
+      var r = await fetch('/api/content?pagina=portada&t=' + Date.now());
       var d = await r.json();
       if (!d.ok || !d.data) return;
       var data = d.data;
