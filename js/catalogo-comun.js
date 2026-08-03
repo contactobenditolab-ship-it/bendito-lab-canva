@@ -151,6 +151,7 @@ function abrirModalDetalle(articuloId) {
       '<h3>' + escapeHtml(a.nombre) + '</h3>' +
       (desc ? '<p class="md-desc">' + escapeHtml(desc) + '</p>' : '') +
       atributosHtml +
+      '<div class="md-calc" id="md-calc"></div>' +
       '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
     '</div>';
 
@@ -160,8 +161,95 @@ function abrirModalDetalle(articuloId) {
     abrirModalPresupuesto(a.id);
   });
 
+  renderCalculadora(a);
+
   document.getElementById('modal-detalle').style.display = 'block';
   document.body.style.overflow = 'hidden';
+}
+
+// ── Calculadora de precio aproximado (producto + técnica + extras) ────────
+var METAP_CACHE = null;
+function cargarMetaPersonalizacion() {
+  if (METAP_CACHE) return METAP_CACHE;
+  METAP_CACHE = fetch('/api/catalogo?meta=personalizacion').then(function(r){ return r.json(); }).catch(function(){ return { tecnicas: [], extras: [] }; });
+  return METAP_CACHE;
+}
+
+async function renderCalculadora(articulo) {
+  var cont = document.getElementById('md-calc');
+  if (!cont) return;
+  cont.innerHTML = '<p class="md-calc-loading">Cargando calculadora…</p>';
+
+  var meta = await cargarMetaPersonalizacion();
+  var todasTecnicas = meta.tecnicas || [];
+  var extrasDisponibles = meta.extras || [];
+
+  var tecnicasArticulo = (articulo.tecnicas_personalizacion || []).map(function(t){ return String(t).toLowerCase(); });
+  var tecnicasAplicables = tecnicasArticulo.length
+    ? todasTecnicas.filter(function(t){ return tecnicasArticulo.indexOf(String(t).toLowerCase()) !== -1; })
+    : todasTecnicas;
+  if (!tecnicasAplicables.length) tecnicasAplicables = todasTecnicas;
+
+  if (!tecnicasAplicables.length) {
+    cont.innerHTML = '';
+    return;
+  }
+
+  var optsTecnica = tecnicasAplicables.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('');
+  var extrasHtml = extrasDisponibles.length
+    ? '<div class="md-calc-extras">' + extrasDisponibles.map(function(ex, i){
+        return '<label class="md-calc-extra"><input type="checkbox" data-extra-nombre="' + escapeHtml(ex.nombre) + '"> ' +
+          escapeHtml(ex.nombre) + ' (+' + Number(ex.precio || 0).toFixed(2) + '€)</label>';
+      }).join('') + '</div>'
+    : '';
+
+  cont.innerHTML =
+    '<div class="md-calc-title">Calcula tu precio aproximado</div>' +
+    '<div class="md-calc-row">' +
+      '<label>Cantidad<input type="number" id="calc-cantidad" min="1" value="25"></label>' +
+      '<label>Técnica<select id="calc-tecnica">' + optsTecnica + '</select></label>' +
+    '</div>' +
+    extrasHtml +
+    '<button type="button" class="btn-calcular" id="btn-calcular">CALCULAR PRECIO→</button>' +
+    '<div class="md-calc-resultado" id="calc-resultado" style="display:none;"></div>';
+
+  document.getElementById('btn-calcular').addEventListener('click', function(){ ejecutarCalculo(articulo.id); });
+}
+
+async function ejecutarCalculo(articuloId) {
+  var btn = document.getElementById('btn-calcular');
+  var resEl = document.getElementById('calc-resultado');
+  var cantidad = parseInt(document.getElementById('calc-cantidad').value, 10) || 1;
+  var tecnica = document.getElementById('calc-tecnica').value;
+  var extras = Array.prototype.slice.call(document.querySelectorAll('#md-calc [data-extra-nombre]:checked'))
+    .map(function(el){ return el.dataset.extraNombre; });
+
+  btn.disabled = true; btn.textContent = 'Calculando...';
+  resEl.style.display = 'none';
+
+  try {
+    var r = await fetch('/api/catalogo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accion: 'calcularPrecio', articulo_id: articuloId, cantidad: cantidad, tecnica: tecnica, extras: extras })
+    });
+    var d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Error al calcular');
+
+    var extrasLinea = d.extras && d.extras.length
+      ? '<div class="md-calc-linea">Extras: +' + d.extras_total.toFixed(2) + '€</div>' : '';
+
+    resEl.innerHTML =
+      '<div class="md-calc-total">Total aprox.: ' + d.total.toFixed(2) + '€ <span>(' + d.precio_unitario.toFixed(2) + '€/ud × ' + d.cantidad + ')</span></div>' +
+      extrasLinea +
+      '<div class="md-calc-aviso">' + escapeHtml(d.aviso) + '</div>';
+    resEl.style.display = 'block';
+  } catch (e) {
+    resEl.innerHTML = '<div class="md-calc-error">' + escapeHtml(e.message) + '</div>';
+    resEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'CALCULAR PRECIO→';
+  }
 }
 
 function cerrarModalDetalle() {
