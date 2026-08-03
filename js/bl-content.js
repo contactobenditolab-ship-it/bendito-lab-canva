@@ -30,3 +30,4 @@
       .catch(function () { /* sin conexión — se queda el texto estático */ });
   });
 })();
+
