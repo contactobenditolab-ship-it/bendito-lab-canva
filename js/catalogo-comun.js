@@ -201,12 +201,16 @@ async function renderCalculadora(articulo) {
     : todasTecnicas;
   if (!tecnicasAplicables.length) tecnicasAplicables = todasTecnicas;
 
-  if (!tecnicasAplicables.length) {
-    cont.innerHTML = '';
-    return;
-  }
-
-  var optsTecnica = tecnicasAplicables.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('');
+  // El precio base del artículo (sin personalizar) siempre se puede calcular
+  // con solo la cantidad — la técnica/extras son opcionales. Antes, si no
+  // había fichas de coste de tipo "tecnica"/"extra" en el catálogo interno
+  // (fichas_costes), aquí se vaciaba el contenedor entero y la calculadora
+  // desaparecía sin más, aunque el precio base sí se pudiera calcular.
+  var tecnicaHtml = tecnicasAplicables.length
+    ? '<label>Técnica (opcional)<select id="calc-tecnica"><option value="">Sin personalizar</option>' +
+        tecnicasAplicables.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('') +
+      '</select></label>'
+    : '';
   var extrasHtml = extrasDisponibles.length
     ? '<div class="md-calc-extras">' + extrasDisponibles.map(function(ex, i){
         return '<label class="md-calc-extra"><input type="checkbox" data-extra-nombre="' + escapeHtml(ex.nombre) + '"> ' +
@@ -218,7 +222,7 @@ async function renderCalculadora(articulo) {
     '<div class="md-calc-title">Calcula tu precio aproximado</div>' +
     '<div class="md-calc-row">' +
       '<label>Cantidad<input type="number" id="calc-cantidad" min="1" value="25"></label>' +
-      '<label>Técnica<select id="calc-tecnica">' + optsTecnica + '</select></label>' +
+      tecnicaHtml +
     '</div>' +
     extrasHtml +
     '<button type="button" class="btn-calcular" id="btn-calcular">CALCULAR PRECIO→</button>' +
@@ -231,7 +235,8 @@ async function ejecutarCalculo(articuloId) {
   var btn = document.getElementById('btn-calcular');
   var resEl = document.getElementById('calc-resultado');
   var cantidad = parseInt(document.getElementById('calc-cantidad').value, 10) || 1;
-  var tecnica = document.getElementById('calc-tecnica').value;
+  var tecnicaEl = document.getElementById('calc-tecnica');
+  var tecnica = tecnicaEl && tecnicaEl.value ? tecnicaEl.value : null;
   var extras = Array.prototype.slice.call(document.querySelectorAll('#md-calc [data-extra-nombre]:checked'))
     .map(function(el){ return el.dataset.extraNombre; });
 
