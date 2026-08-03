@@ -810,95 +810,92 @@ var _webPagina = 'portada';
 var WEB_CAMPOS = {
   portada: [
     { sec: 'Hero', campos: [
-      { key: 'hero.eyebrow', label: 'Frase pequeña', tipo: 'input', hint: 'Texto encima del título' },
+      { key: 'header-tag', label: 'Frase superior (header)', tipo: 'input' },
       { key: 'hero.h1', label: 'Título principal', tipo: 'textarea', hint: 'En mayúsculas. Usa Enter para saltos de línea' },
-      { key: 'hero.sub', label: 'Subtítulo', tipo: 'textarea', hint: 'Descripción breve' },
-      { key: 'hero.cta1', label: 'Botón principal', tipo: 'input' },
-      { key: 'hero.cta2', label: 'Botón secundario', tipo: 'input' }
+      { key: 'hero.p1', label: 'Párrafo 1', tipo: 'textarea' },
+      { key: 'hero.p2', label: 'Párrafo 2', tipo: 'textarea' }
     ]},
-    { sec: 'Bloque Dilo Bonito', campos: [
-      { key: 'db.tag', label: 'Etiqueta', tipo: 'input' },
-      { key: 'db.titulo', label: 'Título', tipo: 'input' },
-      { key: 'db.desc', label: 'Descripción', tipo: 'textarea' },
-      { key: 'db.cta', label: 'Botón', tipo: 'input' }
+    { sec: '¿Qué hacemos?', campos: [
+      { key: 'qh.title', label: 'Título de la sección', tipo: 'input' },
+      { key: 'qh1.h3', label: 'Tarjeta 1 (Dilo Bonito) — título', tipo: 'input' },
+      { key: 'qh1.p', label: 'Tarjeta 1 — texto', tipo: 'textarea' },
+      { key: 'qh1.cta', label: 'Tarjeta 1 — botón', tipo: 'input' },
+      { key: 'qh2.h3', label: 'Tarjeta 2 (Bendito Lab) — título', tipo: 'input' },
+      { key: 'qh2.p', label: 'Tarjeta 2 — texto', tipo: 'textarea' },
+      { key: 'qh2.cta', label: 'Tarjeta 2 — botón', tipo: 'input' },
+      { key: 'qh3.h3', label: 'Tarjeta 3 (Colaboradores) — título', tipo: 'input' },
+      { key: 'qh3.p', label: 'Tarjeta 3 — texto', tipo: 'textarea' },
+      { key: 'qh3.cta', label: 'Tarjeta 3 — botón', tipo: 'input' }
     ]},
-    { sec: 'Bloque Bendito Lab', campos: [
-      { key: 'bl.tag', label: 'Etiqueta', tipo: 'input' },
-      { key: 'bl.titulo', label: 'Título', tipo: 'input' },
-      { key: 'bl.desc', label: 'Descripción', tipo: 'textarea' },
-      { key: 'bl.cta', label: 'Botón', tipo: 'input' }
-    ]},
-    { sec: 'Formulario contacto', campos: [
-      { key: 'cot.titulo', label: 'Título', tipo: 'input' }
+    { sec: 'Footer', campos: [
+      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
     ]},
     { sec: 'Colores', campos: [
       { key: 'colores.cream', label: 'Fondo crema', tipo: 'color' },
       { key: 'colores.deep', label: 'Azul marino', tipo: 'color' },
       { key: 'colores.sunshine', label: 'Amarillo', tipo: 'color' },
       { key: 'colores.poppy', label: 'Naranja', tipo: 'color' }
-    ]},
-    { sec: 'Tipografía', campos: [
-      { key: 'tipografia.titulos', label: 'Fuente títulos', tipo: 'select', opciones: ['League Spartan','Playfair Display','Montserrat','Oswald','Raleway'] },
-      { key: 'tipografia.texto', label: 'Fuente texto', tipo: 'select', opciones: ['Lato','Open Sans','Roboto','Nunito','Source Sans Pro'] }
     ]}
   ],
   'dilo-bonito': [
-    { sec: 'Hero', campos: [
-      { key: 'hero.tag', label: 'Etiqueta', tipo: 'input' },
-      { key: 'hero.h1', label: 'Título', tipo: 'textarea' },
-      { key: 'hero.sub', label: 'Subtítulo', tipo: 'textarea' },
-      { key: 'hero.tel', label: 'Teléfono', tipo: 'input' },
-      { key: 'hero.email', label: 'Email', tipo: 'input' }
-    ]},
-    { sec: 'Servicio 1 — DTF', campos: [
+    { sec: 'Servicio 1 — Personalización en directo', campos: [
       { key: 'srv1.titulo', label: 'Título', tipo: 'input' },
       { key: 'srv1.desc', label: 'Descripción', tipo: 'textarea' }
     ]},
-    { sec: 'Servicio 2 — Seating Plan', campos: [
+    { sec: 'Servicio 2 — Seating plan', campos: [
       { key: 'srv2.titulo', label: 'Título', tipo: 'input' },
       { key: 'srv2.desc', label: 'Descripción', tipo: 'textarea' }
     ]},
-    { sec: 'Servicio 3 — Vasitos', campos: [
+    { sec: 'Servicio 3 — Máquina expendedora', campos: [
       { key: 'srv3.titulo', label: 'Título', tipo: 'input' },
       { key: 'srv3.desc', label: 'Descripción', tipo: 'textarea' }
     ]},
-    { sec: 'Servicio 4 — Máquina Gancho', campos: [
+    { sec: 'Servicio 4 — Máquina de gancho', campos: [
       { key: 'srv4.titulo', label: 'Título', tipo: 'input' },
       { key: 'srv4.desc', label: 'Descripción', tipo: 'textarea' }
     ]},
-    { sec: 'Servicio 5 — Merch Corner', campos: [
+    { sec: 'Servicio 5 — Corner merch', campos: [
       { key: 'srv5.titulo', label: 'Título', tipo: 'input' },
       { key: 'srv5.desc', label: 'Descripción', tipo: 'textarea' }
     ]},
-    { sec: 'Precios packs', campos: [
-      { key: 'pack.mini.precio', label: 'Pack MINI (€)', tipo: 'input' },
-      { key: 'pack.intima.precio', label: 'Pack ÍNTIMA (€)', tipo: 'input' },
-      { key: 'pack.clasica.precio', label: 'Pack CLÁSICA (€)', tipo: 'input' },
-      { key: 'pack.premium.precio', label: 'Pack PREMIUM (€)', tipo: 'input' }
+    { sec: 'Bloques inferiores', campos: [
+      { key: 'personalizacion.title', label: 'Personalización en directo — título', tipo: 'input' },
+      { key: 'seating.title', label: 'Seating plan — título', tipo: 'input' },
+      { key: 'expendedora.title', label: 'Máquina expendedora — título', tipo: 'input' },
+      { key: 'gancho.title', label: 'Máquina de gancho — título', tipo: 'input' },
+      { key: 'merchcorner.title', label: 'Merch corner — título', tipo: 'input' }
+    ]},
+    { sec: 'Footer', campos: [
+      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
     ]}
   ],
   'bendito-lab': [
     { sec: 'Hero', campos: [
       { key: 'hero.h1', label: 'Título', tipo: 'textarea' },
-      { key: 'hero.sub', label: 'Subtítulo', tipo: 'textarea' }
+      { key: 'hero.p1', label: 'Párrafo 1', tipo: 'textarea' },
+      { key: 'hero.p2', label: 'Párrafo 2', tipo: 'textarea' }
     ]},
     { sec: 'Secciones', campos: [
-      { key: 'sec1.titulo', label: 'Título sección 1', tipo: 'input' },
-      { key: 'sec2.titulo', label: 'Título sección 2', tipo: 'input' },
-      { key: 'sec3.titulo', label: 'Título sección 3', tipo: 'input' },
-      { key: 'sec4.titulo', label: 'Título sección 4', tipo: 'input' }
+      { key: 'qh.title', label: '"Qué hacemos" — título', tipo: 'input' },
+      { key: 'porque.title', label: '"Por qué Bendito Lab" — título', tipo: 'input' },
+      { key: 'trabajo.title', label: '"Cómo trabajamos" — título', tipo: 'input' }
+    ]},
+    { sec: 'Footer', campos: [
+      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
     ]}
   ],
   colaboradores: [
     { sec: 'Hero', campos: [
-      { key: 'hero.h1', label: 'Título', tipo: 'textarea' },
-      { key: 'hero.sub', label: 'Subtítulo', tipo: 'textarea' }
+      { key: 'hero.h1', label: 'Título', tipo: 'input' },
+      { key: 'hero.caption', label: 'Frase destacada', tipo: 'textarea' }
     ]},
     { sec: 'Secciones', campos: [
-      { key: 'sec1.titulo', label: 'Cómo funciona — título', tipo: 'input' },
-      { key: 'sec2.titulo', label: 'Ventajas — título', tipo: 'input' },
-      { key: 'cta.titulo', label: 'CTA — título', tipo: 'input' },
-      { key: 'cta.sub', label: 'CTA — subtítulo', tipo: 'textarea' }
+      { key: 'ofrecemos.title', label: '"¿Qué ofrecemos?" — título', tipo: 'input' },
+      { key: 'unete.title', label: '"Únete como colaborador" — título', tipo: 'input' },
+      { key: 'comofunciona.title', label: '"Cómo funciona" — título', tipo: 'input' }
+    ]},
+    { sec: 'Footer', campos: [
+      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
     ]}
   ]
 };
