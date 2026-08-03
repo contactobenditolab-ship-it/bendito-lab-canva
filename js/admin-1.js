@@ -1049,8 +1049,8 @@ function dbApplyColor(input) {
   var key = 'colores.' + input.dataset.var.replace('--','');
   var obj = {};
   obj[key] = input.value;
-  BL_API.gsPost('web', { accion: 'guardarContenidoWeb', pagina: 'portada', contenido: obj })
-    .then(function(d){ if(d.ok) console.log('Color guardado en Sheets:', key, input.value); })
+  BL_API.dbPost({ accion: 'guardarContenidoWeb', pagina: 'portada', contenido: obj })
+    .then(function(d){ if(d.ok) console.log('Color guardado:', key, input.value); })
     .catch(function(e){ console.warn('Error guardando color:', e); });
 }
 function dbApplyFont(type, value) {
