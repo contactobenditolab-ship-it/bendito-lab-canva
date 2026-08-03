@@ -86,14 +86,37 @@ function precioUnitarioProducto(articulo, cantidad) {
 }
 
 // Precio unitario de una técnica de personalización según tramo de cantidad.
-function precioUnitarioTecnica(tecnica, cantidad) {
-  if (!tecnica || !Array.isArray(tecnica.tramos) || !tecnica.tramos.length) return 0;
-  const tramos = tecnica.tramos.slice().sort((a, b) => (a.desde || 0) - (b.desde || 0));
-  let elegido = tramos[0];
-  for (const t of tramos) {
-    if (cantidad >= (t.desde || 0)) elegido = t;
-  }
-  return Number(elegido.precio) || 0;
+// ── Precios derivados de fichas_costes (Bendito OS: /catalogo/fichas-tecnicas
+// y /catalogo/fichas-extras) — una sola fuente de datos, sin duplicar en
+// precios_bendito. Cada ficha trae varias líneas de coste (costes_variables);
+// se usa el coste medio de esas líneas como coste real de la técnica/extra. ──
+function costeTotalLinea(cv) {
+  return (cv.coste_base || 0) + (cv.coste_personalizacion || 0);
+}
+function costeMedioFicha(ficha) {
+  const vars = (ficha && ficha.costes_variables) || [];
+  if (!vars.length) return 0;
+  return vars.reduce((a, cv) => a + costeTotalLinea(cv), 0) / vars.length;
+}
+// Técnicas: SÍ llevan tramos por cantidad — se reutiliza el mismo calendario
+// de márgenes (TRAMOS_MARGEN) que ya aplica al producto base, para que la
+// técnica se abarate igual que el artículo al pedir más unidades.
+function precioTecnicaDesdeFicha(ficha, cantidad) {
+  const coste = costeMedioFicha(ficha);
+  if (!coste) return 0;
+  return coste / (1 - margenPorTramo(cantidad));
+}
+// Extras: precio fijo (no dependen de la cantidad, igual que antes), usando
+// el margen propio de cada línea de coste de la ficha.
+function pvpMedioFicha(ficha) {
+  const vars = (ficha && ficha.costes_variables) || [];
+  if (!vars.length) return 0;
+  const suma = vars.reduce((a, cv) => {
+    const coste = costeTotalLinea(cv);
+    const margen = Math.min(Math.max(cv.margen_pct || 0, 0), 99) / 100;
+    return a + (margen >= 1 ? coste : coste / (1 - margen));
+  }, 0);
+  return suma / vars.length;
 }
 
 module.exports = async function handler(req, res) {
@@ -104,11 +127,16 @@ module.exports = async function handler(req, res) {
     // con sus precios (estos SÍ son públicos, ya son precios de venta).
     if (req.query.meta === 'personalizacion') {
       try {
-        const { data, error } = await supabase
-          .from('precios_bendito').select('tecnicas, extras').eq('id', 1).single();
-        if (error) throw error;
-        const tecnicas = (data && data.tecnicas || []).map((t) => t.nombre).filter(Boolean);
-        const extras = (data && data.extras && data.extras.items) || [];
+        const [{ data: tecnicasData, error: e1 }, { data: extrasData, error: e2 }] = await Promise.all([
+          supabase.from('fichas_costes').select('categoria').eq('tipo', 'tecnica').order('orden'),
+          supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'extra').order('orden'),
+        ]);
+        if (e1) throw e1;
+        if (e2) throw e2;
+        const tecnicas = (tecnicasData || []).map((f) => f.categoria).filter(Boolean);
+        const extras = (extrasData || [])
+          .filter((f) => f.categoria)
+          .map((f) => ({ nombre: f.categoria, precio: Math.round(pvpMedioFicha(f) * 100) / 100 }));
         res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
         return res.status(200).json({ tecnicas, extras });
       } catch (e) {
@@ -153,29 +181,33 @@ module.exports = async function handler(req, res) {
           'coste_mermas_pct', 'coste_comisiones_pct', 'costes_generales_pct', 'margen_pct_b2b',
         ].join(', ');
 
-        const [{ data: articulo, error: e1 }, { data: precios, error: e2 }] = await Promise.all([
+        const [{ data: articulo, error: e1 }, { data: fichaTecnica }, { data: fichasExtra }] = await Promise.all([
           supabase.from('catalogo_articulos').select(CAMPOS_COSTE).eq('id', articuloId).eq('visible_web', true).single(),
-          supabase.from('precios_bendito').select('tecnicas, extras').eq('id', 1).single(),
+          nombreTecnica
+            ? supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'tecnica').eq('categoria', nombreTecnica).maybeSingle()
+            : Promise.resolve({ data: null }),
+          extrasElegidos.length
+            ? supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'extra')
+            : Promise.resolve({ data: [] }),
         ]);
         if (e1 || !articulo) return res.status(404).json({ error: 'Artículo no encontrado' });
-        if (e2) throw e2;
 
         const precioProducto = precioUnitarioProducto(articulo, cantidad);
 
         let precioTecnica = 0;
         let tecnicaNombre = null;
-        if (nombreTecnica) {
-          const tecnicas = (precios && precios.tecnicas) || [];
-          const t = tecnicas.find((x) => (x.nombre || '').toLowerCase() === String(nombreTecnica).toLowerCase());
-          if (t) { precioTecnica = precioUnitarioTecnica(t, cantidad); tecnicaNombre = t.nombre; }
-        }
+        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad); tecnicaNombre = fichaTecnica.categoria; }
 
-        const extrasDisponibles = (precios && precios.extras && precios.extras.items) || [];
+        const extrasDisponibles = fichasExtra || [];
         let extrasTotal = 0;
         const extrasAplicados = [];
         extrasElegidos.forEach((nombreExtra) => {
-          const ex = extrasDisponibles.find((x) => (x.nombre || '').toLowerCase() === String(nombreExtra).toLowerCase());
-          if (ex) { extrasTotal += Number(ex.precio) || 0; extrasAplicados.push({ nombre: ex.nombre, precio: Number(ex.precio) || 0 }); }
+          const f = extrasDisponibles.find((x) => (x.categoria || '').toLowerCase() === String(nombreExtra).toLowerCase());
+          if (f) {
+            const precio = Math.round(pvpMedioFicha(f) * 100) / 100;
+            extrasTotal += precio;
+            extrasAplicados.push({ nombre: f.categoria, precio });
+          }
         });
 
         const precioUnitario = Math.round((precioProducto + precioTecnica) * 100) / 100;
