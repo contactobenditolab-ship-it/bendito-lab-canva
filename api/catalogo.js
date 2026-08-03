@@ -12,6 +12,7 @@
 // Mismo proyecto Supabase que usa Bendito OS. Sin autenticación (de solo
 // lectura salvo el cálculo, que no escribe nada).
 const { createClient } = require('@supabase/supabase-js');
+const { resolverColores } = require('../lib/colores');
 
 let cachedClient = null;
 function client() {
@@ -178,8 +179,16 @@ module.exports = async function handler(req, res) {
         .order('categoria', { ascending: true, nullsFirst: false })
         .order('nombre', { ascending: true });
       if (error) throw error;
+
+      const articulos = await Promise.all(
+        (data || []).map(async (a) => ({
+          ...a,
+          colores_resueltos: a.colores && a.colores.length ? await resolverColores(a.colores) : [],
+        }))
+      );
+
       res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
-      return res.status(200).json({ articulos: data || [] });
+      return res.status(200).json({ articulos });
     } catch (e) {
       console.error('Error listando catálogo público:', e.message);
       return res.status(500).json({ error: 'No se pudo cargar el catálogo' });

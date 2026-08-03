@@ -126,6 +126,36 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
   }
 });
 
+// ── Cuadrados de color (en vez del nombre en texto) ────────
+// colores_resueltos viene ya calculado por /api/catalogo: cada color es
+// { nombre, segmentos: [{hex, esEstampado}, ...] } — 2 segmentos para
+// bicolores tipo "Celeste/Blanco" (se pintan partidos en diagonal), 1 para
+// el resto. hex null (estampados o nombres sin match en la carta de
+// colores) cae en el estilo .color-swatch--sin-match.
+function renderColoresSwatches(coloresResueltos) {
+  if (!coloresResueltos || !coloresResueltos.length) return '';
+
+  var swatches = coloresResueltos.map(function(c) {
+    var segmentos = c.segmentos || [];
+    var sinMatch = segmentos.some(function(s){ return !s.hex; });
+    var estampado = segmentos.some(function(s){ return s.esEstampado; });
+
+    var estiloExtra = '';
+    if (!sinMatch) {
+      if (segmentos.length === 2) {
+        estiloExtra = 'background:linear-gradient(135deg,' + segmentos[0].hex + ' 0 50%,' + segmentos[1].hex + ' 50% 100%);';
+      } else {
+        estiloExtra = 'background:' + segmentos[0].hex + ';';
+      }
+    }
+
+    var clase = 'color-swatch' + (sinMatch ? ' color-swatch--sin-match' : '') + (estampado ? ' color-swatch--estampado' : '');
+    return '<span class="' + clase + '" style="' + estiloExtra + '" title="' + escapeHtml(c.nombre) + '"></span>';
+  }).join('');
+
+  return '<div class="md-colores"><span class="md-colores-label">Colores</span><div class="md-colores-lista">' + swatches + '</div></div>';
+}
+
 // ── Modal de detalle de producto ──────────────────────────
 function abrirModalDetalle(articuloId) {
   var a = ARTICULOS_MOSTRADOS.find(function(x){ return x.id === articuloId; });
@@ -137,7 +167,6 @@ function abrirModalDetalle(articuloId) {
 
   var atributos = [
     ['Material', a.material],
-    ['Colores', a.colores && a.colores.length ? a.colores.join(', ') : null],
     ['Medidas', a.medidas],
     ['Capacidad', a.capacidad],
     ['Formato', a.formato],
@@ -152,6 +181,8 @@ function abrirModalDetalle(articuloId) {
       }).join('') + '</dl>'
     : '';
 
+  var coloresHtml = renderColoresSwatches(a.colores_resueltos);
+
   var desc = a.descripcion || a.descripcion_corta || '';
 
   document.getElementById('md-contenido').innerHTML =
@@ -161,6 +192,7 @@ function abrirModalDetalle(articuloId) {
       (a.categoria ? '<p class="md-cat">' + escapeHtml(a.categoria) + (a.subcategoria ? ' · ' + escapeHtml(a.subcategoria) : '') + '</p>' : '') +
       '<h3>' + escapeHtml(a.nombre) + '</h3>' +
       (desc ? '<p class="md-desc">' + escapeHtml(desc) + '</p>' : '') +
+      coloresHtml +
       atributosHtml +
       '<div class="md-calc" id="md-calc"></div>' +
       '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
