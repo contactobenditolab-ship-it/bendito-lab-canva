@@ -1,8 +1,8 @@
 // Service Worker — Bendito Lab
 // Estrategia: network-first para HTML, cache-first para assets estáticos
 
-const CACHE_NAME = 'bendito-lab-v5';
-const STATIC_CACHE = 'bendito-static-v5';
+const CACHE_NAME = 'bendito-lab-v6';
+const STATIC_CACHE = 'bendito-static-v6';
 
 // Solo cachear assets estáticos (imágenes, fuentes, iconos) + la portada,
 // que es el único HTML que se sirve como fallback offline.
