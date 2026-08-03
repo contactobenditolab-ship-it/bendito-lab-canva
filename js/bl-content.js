@@ -1,7 +1,7 @@
 // js/bl-content.js — Aplica el contenido editado desde /admin sobre los
 // elementos [data-edit="pagina.clave"] de la página pública actual.
 // Detecta automáticamente qué página(s) hay marcadas y consulta
-// /api/web-content?pagina=... (público, solo lectura). Si no hay contenido
+// /api/content?pagina=... (público, solo lectura). Si no hay contenido
 // guardado para una clave, se deja el texto estático del HTML tal cual.
 (function () {
   function aplicar(pagina, datos) {
@@ -24,7 +24,7 @@
   });
 
   Object.keys(paginas).forEach(function (pagina) {
-    fetch('/api/web-content?pagina=' + encodeURIComponent(pagina))
+    fetch('/api/content?pagina=' + encodeURIComponent(pagina))
       .then(function (r) { return r.json(); })
       .then(function (d) { aplicar(pagina, d && d.data); })
       .catch(function () { /* sin conexión — se queda el texto estático */ });
