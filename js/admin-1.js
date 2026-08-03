@@ -909,7 +909,7 @@ async function webCargarPagina(pagina) {
   if (!_webContenido[pagina]) {
     document.getElementById('web-fields').innerHTML = '<p style="color:#888;padding:20px;">Cargando...</p>';
     try {
-      var d = await BL_API.gsWeb({ web: pagina, t: Date.now() });
+      var d = await BL_API.dbGet({ tabla: 'contenido_web', pagina: pagina });
       _webContenido[pagina] = d.data || {};
     } catch(e) { _webContenido[pagina] = {}; }
   }
@@ -965,7 +965,7 @@ async function webGuardar() {
   var btn = document.getElementById('web-save-btn');
   btn.textContent = 'Guardando...'; btn.disabled = true;
   try {
-    var d = await BL_API.gsPost('web', { accion: 'guardarContenidoWeb', pagina: _webPagina, contenido: _webContenido[_webPagina] });
+    var d = await BL_API.dbPost({ accion: 'guardarContenidoWeb', pagina: _webPagina, contenido: _webContenido[_webPagina] });
     if (d.ok) {
       _webDirty = false;
       document.getElementById('web-status').textContent = '✓ Guardado en Sheets';
