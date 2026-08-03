@@ -50,6 +50,13 @@ h1{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;mar
 .btn-pill{background:var(--yellow);font-weight:700;font-size:13px;padding:10px 20px;border-radius:20px;display:inline-block;}
 .topbar-logo{display:flex;align-items:center;gap:10px;}
 .topbar-logo img{height:75px;width:auto;display:block;}
+.site-header{background:var(--yellow);padding:32px 5vw 22px;}
+.header-logo{display:flex;justify-content:center;}
+.header-logo img{height:110px;width:auto;display:block;}
+.site-nav{display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,36px);margin-top:20px;flex-wrap:wrap;}
+.site-nav a{font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--deep);}
+.site-nav a.pill{border:1px solid var(--deep);padding:9px 18px;border-radius:22px;}
+.nav-hamburger{display:none;}
 .faq-title{max-width:1300px;margin:24px auto 0;padding:0 5vw;font-weight:800;font-size:clamp(34px,5.5vw,54px);}
 .faq-list{max-width:1300px;margin:32px auto 0;padding:0 5vw 24px;}
 .faq-row{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid #E3DFCF;}
@@ -66,6 +73,12 @@ footer{background:var(--rose);}
   .faq-row{grid-template-columns:60px 1fr;}
   .footer-bottom{flex-direction:column;text-align:center;}
   .footer-bottom-links{justify-content:center;}
+  .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
+  .site-nav a{font-size:20px;color:var(--white)!important;}
+  .nav-hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;position:absolute;top:28px;right:5vw;z-index:1001;}
+  .nav-hamburger span{display:block;width:22px;height:2px;background:var(--deep);}
+  body.nav-open .site-nav{display:flex;}
+  body.nav-open{overflow:hidden;}
 }
 </style>
   <link rel="apple-touch-icon" href="/icon-web-180.png">
@@ -76,10 +89,19 @@ footer{background:var(--rose);}
 </head>
 <body>
 
-<div class="topbar">
-  <a href="portada.html" class="btn-pill">VOLVER→</a>
-  <a href="portada.html" class="topbar-logo"><img src="logo-bendito.png" alt="Bendito Lab"></a>
-</div>
+<header class="site-header">
+  <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
+  <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+  <nav class="site-nav" id="site-nav">
+    <a href="portada.html">PORTADA→</a>
+    <a href="dilo-bonito.html">DILO BONITO→</a>
+    <a href="bendito-lab.html">BENDITO LAB→</a>
+    <a href="catalogo.html">CATÁLOGO→</a>
+    <a href="colaboradores.html">COLABORADORES→</a>
+    <a href="contacto.html">CONTACTO→</a>
+    <a href="area-clientes.html" class="pill">ÁREA CLIENTE→</a>
+  </nav>
+</header>
 
 <h1 class="faq-title" data-edit="faq.title">Preguntas frecuentes</h1>
 
