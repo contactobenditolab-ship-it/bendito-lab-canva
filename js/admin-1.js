@@ -369,6 +369,19 @@ function selectPagina(i){
   document.getElementById('editor-pagename').textContent=p.nombre;
   document.getElementById('editor-frame').src=p.archivo+'?admin=1';
   document.getElementById('editor-open-tab').href=p.archivo;
+  if(window.innerWidth<=700) closeEditorSidebar();
+}
+
+function toggleEditorSidebar(){
+  var sb=document.getElementById('editor-sidebar');
+  var ov=document.getElementById('editor-sidebar-overlay');
+  var open=sb.classList.toggle('open');
+  ov.classList.toggle('open',open);
+}
+
+function closeEditorSidebar(){
+  document.getElementById('editor-sidebar').classList.remove('open');
+  document.getElementById('editor-sidebar-overlay').classList.remove('open');
 }
 
 function showPanelAvanzado(){
@@ -1453,6 +1466,7 @@ function handleClick(e){
     case 'check-login':          checkLogin(); break;
     case 'logout-admin':         logoutAdmin(); break;
     case 'toggle-sidebar':       toggleSidebar(); break;
+    case 'toggle-editor-sidebar':toggleEditorSidebar(); break;
     case 'back-to-editor':       backToEditor(); break;
     case 'show-panel-avanzado':  showPanelAvanzado(); break;
     case 'save-all':             saveAll(); break;
