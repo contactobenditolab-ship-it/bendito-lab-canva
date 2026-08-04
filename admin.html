@@ -268,16 +268,13 @@ input[type="file"]{display:none;}
       <div class="sb-item" data-action="show" data-panel="db-textos"><span>✏️</span> Textos</div>
       <div class="sb-item" data-action="show" data-panel="db-precios"><span>💰</span> Precios</div>
       <div class="sb-item" data-action="show" data-panel="db-disenyo"><span>🎨</span> Diseño</div>
-      <div class="sb-item" data-action="show" data-panel="db-disenyo"><span>🎨</span> Diseño</div>
       <hr class="sb-div">
       <div class="sb-lbl">Bendito Lab</div>
       <div class="sb-item" data-action="show" data-panel="bl-textos"><span>✏️</span> Textos</div>
       <div class="sb-item" data-action="show" data-panel="bl-productos"><span>📦</span> Productos</div>
       <div class="sb-item" data-action="show" data-panel="colecciones"><span>🗂️</span> Colecciones catálogo</div>
       <hr class="sb-div">
-      <div class="sb-lbl">Contenido Web</div>
-      <div class="sb-item" data-action="show" data-panel="web-editor"><span>🌐</span> Editor de textos</div>
-      <div class="sb-item" data-action="show" data-panel="colores"><span>🎨</span> Colores</div>
+      <div class="sb-lbl">Ajustes generales</div>
       <div class="sb-item" data-action="show" data-panel="colores-globales"><span>🌈</span> Colores globales</div>
       <div class="sb-item" data-action="show" data-panel="ajustes"><span>⚙️</span> Ajustes</div>
       <hr class="sb-div">
@@ -529,7 +526,6 @@ input[type="file"]{display:none;}
         <div class="card"><div class="card-title">Dilo Bonito · Fotos de servicios</div><div id="grp-dilo_bonito"></div></div>
         <div class="card"><div class="card-title">Colaboradores · Foto hero</div><div id="grp-colaboradores"></div></div>
         <div class="card"><div class="card-title">Bendito Lab · Fotos B2B</div><div id="grp-bendito_lab"></div></div>
-        <div class="card"><div class="card-title">Imágenes extra (sin uso activo)</div><div id="grp-extras"></div></div>
         <!-- BANNERS PERSONALIZADOS -->
         <div class="card" style="margin-top:8px;">
           <div class="card-title">🖼️ Banners personalizados</div>
@@ -539,30 +535,6 @@ input[type="file"]{display:none;}
         </div>
       </div>
 
-      <!-- ══════════ EDITOR CONTENIDO WEB ══════════ -->
-      <div class="panel" id="panel-web-editor">
-        <div class="panel-title">Editor de contenido web</div>
-        <div class="panel-desc">Edita los textos, colores y tipografía de cada página. Los cambios se guardan en Google Sheets y la web los muestra automáticamente.</div>
-
-        <!-- Selector de página -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;">
-          <button class="web-page-tab active" data-page="portada" data-action="web-cargar-pagina" style="padding:8px 16px;border:1.5px solid #17233F;background:#17233F;color:#E8C24A;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;">PORTADA</button>
-          <button class="web-page-tab" data-page="dilo-bonito" data-action="web-cargar-pagina" style="padding:8px 16px;border:1.5px solid #E0DDD6;background:#fff;color:#444;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;">DILO BONITO</button>
-          <button class="web-page-tab" data-page="bendito-lab" data-action="web-cargar-pagina" style="padding:8px 16px;border:1.5px solid #E0DDD6;background:#fff;color:#444;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;">BENDITO LAB</button>
-          <button class="web-page-tab" data-page="colaboradores" data-action="web-cargar-pagina" style="padding:8px 16px;border:1.5px solid #E0DDD6;background:#fff;color:#444;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;">COLABORADORES</button>
-        </div>
-
-        <!-- Barra de guardado -->
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px 16px;background:#F4F1E6;border:1px solid #E0DDD6;">
-          <span id="web-status" style="font-size:12px;flex:1;"></span>
-          <button id="web-save-btn" data-action="web-guardar" style="background:#17233F;color:#E8C24A;border:none;font-weight:700;font-size:13px;padding:10px 24px;cursor:pointer;letter-spacing:1px;">💾 Guardar</button>
-        </div>
-
-        <!-- Campos -->
-        <div id="web-fields" style="padding-bottom:40px;">
-          <p style="color:#888;font-size:13px;">Selecciona una página para empezar a editar.</p>
-        </div>
-      </div>
       <div class="panel" id="panel-db-textos">
         <div class="panel-title">Dilo Bonito · Textos</div>
         <div class="panel-desc">Textos de la página de servicios para eventos.</div>
@@ -667,38 +639,8 @@ input[type="file"]{display:none;}
 
         <div id="colecciones-list"></div>
         <button data-action="add-coleccion" style="width:100%;margin-top:4px;padding:10px;background:#F4F1E6;border:1.5px dashed #ccc;color:#666;cursor:pointer;font-size:12px;">+ Añadir colección</button>
-        <button data-action="save-colecciones" class="btn btn-primary" style="margin-top:16px;">💾 Guardar colecciones</button>
+        <button data-action="save-colecciones" style="background:#17233F;color:#E8C24A;border:none;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:13px;padding:12px 28px;cursor:pointer;margin-top:16px;">💾 Guardar colecciones</button>
         <div id="colecciones-status" style="font-size:12px;margin-top:8px;"></div>
-      </div>
-
-      <!-- ══════════ COLORES ══════════ -->
-      <div class="panel" id="panel-colores">
-        <div class="panel-title">Colores y estilos</div>
-        <div class="panel-desc">Cambia el color de fondo y texto de cada sección. Al publicar se aplica directamente a la web.</div>
-
-        <div class="card">
-          <div class="card-title">Paleta de colores</div>
-          <div class="color-grid" id="paleta-grid">
-            <!-- generado por JS -->
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Secciones — Portada</div>
-          <div id="secciones-color-list">
-            <!-- generado por JS -->
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Presets de combinación</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="presets-grid">
-            <!-- generado por JS -->
-          </div>
-        </div>
-
-        <button class="btn btn-primary" style="margin-top:8px;" data-action="publicar-colores">🌐 PUBLICAR CAMBIOS EN LA WEB</button>
-        <button class="btn btn-secondary" style="margin-top:8px;" data-action="reset-colores">↩ Restaurar colores originales</button>
       </div>
 
       <!-- ══════════ COLORES GLOBALES ══════════ -->
