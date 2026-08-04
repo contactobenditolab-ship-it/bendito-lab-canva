@@ -311,6 +311,15 @@ var EDITOR_PAGINAS = [
   {archivo:'contacto.html',     nombre:'Contacto',          color:'#E2704A'},
   {archivo:'link-bio.html',     nombre:'Link Bio (móvil)',  color:'#E2704A'},
   {archivo:'area-clientes.html',nombre:'Área Clientes',     color:'#E2704A'},
+  {archivo:'newsletter-eventos.html',                      nombre:'Newsletter · Eventos',              color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'newsletter-empresas.html',                     nombre:'Newsletter · Empresas',             color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-stand-boda.html',                     nombre:'Art. Stand en boda',                color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-elige-articulos.html',                nombre:'Art. Elige artículos',              color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-uniformes.html',                      nombre:'Art. Uniformes',                    color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-monouso.html',                        nombre:'Art. Monouso',                      color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-personalizacion-directo-empresa.html',nombre:'Art. Personalización en empresa',   color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-regalo-corporativo.html',              nombre:'Art. Regalo corporativo',           color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-packs-estacionales.html',              nombre:'Art. Packs estacionales',           color:'#E8C24A', grupo:'Newsletter'},
 ];
 var editorActiveIdx=0;
 
@@ -329,7 +338,15 @@ function enterEditor(){
 function renderEditorSidebar(){
   var c=document.getElementById('editor-pages');
   c.innerHTML='';
+  var grupoActual=null;
   EDITOR_PAGINAS.forEach(function(p,i){
+    if(p.grupo && p.grupo!==grupoActual){
+      grupoActual=p.grupo;
+      var lbl=document.createElement('div');
+      lbl.className='sb-lbl';
+      lbl.textContent=p.grupo;
+      c.appendChild(lbl);
+    }
     var btn=document.createElement('button');
     btn.className='navbtn';
     btn.textContent=p.nombre;
