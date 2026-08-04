@@ -343,7 +343,7 @@
 
   function saveLink(id, patch) {
     if (!id) return;
-    fetch('/api/save-link', {
+    fetch('/api/save-color', {
       method: 'POST',
       headers: BL_API.authHeaders(),
       body: JSON.stringify(Object.assign({ id: id }, patch))
