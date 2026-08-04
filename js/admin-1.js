@@ -819,179 +819,6 @@ async function uploadImg(input,filePath,uid){
   setTimeout(function(){prog.style.display='none';pb.style.width='0%';},3000);
 }
 
-// ══ CONTENIDO WEB ═══════════════════════════════════════════
-var _webContenido = {}; // { pagina: { clave: valor } }
-var _webDirty = false;
-var _webPagina = 'portada';
-
-var WEB_CAMPOS = {
-  portada: [
-    { sec: 'Hero', campos: [
-      { key: 'header-tag', label: 'Frase superior (header)', tipo: 'input' },
-      { key: 'hero.h1', label: 'Título principal', tipo: 'textarea', hint: 'En mayúsculas. Usa Enter para saltos de línea' },
-      { key: 'hero.p1', label: 'Párrafo 1', tipo: 'textarea' },
-      { key: 'hero.p2', label: 'Párrafo 2', tipo: 'textarea' }
-    ]},
-    { sec: '¿Qué hacemos?', campos: [
-      { key: 'qh.title', label: 'Título de la sección', tipo: 'input' },
-      { key: 'qh1.h3', label: 'Tarjeta 1 (Dilo Bonito) — título', tipo: 'input' },
-      { key: 'qh1.p', label: 'Tarjeta 1 — texto', tipo: 'textarea' },
-      { key: 'qh1.cta', label: 'Tarjeta 1 — botón', tipo: 'input' },
-      { key: 'qh2.h3', label: 'Tarjeta 2 (Bendito Lab) — título', tipo: 'input' },
-      { key: 'qh2.p', label: 'Tarjeta 2 — texto', tipo: 'textarea' },
-      { key: 'qh2.cta', label: 'Tarjeta 2 — botón', tipo: 'input' },
-      { key: 'qh3.h3', label: 'Tarjeta 3 (Colaboradores) — título', tipo: 'input' },
-      { key: 'qh3.p', label: 'Tarjeta 3 — texto', tipo: 'textarea' },
-      { key: 'qh3.cta', label: 'Tarjeta 3 — botón', tipo: 'input' }
-    ]},
-    { sec: 'Footer', campos: [
-      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
-    ]},
-    { sec: 'Colores', campos: [
-      { key: 'colores.cream', label: 'Fondo crema', tipo: 'color' },
-      { key: 'colores.deep', label: 'Azul marino', tipo: 'color' },
-      { key: 'colores.sunshine', label: 'Amarillo', tipo: 'color' },
-      { key: 'colores.poppy', label: 'Naranja', tipo: 'color' }
-    ]}
-  ],
-  'dilo-bonito': [
-    { sec: 'Servicio 1 — Personalización en directo', campos: [
-      { key: 'srv1.titulo', label: 'Título', tipo: 'input' },
-      { key: 'srv1.desc', label: 'Descripción', tipo: 'textarea' }
-    ]},
-    { sec: 'Servicio 2 — Seating plan', campos: [
-      { key: 'srv2.titulo', label: 'Título', tipo: 'input' },
-      { key: 'srv2.desc', label: 'Descripción', tipo: 'textarea' }
-    ]},
-    { sec: 'Servicio 3 — Máquina expendedora', campos: [
-      { key: 'srv3.titulo', label: 'Título', tipo: 'input' },
-      { key: 'srv3.desc', label: 'Descripción', tipo: 'textarea' }
-    ]},
-    { sec: 'Servicio 4 — Máquina de gancho', campos: [
-      { key: 'srv4.titulo', label: 'Título', tipo: 'input' },
-      { key: 'srv4.desc', label: 'Descripción', tipo: 'textarea' }
-    ]},
-    { sec: 'Servicio 5 — Corner merch', campos: [
-      { key: 'srv5.titulo', label: 'Título', tipo: 'input' },
-      { key: 'srv5.desc', label: 'Descripción', tipo: 'textarea' }
-    ]},
-    { sec: 'Bloques inferiores', campos: [
-      { key: 'personalizacion.title', label: 'Personalización en directo — título', tipo: 'input' },
-      { key: 'seating.title', label: 'Seating plan — título', tipo: 'input' },
-      { key: 'expendedora.title', label: 'Máquina expendedora — título', tipo: 'input' },
-      { key: 'gancho.title', label: 'Máquina de gancho — título', tipo: 'input' },
-      { key: 'merchcorner.title', label: 'Merch corner — título', tipo: 'input' }
-    ]},
-    { sec: 'Footer', campos: [
-      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
-    ]}
-  ],
-  'bendito-lab': [
-    { sec: 'Hero', campos: [
-      { key: 'hero.h1', label: 'Título', tipo: 'textarea' },
-      { key: 'hero.p1', label: 'Párrafo 1', tipo: 'textarea' },
-      { key: 'hero.p2', label: 'Párrafo 2', tipo: 'textarea' }
-    ]},
-    { sec: 'Secciones', campos: [
-      { key: 'qh.title', label: '"Qué hacemos" — título', tipo: 'input' },
-      { key: 'porque.title', label: '"Por qué Bendito Lab" — título', tipo: 'input' },
-      { key: 'trabajo.title', label: '"Cómo trabajamos" — título', tipo: 'input' }
-    ]},
-    { sec: 'Footer', campos: [
-      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
-    ]}
-  ],
-  colaboradores: [
-    { sec: 'Hero', campos: [
-      { key: 'hero.h1', label: 'Título', tipo: 'input' },
-      { key: 'hero.caption', label: 'Frase destacada', tipo: 'textarea' }
-    ]},
-    { sec: 'Secciones', campos: [
-      { key: 'ofrecemos.title', label: '"¿Qué ofrecemos?" — título', tipo: 'input' },
-      { key: 'unete.title', label: '"Únete como colaborador" — título', tipo: 'input' },
-      { key: 'comofunciona.title', label: '"Cómo funciona" — título', tipo: 'input' }
-    ]},
-    { sec: 'Footer', campos: [
-      { key: 'footer.h2', label: 'Título CTA final', tipo: 'textarea' }
-    ]}
-  ]
-};
-
-async function webCargarPagina(pagina) {
-  _webPagina = pagina;
-  document.querySelectorAll('.web-page-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.page === pagina); });
-  if (!_webContenido[pagina]) {
-    document.getElementById('web-fields').innerHTML = '<p style="color:#888;padding:20px;">Cargando...</p>';
-    try {
-      var d = await BL_API.dbGet({ tabla: 'contenido_web', pagina: pagina });
-      _webContenido[pagina] = d.data || {};
-    } catch(e) { _webContenido[pagina] = {}; }
-  }
-  webRenderCampos();
-}
-
-function webRenderCampos() {
-  var secciones = WEB_CAMPOS[_webPagina] || [];
-  var data = _webContenido[_webPagina] || {};
-  var html = '';
-
-  secciones.forEach(function(sec) {
-    html += '<div style="margin-bottom:20px;">';
-    html += '<div class="card-title" style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #F0EDE6;">'+sec.sec+'</div>';
-    sec.campos.forEach(function(c) {
-      var val = data[c.key] || '';
-      html += '<div class="field" style="margin-bottom:10px;">';
-      html += '<label style="font-size:11px;font-weight:700;color:#666;display:block;margin-bottom:4px;">'+c.label+'</label>';
-      if (c.tipo === 'textarea') {
-        html += '<textarea data-action="web-campo-change" data-key="'+c.key+'" style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;resize:vertical;min-height:60px;font-family:inherit;">'+val+'</textarea>';
-      } else if (c.tipo === 'color') {
-        html += '<div style="display:flex;gap:8px;align-items:center;">';
-        html += '<input type="color" value="'+(val||'#000000')+'" data-action="web-campo-change" data-key="'+c.key+'" style="width:48px;height:36px;padding:2px;border:1.5px solid #E0DDD6;cursor:pointer;">';
-        html += '<input type="text" value="'+val+'" data-action="web-campo-change" data-key="'+c.key+'" style="width:100px;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;">';
-        html += '</div>';
-      } else if (c.tipo === 'select') {
-        html += '<select data-action="web-campo-change" data-key="'+c.key+'" style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;">';
-        (c.opciones||[]).forEach(function(op) {
-          html += '<option value="'+op+'"'+(val===op?' selected':'')+'>'+op+'</option>';
-        });
-        html += '</select>';
-      } else {
-        html += '<input type="text" value="'+val+'" data-action="web-campo-change" data-key="'+c.key+'" style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;">';
-      }
-      if (c.hint) html += '<div style="font-size:11px;color:#aaa;margin-top:3px;">'+c.hint+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  });
-
-  document.getElementById('web-fields').innerHTML = html;
-}
-
-function webCampoChange(key, valor) {
-  if (!_webContenido[_webPagina]) _webContenido[_webPagina] = {};
-  _webContenido[_webPagina][key] = valor;
-  _webDirty = true;
-  document.getElementById('web-status').textContent = '● Cambios sin guardar';
-  document.getElementById('web-status').style.color = '#E2704A';
-}
-
-async function webGuardar() {
-  var btn = document.getElementById('web-save-btn');
-  btn.textContent = 'Guardando...'; btn.disabled = true;
-  try {
-    var d = await BL_API.dbPost({ accion: 'guardarContenidoWeb', pagina: _webPagina, contenido: _webContenido[_webPagina] });
-    if (d.ok) {
-      _webDirty = false;
-      document.getElementById('web-status').textContent = '✓ Guardado en Sheets';
-      document.getElementById('web-status').style.color = '#27AE60';
-      setTimeout(function(){ document.getElementById('web-status').textContent = ''; }, 3000);
-    } else throw new Error(d.error);
-  } catch(e) {
-    document.getElementById('web-status').textContent = '✗ Error: ' + e.message;
-    document.getElementById('web-status').style.color = '#C0392B';
-  }
-  btn.textContent = '💾 Guardar'; btn.disabled = false;
-}
 function saveToken(){var v=document.getElementById('gh-token').value;if(v&&!v.startsWith('••')){sessionStorage.setItem('bl-gh-token',v);document.getElementById('gh-token').value='••••••••••••';var ok=document.getElementById('tok-ok');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
 function saveToken2(){var v=document.getElementById('gh-token-2').value;if(v&&!v.startsWith('••')){sessionStorage.setItem('bl-gh-token',v);document.getElementById('gh-token-2').value='••••••••••••';var ok=document.getElementById('tok-ok-2');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
 
@@ -1637,7 +1464,6 @@ function handleClick(e){
     case 'save-token':           saveToken(); break;
     case 'publicar-carrusel-db': publicarCarruselDB(); break;
     case 'crear-banner':         crearBanner(); break;
-    case 'web-guardar':          webGuardar(); break;
     case 'agregar-precio-portal':agregarPrecioPortal(); break;
     case 'add-producto':         addProducto(); break;
     case 'publicar-colores':     publicarColores(); break;
@@ -1646,7 +1472,6 @@ function handleClick(e){
     case 'gc-reset':             gcReset(); break;
     case 'save-token2':          saveToken2(); break;
     case 'show':                 show(el.dataset.panel, el); break;
-    case 'web-cargar-pagina':    webCargarPagina(el.dataset.page); break;
     case 'apply-preset':         applyPreset(el.dataset.preset); break;
     case 'ver-img-grande':       verImgGrande(el.dataset.url); break;
     case 'eliminar-img':         eliminarImg(el.dataset.grp, parseInt(el.dataset.i,10), el.dataset.path, el.dataset.uid); break;
@@ -1691,7 +1516,6 @@ function handleChange(e){
     case 'upload-img-data':  uploadImgData(el); break;
     case 'anadir-img-data':  anadirImgData(el); break;
     case 'subir-img-banner': subirImgBanner(el, i); break;
-    case 'web-campo-change': webCampoChange(el.dataset.key, el.value); break;
     case 'subir-hero-coleccion': subirHeroColeccion(el, el.dataset.slug); break;
   }
 }
