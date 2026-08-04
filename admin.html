@@ -161,14 +161,14 @@ input[type="file"]{display:none;}
   .main{padding:14px;}
   .grid2,.grid3{grid-template-columns:1fr;}
   .img-card{flex-direction:column;}
-  .topbar .prev-btn{display:none;}
+  .topbar .prev-btn:not(.backbtn){display:none;}
 }
 
 /* ── MÓVIL ── */
 @media(max-width:700px){
   body{overflow:auto;}
   .hamburger{display:flex!important;}
-  .topbar-right .prev-btn{display:none;}
+  .topbar-right .prev-btn:not(.backbtn){display:none;}
   .sidebar{
     position:fixed;
     left:-220px;
@@ -243,7 +243,7 @@ input[type="file"]{display:none;}
       <span class="saved" id="saved">✓ Guardado</span>
     </div>
     <div class="topbar-right">
-      <button class="prev-btn" data-action="back-to-editor" style="cursor:pointer;">✏️ Editor visual</button>
+      <button class="prev-btn backbtn" data-action="back-to-editor" style="cursor:pointer;">✏️ Editor visual</button>
       <a href="index.html" target="_blank" class="prev-btn">👁 Portada</a>
       <a href="dilo-bonito.html" target="_blank" class="prev-btn">👁 Dilo Bonito</a>
       <a href="bendito-lab.html" target="_blank" class="prev-btn">👁 Bendito Lab</a>
@@ -261,22 +261,9 @@ input[type="file"]{display:none;}
       <div class="sb-lbl">Imágenes</div>
       <div class="sb-item" data-action="show" data-panel="imagenes"><span>📸</span> Imágenes</div>
       <hr class="sb-div">
-      <div class="sb-lbl">Dilo Bonito</div>
-      <div class="sb-item" data-action="show" data-panel="db-precios"><span>💰</span> Precios</div>
-      <div class="sb-item" data-action="show" data-panel="db-disenyo"><span>🎨</span> Diseño</div>
-      <hr class="sb-div">
-      <div class="sb-lbl">Bendito Lab</div>
-      <div class="sb-item" data-action="show" data-panel="bl-productos"><span>📦</span> Productos</div>
-      <div class="sb-item" data-action="show" data-panel="colecciones"><span>🗂️</span> Colecciones catálogo</div>
-      <hr class="sb-div">
       <div class="sb-lbl">Ajustes generales</div>
-      <div class="sb-item" data-action="show" data-panel="colores-globales"><span>🌈</span> Colores globales</div>
+      <div class="sb-item" data-action="show" data-panel="colores-globales"><span>🌈</span> Colores y tipografías</div>
       <div class="sb-item" data-action="show" data-panel="ajustes"><span>⚙️</span> Ajustes</div>
-      <hr class="sb-div">
-      <div class="sb-lbl">Calculadora</div>
-      <div class="sb-item" data-action="show" data-panel="calc-proveedores"><span>🏭</span> Proveedores DTF</div>
-      <div class="sb-item" data-action="show" data-panel="calc-tecnicas"><span>🧵</span> Bordado y Láser</div>
-      <div class="sb-item" data-action="show" data-panel="calc-margenes"><span>📊</span> Márgenes y envíos</div>
     </nav>
 
     <div class="main">
@@ -362,141 +349,6 @@ input[type="file"]{display:none;}
 
       <!-- ══════════ COLORES ══════════ -->
       <!-- ══════════ DB DISEÑO ══════════ -->
-      <div class="panel" id="panel-db-disenyo">
-        <div class="panel-title">Diseño · Dilo Bonito</div>
-        <div class="panel-desc">Personaliza colores, tipografía y textos de la página Dilo Bonito. Los cambios se aplican en tiempo real en la pestaña de vista previa.</div>
-
-        <div class="card">
-          <div class="card-title">🎨 Colores principales</div>
-          <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Fondo general</div><small style="color:#888;">--cream</small></div>
-              <input type="color" value="#F4F1E6" data-var="--cream" data-action="db-apply-color">
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Azul marino</div><small style="color:#888;">--deep · secciones oscuras</small></div>
-              <input type="color" value="#17233F" data-var="--deep" data-action="db-apply-color">
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Azul medio</div><small style="color:#888;">--captain · botones</small></div>
-              <input type="color" value="#2F8FEA" data-var="--captain" data-action="db-apply-color">
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Azul cielo</div><small style="color:#888;">--baby · fondos secundarios</small></div>
-              <input type="color" value="#93ACA7" data-var="--baby" data-action="db-apply-color">
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Amarillo</div><small style="color:#888;">--sunshine · destacados, CTAs</small></div>
-              <input type="color" value="#E8C24A" data-var="--sunshine" data-action="db-apply-color">
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Rosa</div><small style="color:#888;">--rose · secciones hero</small></div>
-              <input type="color" value="#E3A29C" data-var="--rose" data-action="db-apply-color">
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div><div style="font-weight:700;font-size:13px;">Coral</div><small style="color:#888;">--poppy · hover botones</small></div>
-              <input type="color" value="#E2704A" data-var="--poppy" data-action="db-apply-color">
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:16px;">
-          <div class="card-title">🔤 Tipografía</div>
-          <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px;">
-            <div>
-              <div style="font-weight:700;font-size:13px;margin-bottom:6px;">Fuente títulos</div>
-              <select style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;" data-action="db-apply-font" data-font="title">
-                <option value="League Spartan">League Spartan</option>
-                <option value="Anton">Anton</option>
-                <option value="Bebas Neue">Bebas Neue</option>
-                <option value="Oswald">Oswald</option>
-                <option value="Montserrat">Montserrat</option>
-              </select>
-            </div>
-            <div>
-              <div style="font-weight:700;font-size:13px;margin-bottom:6px;">Fuente cuerpo</div>
-              <select style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;" data-action="db-apply-font" data-font="body">
-                <option value="Lato">Lato</option>
-                <option value="DM Sans">DM Sans</option>
-                <option value="Inter">Inter</option>
-                <option value="Barlow">Barlow</option>
-                <option value="Raleway">Raleway</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:16px;">
-          <div class="card-title">✍️ Textos clave hero</div>
-          <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px;">
-            <div>
-              <div style="font-weight:700;font-size:13px;margin-bottom:6px;">Título hero</div>
-              <input type="text" style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;" value="HAZ QUE TU EVENTO SEA" id="db-edit-hero-title">
-            </div>
-            <div>
-              <div style="font-weight:700;font-size:13px;margin-bottom:6px;">Subtítulo hero</div>
-              <textarea style="width:100%;padding:8px;border:1.5px solid #E0DDD6;font-size:13px;resize:vertical;height:72px;">Personalizamos artículos en directo para que cada invitado se lleve un recuerdo único.</textarea>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
-          <button data-action="db-export-css" style="background:#17233F;color:#E8C24A;border:none;padding:12px 24px;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:1px;">📋 COPIAR CSS GENERADO</button>
-          <button data-action="db-reset-all" style="background:#fff;color:#17233F;border:1.5px solid #17233F;padding:12px 24px;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:1px;">↩ RESTAURAR ORIGINAL</button>
-        </div>
-        <div id="db-saved-msg" style="display:none;background:#d4edda;color:#155724;padding:10px 16px;margin-top:12px;font-size:13px;">✓ CSS copiado al portapapeles</div>
-        <textarea id="db-code-area" style="display:none;width:100%;margin-top:12px;background:#17233F;color:#7aff7a;font-family:monospace;font-size:11px;padding:12px;height:160px;border:none;"></textarea>
-      </div>
-
-      <div class="panel" id="panel-colores">
-        <div class="panel-title">Colores y estilos</div>
-        <div class="panel-desc">Personaliza el color de fondo y texto de cada sección de la portada de forma independiente.</div>
-
-        <!-- SECCIONES INDIVIDUALES -->
-        <div class="card">
-          <div class="card-title">Secciones de la portada</div>
-          <p style="font-size:12px;color:#888;margin-bottom:16px;">Elige el color de fondo y el color de texto de cada sección.</p>
-
-          <div id="sec-color-list">
-            <!-- Generado por JS -->
-          </div>
-        </div>
-
-        <!-- PALETA GLOBAL -->
-        <div class="card">
-          <div class="card-title">Paleta global de colores</div>
-          <p style="font-size:12px;color:#888;margin-bottom:16px;">Cambia los colores base que se usan en toda la web. Úsalo con cuidado — afecta a todo.</p>
-          <div class="color-grid" id="color-grid"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Presets de paleta</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="preset-btn" data-action="apply-preset" data-preset="marble" style="padding:10px 20px;background:#17233F;color:#E8C24A;border:none;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:12px;cursor:pointer;letter-spacing:1px;">MARBLE BLUE</button>
-            <button class="preset-btn" data-action="apply-preset" data-preset="tierra" style="padding:10px 20px;background:#5C3D2E;color:#F5E6C8;border:none;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:12px;cursor:pointer;letter-spacing:1px;">TIERRA CÁLIDA</button>
-            <button class="preset-btn" data-action="apply-preset" data-preset="verde" style="padding:10px 20px;background:#1B4332;color:#D8F3DC;border:none;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:12px;cursor:pointer;letter-spacing:1px;">VERDE BOTÁNICO</button>
-            <button class="preset-btn" data-action="apply-preset" data-preset="negro" style="padding:10px 20px;background:#111;color:#E8C24A;border:none;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:12px;cursor:pointer;letter-spacing:1px;">NEGRO EDITORIAL</button>
-          </div>
-        </div>
-      </div>
-
-<div class="panel" id="panel-redes">
-        <div class="panel-title">Redes sociales</div>
-        <div class="panel-desc">Edita los enlaces y handles. Activa o desactiva cada red.</div>
-        <div class="card">
-          <div class="card-title">Configuración</div>
-          <div style="display:grid;grid-template-columns:40px 1fr 1fr 1fr 44px;gap:8px;padding:6px 0;border-bottom:2px solid #F0EDE6;margin-bottom:4px;">
-            <span style="font-size:10px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;text-align:center;">Red</span>
-            <span style="font-size:10px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;">Nombre</span>
-            <span style="font-size:10px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;">Handle / número</span>
-            <span style="font-size:10px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;">URL</span>
-            <span style="font-size:10px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;text-align:center;">Visible</span>
-          </div>
-          <div id="redes-list"></div>
-        </div>
-      </div>
-
-      <!-- ══════════ IMÁGENES ══════════ -->
       <div class="panel" id="panel-imagenes">
         <div class="panel-title">Imágenes</div>
         <div class="panel-desc">Sube imágenes directamente al servidor. Visibles en ~30 segundos.</div>
@@ -549,99 +401,36 @@ input[type="file"]{display:none;}
       </div>
 
       <!-- ══════════ DB PRECIOS ══════════ -->
-      <div class="panel" id="panel-db-precios">
-        <div class="panel-title">💰 Precios del portal web</div>
-        <div class="panel-desc">Precios que se muestran en el portal de clientes. Los cambios se aplican al instante.</div>
-        <div id="precios-portal-list">
-          <div style="padding:20px;text-align:center;color:#aaa;">Cargando precios...</div>
-        </div>
-        <div class="card" style="border:2px dashed #e5e7eb;margin-top:12px;">
-          <div class="card-title" style="margin-bottom:12px;">➕ Añadir precio</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <div class="field"><label>Nombre</label><input type="text" id="nuevo-nombre" placeholder="Ej: Pack Mini"></div>
-            <div class="field"><label>Precio</label><input type="text" id="nuevo-precio" placeholder="Ej: 299"></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div class="field"><label>Sección</label>
-              <select id="nuevo-seccion">
-                <option value="eventos">🎉 Packs Dilo Bonito</option>
-                <option value="extras">➕ Extras</option>
-              </select>
-            </div>
-            <div class="field"><label>Tipo</label>
-              <select id="nuevo-tipo">
-                <option value="fijo">Fijo</option>
-                <option value="desde">Desde</option>
-                <option value="consultar">Consultar</option>
-              </select>
-            </div>
-          </div>
-          <button data-action="agregar-precio-portal" style="width:100%;background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:11px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:14px;cursor:pointer;">AÑADIR PRECIO</button>
-        </div>
-      </div>
-
-      <!-- ══════════ BL TEXTOS ══════════ -->
-      <!-- ══════════ BL TEXTOS ══════════ -->
-      <!-- ══════════ BL TEXTOS ══════════ -->
-      <div class="panel" id="panel-bl-textos">
-        <div class="panel-title">Bendito Lab · Textos B2B</div>
-        <div class="panel-desc">Textos de la página de artículos para empresas.</div>
-        <div class="card">
-          <div class="card-title">Hero B2B</div>
-          <div class="field"><label>Etiqueta</label><input type="text" id="bt-tag" data-action="mark-dirty"></div>
-          <div class="field"><label>Título</label><input type="text" id="bt-h1" data-action="mark-dirty"></div>
-          <div class="field"><label>Subtítulo</label><textarea id="bt-sub" data-action="mark-dirty"></textarea></div>
-          <div class="grid2">
-            <div class="field"><label>Botón texto</label><input type="text" id="bt-ctat" data-action="mark-dirty"></div>
-            <div class="field"><label>Botón enlace</label><input type="text" id="bt-ctas" data-action="mark-dirty"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════ BL PRODUCTOS ══════════ -->
-      <div class="panel" id="panel-bl-productos">
-        <div class="panel-title">Bendito Lab · Catálogo</div>
-        <div class="panel-desc">Productos B2B.</div>
-        <div class="card">
-          <div class="card-title">Productos</div>
-          <div style="display:grid;grid-template-columns:1fr 2fr 100px 32px;gap:8px;padding:6px 0;border-bottom:2px solid #F0EDE6;margin-bottom:4px;">
-            <span style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;">Producto</span>
-            <span style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;">Descripción</span>
-            <span style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;">Precio</span>
-            <span></span>
-          </div>
-          <div id="productos-list"></div>
-          <button data-action="add-producto" style="width:100%;margin-top:10px;padding:10px;background:#F4F1E6;border:1.5px dashed #ccc;color:#666;cursor:pointer;font-size:12px;">+ Añadir producto</button>
-        </div>
-      </div>
-
-      <!-- ══════════ COLECCIONES DEL CATÁLOGO ══════════ -->
-      <div class="panel" id="panel-colecciones">
-        <div class="panel-title">Colecciones del catálogo público</div>
-        <div class="panel-desc">
-          Sub-páginas de <code>/catalogo</code> por tipo de negocio, temporada o campaña (ej. <code>/coleccion/verano</code>). Cada una
-          filtra los artículos que tengan su etiqueta puesta en la ficha del producto en Bendito OS (campo "Etiquetas").
-        </div>
-
-        <div class="card">
-          <div class="card-title">Categorías y etiquetas ya usadas en el catálogo</div>
-          <p style="font-size:12px;color:#888;margin-bottom:10px;">
-            Referencia para no escribir la etiqueta a ciegas al crear una colección — solo los artículos <b>activos</b>.
-          </p>
-          <div id="meta-categorias" style="font-size:12px;color:#444;margin-bottom:6px;">Cargando…</div>
-          <div id="meta-etiquetas" style="font-size:12px;color:#444;"></div>
-        </div>
-
-        <div id="colecciones-list"></div>
-        <button data-action="add-coleccion" style="width:100%;margin-top:4px;padding:10px;background:#F4F1E6;border:1.5px dashed #ccc;color:#666;cursor:pointer;font-size:12px;">+ Añadir colección</button>
-        <button data-action="save-colecciones" style="background:#17233F;color:#E8C24A;border:none;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:13px;padding:12px 28px;cursor:pointer;margin-top:16px;">💾 Guardar colecciones</button>
-        <div id="colecciones-status" style="font-size:12px;margin-top:8px;"></div>
-      </div>
-
-      <!-- ══════════ COLORES GLOBALES ══════════ -->
       <div class="panel" id="panel-colores-globales">
-        <div class="panel-title">Colores globales</div>
-        <div class="panel-desc">Cambia los colores de todas las páginas a la vez. Pulsa "Publicar" para aplicarlos en la web.</div>
+        <div class="panel-title">Colores y tipografías</div>
+        <div class="panel-desc">Referencia rápida de la paleta y las fuentes del sitio, y cambio de colores en todas las páginas a la vez.</div>
+
+        <div class="card">
+          <div class="card-title">🔤 Tipografía</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:700;font-size:13px;">Títulos (h1, h2, h3…)</div>
+                <div style="font-size:11px;color:#888;">Casi todas las páginas</div>
+              </div>
+              <div style="font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:16px;">Helvetica World / Helvetica Neue</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:700;font-size:13px;">Cuerpo de texto</div>
+                <div style="font-size:11px;color:#888;">Casi todas las páginas</div>
+              </div>
+              <div style="font-family:'Inter',sans-serif;font-size:16px;">Inter</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:700;font-size:13px;">Dilo Bonito (títulos/cuerpo alternativos)</div>
+                <div style="font-size:11px;color:#888;">Configurable en el panel de Diseño de esa página</div>
+              </div>
+              <div style="font-size:13px;color:#555;">League Spartan / Lato</div>
+            </div>
+          </div>
+        </div>
 
         <div class="card">
           <div class="card-title">🎨 Paleta principal</div>
@@ -652,7 +441,7 @@ input[type="file"]{display:none;}
               <div>
                 <div style="font-weight:700;font-size:13px;">Color principal</div>
                 <div style="font-size:11px;color:#888;">--baby · fondos hero, nav, secciones</div>
-                <div style="font-size:11px;color:#aaa;margin-top:2px;">Ahora: azul marino #17233F</div>
+                <div style="font-family:monospace;font-size:11px;color:#aaa;margin-top:2px;">#93ACA7</div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <input type="color" id="gc-baby" value="#93ACA7" data-action="gc-preview">
@@ -664,6 +453,7 @@ input[type="file"]{display:none;}
               <div>
                 <div style="font-weight:700;font-size:13px;">Color oscuro</div>
                 <div style="font-size:11px;color:#888;">--deep · textos, botones, footer</div>
+                <div style="font-family:monospace;font-size:11px;color:#aaa;margin-top:2px;">#17233F</div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <input type="color" id="gc-deep" value="#17233F" data-action="gc-preview">
@@ -675,6 +465,7 @@ input[type="file"]{display:none;}
               <div>
                 <div style="font-weight:700;font-size:13px;">Color acento</div>
                 <div style="font-size:11px;color:#888;">--sunshine · CTAs, botones, destacados</div>
+                <div style="font-family:monospace;font-size:11px;color:#aaa;margin-top:2px;">#E8C24A</div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <input type="color" id="gc-sunshine" value="#E8C24A" data-action="gc-preview">
@@ -686,6 +477,7 @@ input[type="file"]{display:none;}
               <div>
                 <div style="font-weight:700;font-size:13px;">Fondo crema</div>
                 <div style="font-size:11px;color:#888;">--cream · fondo general, texto sobre oscuro</div>
+                <div style="font-family:monospace;font-size:11px;color:#aaa;margin-top:2px;">#F4F1E6</div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <input type="color" id="gc-cream" value="#F4F1E6" data-action="gc-preview">
@@ -697,6 +489,7 @@ input[type="file"]{display:none;}
               <div>
                 <div style="font-weight:700;font-size:13px;">Azul medio</div>
                 <div style="font-size:11px;color:#888;">--captain · hover, secciones secundarias</div>
+                <div style="font-family:monospace;font-size:11px;color:#aaa;margin-top:2px;">#2F8FEA</div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <input type="color" id="gc-captain" value="#2F8FEA" data-action="gc-preview">
@@ -708,6 +501,7 @@ input[type="file"]{display:none;}
               <div>
                 <div style="font-weight:700;font-size:13px;">Rosa</div>
                 <div style="font-size:11px;color:#888;">--rose · detalles, secciones hero DB</div>
+                <div style="font-family:monospace;font-size:11px;color:#aaa;margin-top:2px;">#E3A29C</div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <input type="color" id="gc-rose" value="#E3A29C" data-action="gc-preview">
@@ -768,125 +562,25 @@ input[type="file"]{display:none;}
           <span id="tok-ok-2" style="color:#27AE60;font-size:12px;margin-left:10px;display:none;">✓ Guardado</span>
         </div>
         <div class="card">
-          <div class="card-title">Repositorio</div>
-          <div class="grid2">
-            <div class="field"><label>Organización</label><input type="text" id="gh-user" value="contactobenditolab-ship-it" data-action="mark-dirty"></div>
-            <div class="field"><label>Repositorio</label><input type="text" id="gh-repo" value="dossier-dilo-bonito" data-action="mark-dirty"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════ CALC: PROVEEDORES DTF ══════════ -->
-      <div class="panel" id="panel-calc-proveedores">
-        <div class="panel-title">Calculadora · Proveedores DTF</div>
-        <div class="panel-desc">Costes internos para la calculadora B2B de la app. <strong>No es</strong> la calculadora pública del catálogo (esa usa las fichas de técnicas/extras de Bendito OS, en app.benditolab.com/catalogo).</div>
-        <div class="card">
-          <div class="card-title">321DTF</div>
-          <div class="grid3">
-            <div class="field"><label>Ancho pliego (cm)</label><input type="number" id="cp-321-ancho" value="56" data-action="mark-dirty"></div>
-            <div class="field"><label>Alto pliego (cm)</label><input type="number" id="cp-321-alto" value="100" data-action="mark-dirty"></div>
-            <div class="field"><label>Envío fijo (€)</label><input type="number" id="cp-321-envio" value="3.50" step="0.01" data-action="mark-dirty"></div>
-          </div>
-          <p style="font-size:12px;color:#888;margin-top:8px;">Precio variable por tramos — se configura en la calculadora B2B directamente.</p>
-        </div>
-        <div class="card">
-          <div class="card-title">DTF Barcelona</div>
-          <div class="grid3">
-            <div class="field"><label>Ancho pliego (cm)</label><input type="number" id="cp-dtfbcn-ancho" value="60" data-action="mark-dirty"></div>
-            <div class="field"><label>Alto pliego (cm)</label><input type="number" id="cp-dtfbcn-alto" value="100" data-action="mark-dirty"></div>
-            <div class="field"><label>Precio / pliego (€)</label><input type="number" id="cp-dtfbcn-precio" value="9.15" step="0.01" data-action="mark-dirty"></div>
-          </div>
-          <div class="grid2" style="margin-top:8px">
-            <div class="field"><label>Envío (€)</label><input type="number" id="cp-dtfbcn-envio" value="6.90" step="0.01" data-action="mark-dirty"></div>
-            <div class="field"><label>Gratis desde (€ sin IVA)</label><input type="number" id="cp-dtfbcn-gratis" value="50" data-action="mark-dirty"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">TuDTF</div>
-          <div class="grid3">
-            <div class="field"><label>Ancho pliego (cm)</label><input type="number" id="cp-tudtf-ancho" value="56" data-action="mark-dirty"></div>
-            <div class="field"><label>Alto pliego (cm)</label><input type="number" id="cp-tudtf-alto" value="100" data-action="mark-dirty"></div>
-            <div class="field"><label>Precio / pliego (€)</label><input type="number" id="cp-tudtf-precio" value="10.90" step="0.01" data-action="mark-dirty"></div>
-          </div>
-          <div class="grid2" style="margin-top:8px">
-            <div class="field"><label>Envío (€)</label><input type="number" id="cp-tudtf-envio" value="4.90" step="0.01" data-action="mark-dirty"></div>
-            <div class="field"><label>Gratis desde (€ sin IVA)</label><input type="number" id="cp-tudtf-gratis" value="150" data-action="mark-dirty"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">DTFRápido</div>
-          <div class="grid3">
-            <div class="field"><label>Ancho pliego (cm)</label><input type="number" id="cp-dtfrap-ancho" value="55" data-action="mark-dirty"></div>
-            <div class="field"><label>Alto pliego (cm)</label><input type="number" id="cp-dtfrap-alto" value="100" data-action="mark-dirty"></div>
-            <div class="field"><label>Precio / pliego (€)</label><input type="number" id="cp-dtfrap-precio" value="9.65" step="0.01" data-action="mark-dirty"></div>
-          </div>
-          <p style="font-size:12px;color:#888;margin-top:8px;">Envío gratuito siempre.</p>
-        </div>
-        <div class="card">
-          <div class="card-title">Vinilo (Amazon)</div>
-          <div class="grid3">
-            <div class="field"><label>Ancho rollo (cm)</label><input type="number" id="cp-vin-ancho" value="30.5" step="0.5" data-action="mark-dirty"></div>
-            <div class="field"><label>Largo rollo (cm)</label><input type="number" id="cp-vin-largo" value="300" data-action="mark-dirty"></div>
-            <div class="field"><label>Precio rollo (€)</label><input type="number" id="cp-vin-precio" value="14.20" step="0.01" data-action="mark-dirty"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════ CALC: BORDADO Y LÁSER ══════════ -->
-      <div class="panel" id="panel-calc-tecnicas">
-        <div class="panel-title">Calculadora · Bordado y Láser</div>
-        <div class="panel-desc">Costes de producción propia. Se aplican en la calculadora B2B y en los costes internos de la app.</div>
-        <div class="card">
-          <div class="card-title">Bordado</div>
-          <div class="grid2">
-            <div class="field"><label>Coste por puntada (€)</label><input type="number" id="ct-bord-puntada" value="0.0015" step="0.0001" data-action="mark-dirty"></div>
-            <div class="field"><label>Manipulación / posición (€)</label><input type="number" id="ct-bord-manip" value="1.25" step="0.01" data-action="mark-dirty"></div>
-          </div>
-          <div class="grid2" style="margin-top:8px">
-            <div class="field"><label>Picaje primer pedido (€)</label><input type="number" id="ct-bord-picaje" value="10" step="0.5" data-action="mark-dirty"></div>
-            <div class="field"><label>Extra por color adicional (€)</label><input type="number" id="ct-bord-color" value="0.15" step="0.01" data-action="mark-dirty"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Láser</div>
-          <div class="grid2">
-            <div class="field"><label>Coste máquina / hora (€)</label><input type="number" id="ct-laser-maq" value="0.63" step="0.01" data-action="mark-dirty"></div>
-            <div class="field"><label>Coste mano de obra / hora (€)</label><input type="number" id="ct-laser-mo" value="15.00" step="0.1" data-action="mark-dirty"></div>
-          </div>
-          <p style="font-size:12px;color:#888;margin-top:8px;">Los minutos por tipo de trabajo se ajustan al hacer el presupuesto.</p>
-        </div>
-      </div>
-
-      <!-- ══════════ CALC: MÁRGENES Y ENVÍOS ══════════ -->
-      <div class="panel" id="panel-calc-margenes">
-        <div class="panel-title">Calculadora · Márgenes y envíos</div>
-        <div class="panel-desc">Margen objetivo por defecto, IVA y envíos de blancos.</div>
-        <div class="card">
-          <div class="card-title">Margen e IVA</div>
-          <div class="grid3">
-            <div class="field"><label>Margen mínimo por defecto (%)</label><input type="number" id="cm-margen" value="60" step="5" min="30" max="85" data-action="mark-dirty"></div>
-            <div class="field"><label>IVA de compra (%)</label><input type="number" id="cm-iva-compra" value="21" step="1" data-action="mark-dirty"></div>
-            <div class="field"><label>IVA de venta (%)</label><input type="number" id="cm-iva-venta" value="21" step="1" data-action="mark-dirty"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Envío de blancos</div>
-          <div class="grid2">
-            <div class="field"><label>Coste envío estándar (€)</label><input type="number" id="cm-envio-bl" value="5.95" step="0.01" data-action="mark-dirty"></div>
-            <div class="field"><label>Gratis desde (€ sin IVA)</label><input type="number" id="cm-envio-gratis" value="100" data-action="mark-dirty"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Descuentos por cantidad (sobre artículo base)</div>
-          <p style="font-size:12px;color:#888;margin-bottom:12px;">Se aplican automáticamente según el tramo de unidades.</p>
-          <div class="grid3">
-            <div class="field"><label>1–25 ud (%)</label><input type="number" id="cm-dto-1" value="0" step="1" min="0" max="50" data-action="mark-dirty"></div>
-            <div class="field"><label>26–100 ud (%)</label><input type="number" id="cm-dto-2" value="5" step="1" min="0" max="50" data-action="mark-dirty"></div>
-            <div class="field"><label>101–200 ud (%)</label><input type="number" id="cm-dto-3" value="10" step="1" min="0" max="50" data-action="mark-dirty"></div>
-          </div>
-          <div class="grid2" style="margin-top:8px">
-            <div class="field"><label>201–300 ud (%)</label><input type="number" id="cm-dto-4" value="15" step="1" min="0" max="50" data-action="mark-dirty"></div>
-            <div class="field"><label>+300 ud (%)</label><input type="number" id="cm-dto-5" value="20" step="1" min="0" max="50" data-action="mark-dirty"></div>
+          <div class="card-title">🔌 Conexiones</div>
+          <p style="font-size:12px;color:#888;margin-bottom:16px;">Cómo está montada la web por dentro. Son datos de referencia, no editables desde aquí.</p>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="font-weight:700;font-size:13px;">Código fuente (GitHub)</div>
+              <div style="font-size:12px;color:#555;">contactobenditolab-ship-it/bendito-lab-canva</div>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;">Hosting y dominio (Vercel)</div>
+              <div style="font-size:12px;color:#555;">Proyecto bendito-lab-canva — benditolab.com / benditolab.es</div>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;">Contenido editable (fotos, textos, colores, enlaces)</div>
+              <div style="font-size:12px;color:#555;">Vercel Blob — se actualiza al vuelo desde el Editor visual, sin tocar el código</div>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;">Catálogo, precios, calculadora y colecciones</div>
+              <div style="font-size:12px;color:#555;">Base de datos Supabase, gestionada desde <strong>bendito-os</strong></div>
+            </div>
           </div>
         </div>
       </div>
@@ -897,6 +591,5 @@ input[type="file"]{display:none;}
 
 <script src="/js/bl-api.js"></script>
 <script src="/js/admin-1.js"></script>
-<script src="/js/admin-colecciones.js"></script>
 </body>
 </html>

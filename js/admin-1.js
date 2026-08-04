@@ -395,8 +395,6 @@ function show(id,el){
   var p=document.getElementById('panel-'+id);
   if(p)p.classList.add('active');
   if(el)el.classList.add('active');
-  if(id==='db-precios') loadPreciosPortal();
-  if(id==='colecciones'){ cargarColecciones(); cargarMetaCatalogo(); }
 }
 
 // ══ DIRTY ══════════════════════════════════════════════════
