@@ -9,7 +9,7 @@
     return (src || '').replace(/^\.?\//, '').split('?')[0];
   }
 
-  var CONTENT = { images: {}, imageView: {}, colors: {}, texts: {} };
+  var CONTENT = { images: {}, imageView: {}, colors: {}, texts: {}, links: {} };
 
   function applyImages(images) {
     document.querySelectorAll('img[src]').forEach(function (img) {
@@ -69,6 +69,16 @@
     });
   }
 
+  function applyLinks(links) {
+    document.querySelectorAll('[data-link-id]').forEach(function (a) {
+      var id = a.getAttribute('data-link-id');
+      var cfg = links[id];
+      if (!cfg) return;
+      if (cfg.url) a.setAttribute('href', cfg.url);
+      if (cfg.hidden) a.style.display = 'none';
+    });
+  }
+
   var loaded = fetch('/api/content', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
@@ -76,10 +86,12 @@
       CONTENT.imageView = (data && data.imageView) || {};
       CONTENT.colors = (data && data.colors) || {};
       CONTENT.texts = (data && data.texts) || {};
+      CONTENT.links = (data && data.links) || {};
       applyImages(CONTENT.images);
       applyImageViews(CONTENT.imageView);
       applyColors(CONTENT.colors);
       applyTexts(CONTENT.texts);
+      applyLinks(CONTENT.links);
     })
     .catch(function () {});
 
@@ -144,6 +156,7 @@
     wireImages();
     wireTexts();
     wireColors();
+    wireLinks();
   }
 
   function injectStyles() {
@@ -165,7 +178,14 @@
       'background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);}' +
       '[data-color-bg]:hover>.bl-color-btn,[data-color-text]:hover>.bl-color-btn{display:block;}' +
       'img[data-slot][data-reframing]{cursor:grab;}' +
-      'img[data-slot][data-reframing][data-panning]{cursor:grabbing;}';
+      'img[data-slot][data-reframing][data-panning]{cursor:grabbing;}' +
+      '.bl-link-wrap{position:relative;display:inline-block;}' +
+      '.bl-link-toolbar{position:absolute;top:-4px;right:-4px;display:none;gap:3px;z-index:100;transform:translateY(-100%);}' +
+      '.bl-link-wrap:hover>.bl-link-toolbar{display:flex;}' +
+      '.bl-link-toolbar button{background:rgba(23,35,63,.9);color:#fff;border:none;border-radius:5px;' +
+      'padding:3px 6px;font-size:11px;cursor:pointer;line-height:1.4;}' +
+      '.bl-link-toolbar button:hover{background:#2F8FEA;}' +
+      '[data-link-id][data-link-hidden]{opacity:.35;}';
     document.head.appendChild(s);
   }
 
@@ -263,6 +283,73 @@
     })
       .then(function (r) { return r.json(); })
       .then(function (d) { toast(d.ok ? 'Color guardado ✓' : ('Error: ' + d.error), d.ok); })
+      .catch(function () { toast('Error de conexión', false); });
+  }
+
+  // ── ENLACES (redes sociales y similares) ────────────────────────────────
+  function wireLinks() {
+    document.querySelectorAll('[data-link-id]').forEach(function (a) {
+      if (a.parentElement && a.parentElement.classList.contains('bl-link-wrap')) return;
+      var wrap = document.createElement('span');
+      wrap.className = 'bl-link-wrap';
+      a.parentElement.insertBefore(wrap, a);
+      wrap.appendChild(a);
+
+      var id = a.getAttribute('data-link-id');
+      if (CONTENT.links[id] && CONTENT.links[id].hidden) {
+        a.style.display = '';
+        a.setAttribute('data-link-hidden', '');
+      }
+
+      var toolbar = document.createElement('span');
+      toolbar.className = 'bl-link-toolbar';
+
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.textContent = '🔗';
+      editBtn.title = 'Cambiar URL';
+      editBtn.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var current = a.getAttribute('href') || '';
+        var next = prompt('Nueva URL para «' + id + '»:', current);
+        if (next === null) return;
+        next = next.trim();
+        if (!next) return;
+        a.setAttribute('href', next);
+        saveLink(id, { url: next });
+      });
+      toolbar.appendChild(editBtn);
+
+      var toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      var setToggleLabel = function () {
+        toggleBtn.textContent = a.hasAttribute('data-link-hidden') ? '👁' : '🙈';
+        toggleBtn.title = a.hasAttribute('data-link-hidden') ? 'Mostrar' : 'Ocultar';
+      };
+      setToggleLabel();
+      toggleBtn.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var nowHidden = !a.hasAttribute('data-link-hidden');
+        if (nowHidden) a.setAttribute('data-link-hidden', '');
+        else a.removeAttribute('data-link-hidden');
+        setToggleLabel();
+        saveLink(id, { hidden: nowHidden });
+      });
+      toolbar.appendChild(toggleBtn);
+
+      wrap.appendChild(toolbar);
+    });
+  }
+
+  function saveLink(id, patch) {
+    if (!id) return;
+    fetch('/api/save-link', {
+      method: 'POST',
+      headers: BL_API.authHeaders(),
+      body: JSON.stringify(Object.assign({ id: id }, patch))
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { toast(d.ok ? 'Enlace guardado ✓' : ('Error: ' + d.error), d.ok); })
       .catch(function () { toast('Error de conexión', false); });
   }
 
