@@ -3,6 +3,40 @@ var PASS = null; // gestionado por /api/auth
 var STORE = 'bl-admin-v5';
 var dirty = false;
 
+// ── AUTO-ACTUALIZACIÓN ───────────────────────────────────────
+// Comprueba cada 2 min si hay una versión nueva del panel desplegada
+// (compara el ETag de admin.html, que cambia con cada deploy). Si no
+// hay cambios sin guardar, recarga sola; si los hay, avisa con una
+// barra en vez de recargar y perder el trabajo a medias.
+(function () {
+  var baseline = null;
+  function checkVersion() {
+    fetch('/admin.html', { method: 'HEAD', cache: 'no-store' })
+      .then(function (r) { return r.headers.get('etag') || r.headers.get('last-modified'); })
+      .then(function (tag) {
+        if (!tag) return;
+        if (baseline === null) { baseline = tag; return; }
+        if (tag !== baseline) onNewVersion();
+      })
+      .catch(function () {});
+  }
+  function onNewVersion() {
+    if (!dirty) { location.reload(); return; }
+    if (document.getElementById('update-banner')) return;
+    var bar = document.createElement('div');
+    bar.id = 'update-banner';
+    bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#17233F;color:#FBF4E9;' +
+      'padding:12px 20px;display:flex;align-items:center;gap:14px;justify-content:center;flex-wrap:wrap;' +
+      'font:600 13px/1.3 Inter,sans-serif;z-index:99999;';
+    bar.innerHTML = '<span>🔄 Hay una versión nueva del panel. Guarda tus cambios y recarga.</span>' +
+      '<button style="background:#E8C24A;color:#17233F;border:none;padding:8px 18px;font-weight:800;cursor:pointer;">Recargar ahora</button>';
+    bar.querySelector('button').addEventListener('click', function () { location.reload(); });
+    document.body.appendChild(bar);
+  }
+  checkVersion();
+  setInterval(checkVersion, 120000);
+})();
+
 // ── COLORES ──────────────────────────────────────────────
 // ── SECCIONES EDITABLES ──────────────────────────────────
 var SEC_STYLES = [
