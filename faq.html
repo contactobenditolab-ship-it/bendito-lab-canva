@@ -51,8 +51,9 @@ h1{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;mar
 .topbar-logo{display:flex;align-items:center;gap:10px;}
 .topbar-logo img{height:75px;width:auto;display:block;}
 .site-header{background:var(--yellow);padding:32px 5vw 22px;}
-.header-logo{display:flex;justify-content:center;}
-.header-logo img{height:110px;width:auto;display:block;}
+.header-tag{text-align:center;color:var(--deep);font-weight:700;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;}
+.header-logo{margin-top:14px;display:flex;justify-content:center;}
+.header-logo img{height:170px;width:auto;display:block;}
 .site-nav{display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,36px);margin-top:20px;flex-wrap:wrap;}
 .site-nav a{font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--deep);}
 .site-nav a.pill{border:1px solid var(--deep);padding:9px 18px;border-radius:22px;}
@@ -89,7 +90,8 @@ footer{background:var(--rose);}
 </head>
 <body>
 
-<header class="site-header">
+<header class="site-header" data-color-bg="faq.header.bg">
+  <div class="header-tag">Artículos personalizados para empresas y eventos</div>
   <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
   <nav class="site-nav" id="site-nav">
@@ -99,7 +101,7 @@ footer{background:var(--rose);}
     <a href="catalogo.html">CATÁLOGO→</a>
     <a href="colaboradores.html">COLABORADORES→</a>
     <a href="contacto.html">CONTACTO→</a>
-    <a href="area-clientes.html" class="pill">ÁREA CLIENTE→</a>
+    <a href="https://portal.benditolab.com/portal" class="pill">ÁREA CLIENTE→</a>
   </nav>
 </header>
 
