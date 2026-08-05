@@ -103,7 +103,7 @@ footer{background:var(--rose);}
 
 <section class="intro">
   <h1 data-edit="contacto.hero.h1" data-color-text="contacto.hero.h1">¿Hablamos?</h1>
-  <p>Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.</p>
+  <p data-edit="contacto.hero.p">Cuéntanos tu proyecto o tu evento y te responderemos con una propuesta personalizada, sin compromiso.</p>
 </section>
 
 <section class="form-wrap">
@@ -123,9 +123,10 @@ footer{background:var(--rose);}
         </select>
       </div>
       <select class="field" name="tipo_contacto" required>
-        <option value="">¿Tu consulta es para un evento o para tu empresa (B2B)?</option>
+        <option value="">¿Tu consulta es para un evento, tu empresa o quieres colaborar?</option>
         <option value="evento">Evento</option>
         <option value="empresa">Empresa / B2B</option>
+        <option value="colaborador">Quiero ser colaborador</option>
       </select>
       <input class="field" name="asunto" type="text" placeholder="Asunto">
       <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
@@ -134,27 +135,27 @@ footer{background:var(--rose);}
         <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
         <span>Acepto que Bendito Lab guarde mis datos para responder a mi consulta. Consulta nuestra <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
       </label>
-      <button type="submit" class="btn-send">ENVIAR→</button>
+      <button type="submit" class="btn-send" data-edit="contacto.form.submit">ENVIAR→</button>
       <p id="contacto-error" style="display:none;color:#B3261E;font-size:13px;margin:4px 0 0;"></p>
     </form>
     <div id="contacto-success" style="display:none;text-align:center;padding:40px 20px;">
       <div style="font-size:40px;margin-bottom:12px;">✓</div>
-      <h2 style="font-size:22px;margin:0 0 8px;">¡Mensaje enviado!</h2>
-      <p style="font-size:14px;color:var(--deep);">Te responderemos en menos de 24 horas.</p>
+      <h2 style="font-size:22px;margin:0 0 8px;" data-edit="contacto.success.h2">¡Mensaje enviado!</h2>
+      <p style="font-size:14px;color:var(--deep);" data-edit="contacto.success.p">Te responderemos en menos de 24 horas.</p>
     </div>
   </div>
 
   <div class="info-card">
     <h2 data-edit="contacto.info.title">También puedes escribirnos por</h2>
     <div class="info-block">
-      <div class="info-label">Email</div>
+      <div class="info-label" data-edit="contacto.info.label-email">Email</div>
       <a class="info-value" href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>
     </div>
     <div class="info-block">
-      <div class="info-label">WhatsApp</div>
+      <div class="info-label" data-edit="contacto.info.label-whatsapp">WhatsApp</div>
       <a class="info-value" href="https://wa.me/34647444308" target="_blank">+34 647 44 43 08</a>
     </div>
-    <div class="info-label">Redes sociales</div>
+    <div class="info-label" data-edit="contacto.info.label-social">Redes sociales</div>
     <div class="social-row">
       <a href="https://instagram.com/bendito_lab" target="_blank" aria-label="Instagram" data-link-id="social-instagram"><img src="images/social-instagram.svg" alt="Instagram" width="28" height="28"></a>
       <a href="https://wa.me/34647444308" target="_blank" aria-label="WhatsApp" data-link-id="social-whatsapp"><img src="images/social-whatsapp.svg" alt="WhatsApp" width="28" height="28"></a>

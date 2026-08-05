@@ -51,8 +51,9 @@ h1{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;mar
 .topbar-logo{display:flex;align-items:center;gap:10px;}
 .topbar-logo img{height:75px;width:auto;display:block;}
 .site-header{background:var(--yellow);padding:32px 5vw 22px;}
-.header-logo{display:flex;justify-content:center;}
-.header-logo img{height:110px;width:auto;display:block;}
+.header-tag{text-align:center;color:var(--deep);font-weight:700;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;}
+.header-logo{margin-top:14px;display:flex;justify-content:center;}
+.header-logo img{height:170px;width:auto;display:block;}
 .site-nav{display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,36px);margin-top:20px;flex-wrap:wrap;}
 .site-nav a{font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--deep);}
 .site-nav a.pill{border:1px solid var(--deep);padding:9px 18px;border-radius:22px;}
@@ -89,7 +90,8 @@ footer{background:var(--rose);}
 </head>
 <body>
 
-<header class="site-header">
+<header class="site-header" data-color-bg="faq.header.bg">
+  <div class="header-tag">Artículos personalizados para empresas y eventos</div>
   <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
   <nav class="site-nav" id="site-nav">
@@ -99,26 +101,26 @@ footer{background:var(--rose);}
     <a href="catalogo.html">CATÁLOGO→</a>
     <a href="colaboradores.html">COLABORADORES→</a>
     <a href="contacto.html">CONTACTO→</a>
-    <a href="area-clientes.html" class="pill">ÁREA CLIENTE→</a>
+    <a href="https://portal.benditolab.com/portal" class="pill">ÁREA CLIENTE→</a>
   </nav>
 </header>
 
 <h1 class="faq-title" data-edit="faq.title">Preguntas frecuentes</h1>
 
 <div class="faq-list">
-  <div class="faq-row"><div class="faq-num">01</div><div class="faq-text"><strong>¿Qué servicios ofrecéis?</strong> Ayudamos a empresas, organizaciones y particulares con productos personalizados, merchandising, ropa laboral, regalos corporativos y experiencias de personalización en directo para bodas, comuniones y todo tipo de eventos.</div></div>
-  <div class="faq-row"><div class="faq-num">02</div><div class="faq-text"><strong>¿Cuál es el pedido mínimo?</strong> Depende del producto. Trabajamos desde pequeñas cantidades y también realizamos producciones de mayor volumen. Te asesoraremos según tus necesidades.</div></div>
-  <div class="faq-row"><div class="faq-num">03</div><div class="faq-text"><strong>¿Puedo personalizar cualquier diseño?</strong> Sí. Adaptamos cada proyecto a tu marca, evento o idea. Si tu diseño necesita ajustes para obtener el mejor resultado, nosotros nos encargamos.</div></div>
-  <div class="faq-row"><div class="faq-num">04</div><div class="faq-text"><strong>¿Cuánto tardáis en entregar un pedido?</strong> Los plazos dependen del producto y la cantidad solicitada. Una vez aprobado el diseño, te indicaremos la fecha estimada de producción y entrega antes de comenzar.</div></div>
-  <div class="faq-row"><div class="faq-num">05</div><div class="faq-text"><strong>¿Trabajáis en toda España?</strong> Sí. Realizamos envíos a cualquier punto de la península y, si estás cerca de nuestras instalaciones, también puedes recoger tu pedido en persona.</div></div>
-  <div class="faq-row"><div class="faq-num">06</div><div class="faq-text"><strong>¿Qué incluye el servicio de personalización en directo?</strong> Nos encargamos del transporte, montaje, personalización durante el evento y desmontaje. Tú solo tienes que disfrutar de la experiencia junto a tus invitados.</div></div>
-  <div class="faq-row"><div class="faq-num">07</div><div class="faq-text"><strong>¿Puedo seguir el estado de mi pedido?</strong> Sí. Dispondrás de un área privada de cliente donde podrás consultar presupuestos, aprobar diseños, revisar el estado de tus pedidos y acceder a toda la documentación relacionada con tus proyectos.</div></div>
-  <div class="faq-row"><div class="faq-num">08</div><div class="faq-text"><strong>¿Puedo colaborar con Bendito Lab o Dilo Bonito?</strong> Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes.</div></div>
-  <div class="faq-row"><div class="faq-num">09</div><div class="faq-text"><strong>¿Y si no encuentro el producto o servicio que necesito?</strong> No trabajamos con un catálogo cerrado. Si tienes una idea o un proyecto especial, prepararemos una propuesta personalizada adaptada a tus necesidades.</div></div>
-  <div class="faq-row"><div class="faq-num">10</div><div class="faq-text"><strong>¿Cómo solicito un presupuesto?</strong> Puedes hacerlo a través del formulario de contacto, por WhatsApp o por correo electrónico. Cuéntanos tu idea y prepararemos una propuesta personalizada sin compromiso.</div></div>
-  <div class="faq-row"><div class="faq-num">11</div><div class="faq-text"><strong>¿Cómo funciona el proceso de trabajo?</strong> Solo tienes que contarnos tu idea. Nosotros te asesoramos, preparamos el presupuesto, adaptamos el diseño, producimos el pedido y te mantenemos informado hasta la entrega.</div></div>
-  <div class="faq-row"><div class="faq-num">12</div><div class="faq-text"><strong>¿Qué formas de pago aceptáis?</strong> Aceptamos diferentes métodos de pago. Transferencia, Bizum y efectivo. Te informaremos de las opciones disponibles junto al presupuesto.</div></div>
-  <div class="faq-row"><div class="faq-num">13</div><div class="faq-text"><strong>¿Alguna duda más?</strong> Escríbenos a contacto@benditolab.com o vía whatsapp al +34647444308</div></div>
+  <div class="faq-row"><div class="faq-num">01</div><div class="faq-text" data-edit="faq.item01"><strong>¿Qué servicios ofrecéis?</strong> Ayudamos a empresas, organizaciones y particulares con productos personalizados, merchandising, ropa laboral, regalos corporativos y experiencias de personalización en directo para bodas, comuniones y todo tipo de eventos.</div></div>
+  <div class="faq-row"><div class="faq-num">02</div><div class="faq-text" data-edit="faq.item02"><strong>¿Cuál es el pedido mínimo?</strong> Depende del producto. Trabajamos desde pequeñas cantidades y también realizamos producciones de mayor volumen. Te asesoraremos según tus necesidades.</div></div>
+  <div class="faq-row"><div class="faq-num">03</div><div class="faq-text" data-edit="faq.item03"><strong>¿Puedo personalizar cualquier diseño?</strong> Sí. Adaptamos cada proyecto a tu marca, evento o idea. Si tu diseño necesita ajustes para obtener el mejor resultado, nosotros nos encargamos.</div></div>
+  <div class="faq-row"><div class="faq-num">04</div><div class="faq-text" data-edit="faq.item04"><strong>¿Cuánto tardáis en entregar un pedido?</strong> Los plazos dependen del producto y la cantidad solicitada. Una vez aprobado el diseño, te indicaremos la fecha estimada de producción y entrega antes de comenzar.</div></div>
+  <div class="faq-row"><div class="faq-num">05</div><div class="faq-text" data-edit="faq.item05"><strong>¿Trabajáis en toda España?</strong> Sí. Realizamos envíos a cualquier punto de la península y, si estás cerca de nuestras instalaciones, también puedes recoger tu pedido en persona.</div></div>
+  <div class="faq-row"><div class="faq-num">06</div><div class="faq-text" data-edit="faq.item06"><strong>¿Qué incluye el servicio de personalización en directo?</strong> Nos encargamos del transporte, montaje, personalización durante el evento y desmontaje. Tú solo tienes que disfrutar de la experiencia junto a tus invitados.</div></div>
+  <div class="faq-row"><div class="faq-num">07</div><div class="faq-text" data-edit="faq.item07"><strong>¿Puedo seguir el estado de mi pedido?</strong> Sí. Dispondrás de un área privada de cliente donde podrás consultar presupuestos, aprobar diseños, revisar el estado de tus pedidos y acceder a toda la documentación relacionada con tus proyectos.</div></div>
+  <div class="faq-row"><div class="faq-num">08</div><div class="faq-text" data-edit="faq.item08"><strong>¿Puedo colaborar con Bendito Lab o Dilo Bonito?</strong> Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes.</div></div>
+  <div class="faq-row"><div class="faq-num">09</div><div class="faq-text" data-edit="faq.item09"><strong>¿Y si no encuentro el producto o servicio que necesito?</strong> No trabajamos con un catálogo cerrado. Si tienes una idea o un proyecto especial, prepararemos una propuesta personalizada adaptada a tus necesidades.</div></div>
+  <div class="faq-row"><div class="faq-num">10</div><div class="faq-text" data-edit="faq.item10"><strong>¿Cómo solicito un presupuesto?</strong> Puedes hacerlo a través del formulario de contacto, por WhatsApp o por correo electrónico. Cuéntanos tu idea y prepararemos una propuesta personalizada sin compromiso.</div></div>
+  <div class="faq-row"><div class="faq-num">11</div><div class="faq-text" data-edit="faq.item11"><strong>¿Cómo funciona el proceso de trabajo?</strong> Solo tienes que contarnos tu idea. Nosotros te asesoramos, preparamos el presupuesto, adaptamos el diseño, producimos el pedido y te mantenemos informado hasta la entrega.</div></div>
+  <div class="faq-row"><div class="faq-num">12</div><div class="faq-text" data-edit="faq.item12"><strong>¿Qué formas de pago aceptáis?</strong> Aceptamos diferentes métodos de pago. Transferencia, Bizum y efectivo. Te informaremos de las opciones disponibles junto al presupuesto.</div></div>
+  <div class="faq-row"><div class="faq-num">13</div><div class="faq-text" data-edit="faq.item13"><strong>¿Alguna duda más?</strong> Escríbenos a contacto@benditolab.com o vía whatsapp al +34647444308</div></div>
 </div>
 
 <div class="faq-back"><a href="portada.html" class="btn-pill">VOLVER→</a></div>

@@ -678,6 +678,19 @@
         var d = await r.json();
         if (!d.ok) throw new Error(d.error || 'Error al subir');
         img.src = d.url;
+
+        // La foto nueva no tiene por qué encajar con el zoom/posición que se
+        // hubiera guardado para la foto anterior en este mismo hueco — sin
+        // este reseteo, se seguía aplicando el encuadre viejo sobre la
+        // imagen nueva y se veía descuadrada o "rota".
+        img.style.transform = '';
+        delete CONTENT.imageView[slot];
+        fetch('/api/save-image-view', {
+          method: 'POST',
+          headers: BL_API.authHeaders(),
+          body: JSON.stringify({ path: slot, s: 1, x: 0, y: 0 })
+        }).catch(function () {});
+
         if (tooSmall) {
           toast('Imagen actualizada, pero es más pequeña de lo ideal (' + needed.w + '×' + needed.h + ' px) y puede verse borrosa', true);
         } else if (oversized) {
