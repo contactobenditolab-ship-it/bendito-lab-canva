@@ -1535,9 +1535,6 @@ function handleClick(e){
     case 'copiar-codigo-banner': copiarCodigoBanner(); break;
     case 'guardar-precio-portal':  guardarPrecioPortal(el.dataset.id); break;
     case 'eliminar-precio-portal': eliminarPrecioPortal(el.dataset.id); break;
-    case 'add-coleccion':        addColeccion(); break;
-    case 'rm-coleccion':         rmColeccion(el.dataset.slug); break;
-    case 'save-colecciones':     guardarColecciones(); break;
   }
 }
 document.addEventListener('click', handleClick);
@@ -1562,7 +1559,6 @@ function handleChange(e){
     case 'upload-img-data':  uploadImgData(el); break;
     case 'anadir-img-data':  anadirImgData(el); break;
     case 'subir-img-banner': subirImgBanner(el, i); break;
-    case 'subir-hero-coleccion': subirHeroColeccion(el, el.dataset.slug); break;
   }
 }
 document.addEventListener('change', handleChange);
@@ -1575,10 +1571,6 @@ function handleInput(e){
   switch(el.dataset.action){
     case 'sync-color':      syncColor(el.dataset.id, el.value); break;
     case 'sync-color-text': syncColorText(el.dataset.id, el.value); break;
-    case 'upd-coleccion-slug':      updColeccionSlug(el.dataset.slug, el.value); break;
-    case 'upd-coleccion-titulo':    updColeccionCampo(el.dataset.slug, 'titulo', el.value); break;
-    case 'upd-coleccion-subtitulo': updColeccionCampo(el.dataset.slug, 'subtitulo', el.value); break;
-    case 'upd-coleccion-tag':       updColeccionCampo(el.dataset.slug, 'tag', el.value); break;
   }
 }
 document.addEventListener('input', handleInput);

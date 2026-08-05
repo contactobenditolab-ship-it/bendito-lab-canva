@@ -32,16 +32,6 @@
       "continue": true
     },
     {
-      "src": "/coleccion(\\.html)?",
-      "headers": { "X-Robots-Tag": "noindex, nofollow" },
-      "continue": true
-    },
-    {
-      "src": "/coleccion/.*",
-      "headers": { "X-Robots-Tag": "noindex, nofollow" },
-      "continue": true
-    },
-    {
       "src": "/",
       "dest": "/portada.html"
     },
@@ -73,10 +63,6 @@
     {
       "src": "/catalogo",
       "dest": "/catalogo.html"
-    },
-    {
-      "src": "/coleccion/([^/]+)",
-      "dest": "/coleccion.html?c=$1"
     },
     {
       "src": "/area-clientes",
