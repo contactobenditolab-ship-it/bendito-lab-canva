@@ -35,6 +35,7 @@ function valorUtil(v) {
 const NEWSLETTER_POR_TIPO = {
   evento: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
   empresa: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
+  colaborador: { url: 'https://www.benditolab.com/newsletter-colaboradores.html', etiqueta: 'colaboradores' },
 };
 
 async function enviarEmailResend(payload) {
