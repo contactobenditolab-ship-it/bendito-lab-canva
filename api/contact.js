@@ -29,6 +29,26 @@ function valorUtil(v) {
   return v && v !== '-' ? v : '';
 }
 
+const NEWSLETTER_POR_TIPO = {
+  evento: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
+  empresa: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
+};
+
+async function enviarEmailResend(payload) {
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!r.ok) {
+    const detalle = await r.text().catch(() => '');
+    throw new Error('Resend respondió ' + r.status + ': ' + detalle);
+  }
+}
+
 async function enviarContactoEmail(data) {
   if (!RESEND_API_KEY) {
     throw new Error('RESEND_API_KEY no configurada en el servidor');
@@ -48,17 +68,24 @@ async function enviarContactoEmail(data) {
     emailPayload.reply_to = data.email;
   }
 
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-    },
-    body: JSON.stringify(emailPayload),
-  });
-  if (!r.ok) {
-    const detalle = await r.text().catch(() => '');
-    throw new Error('Resend respondió ' + r.status + ': ' + detalle);
+  await enviarEmailResend(emailPayload);
+
+  // Confirmación al visitante: además de avisar que hemos recibido su
+  // mensaje, le enlazamos la newsletter que corresponde según haya
+  // marcado "evento" o "empresa" en el formulario.
+  if (esEmailValido(data.email)) {
+    const newsletter = NEWSLETTER_POR_TIPO[data.tipo_contacto];
+    if (newsletter) {
+      await enviarEmailResend({
+        from: 'Bendito Lab <no-reply@benditolab.com>',
+        to: data.email,
+        subject: 'Hemos recibido tu mensaje · Bendito Lab',
+        html: `<h2>¡Gracias por escribirnos, ${escapeHtml(data.nombre)}!</h2>
+<p>Hemos recibido tu consulta y te responderemos en menos de 24 horas.</p>
+<p>Mientras tanto, échale un vistazo a nuestra newsletter de ${escapeHtml(newsletter.etiqueta)}:</p>
+<p><a href="${newsletter.url}">${newsletter.url}</a></p>`,
+      });
+    }
   }
 }
 
@@ -108,6 +135,7 @@ async function enviarContactoAOS(data) {
     email: data.email,
     telefono: valorUtil(data.telefono) || undefined,
     contactoPreferido: valorUtil(data.contacto_preferido) || undefined,
+    tipoContacto: valorUtil(data.tipo_contacto) || undefined,
     asunto: valorUtil(data.asunto) || undefined,
     mensaje: valorUtil(data.mensaje) || undefined,
   };

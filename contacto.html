@@ -122,6 +122,11 @@ footer{background:var(--rose);}
           <option value="whatsapp">WhatsApp</option>
         </select>
       </div>
+      <select class="field" name="tipo_contacto" required>
+        <option value="">¿Tu consulta es para un evento o para tu empresa (B2B)?</option>
+        <option value="evento">Evento</option>
+        <option value="empresa">Empresa / B2B</option>
+      </select>
       <input class="field" name="asunto" type="text" placeholder="Asunto">
       <textarea class="field" name="mensaje" rows="6" placeholder="Cuéntanos tu proyecto o evento..." required></textarea>
       <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
