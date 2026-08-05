@@ -6,7 +6,7 @@
 .nav-links{display:flex;align-items:center;gap:32px;}
 .nav-links a{font-family:'Inter',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--deep,#17233F);text-decoration:none;transition:color .2s;}
 .nav-links a:hover{color:var(--captain,#2F8FEA);}
-.nav-cta{background:var(--poppy,#E2704A) !important;color:var(--white,#FBF4E9) !important;padding:12px 24px !important;border-radius:22px !important;font-family:'Inter',sans-serif !important;font-weight:800 !important;font-size:13px !important;letter-spacing:.5px !important;transition:background .2s !important;}
+.nav-cta{background:var(--poppy-dark,#9B3919) !important;color:var(--white,#FBF4E9) !important;padding:12px 24px !important;border-radius:22px !important;font-family:'Inter',sans-serif !important;font-weight:800 !important;font-size:13px !important;letter-spacing:.5px !important;transition:background .2s !important;}
 .nav-cta:hover{background:var(--deep,#17233F) !important;}
 .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;flex-shrink:0;position:relative;z-index:10001;}
 .nav-hamburger span{display:block;width:24px;height:2px;background:var(--deep,#17233F);transition:all .25s;transform-origin:center;}
@@ -21,7 +21,7 @@
   body.nav-open .nav{z-index:10000;}
   body.nav-open .nav-links{display:flex !important;flex-direction:column;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--deep,#17233F);z-index:10000;gap:28px;}
   body.nav-open .nav-links a{font-size:22px;color:var(--white,#FBF4E9);}
-  body.nav-open .nav-links .nav-cta{font-size:18px !important;padding:16px 40px !important;background:var(--poppy,#E2704A) !important;color:var(--white,#FBF4E9) !important;}
+  body.nav-open .nav-links .nav-cta{font-size:18px !important;padding:16px 40px !important;background:var(--poppy-dark,#9B3919) !important;color:var(--white,#FBF4E9) !important;}
   body.nav-open .nav-hamburger span{background:var(--white,#FBF4E9);}
 }
 

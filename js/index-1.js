@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function(){
     var d = document.createElement('button');
     d.className = 'c-dot' + (i===0?' on':'');
     d.setAttribute('data-i', i);
+    d.setAttribute('type', 'button');
+    d.setAttribute('aria-label', 'Ir a la imagen ' + (i+1) + ' de ' + n);
     d.onclick = (function(idx){ return function(){ clearInterval(timer); go(idx); start(); }; })(i);
     dotsEl.appendChild(d);
   }
