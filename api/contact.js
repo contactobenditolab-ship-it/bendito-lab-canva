@@ -1,10 +1,13 @@
 // POST /api/contact — procesa los leads de los formularios públicos.
-// - "contacto": email directo por Resend a contacto@benditolab.com.
+// - "contacto": email directo por Resend a contacto@benditolab.com, más
+//   confirmación al visitante enlazando la newsletter de eventos o de
+//   empresas según lo que haya marcado en el formulario.
 // - "colaborador": se reenvía al mismo endpoint público que usa el propio
 //   formulario /unete de Bendito OS (portal.benditolab.com), que crea el
 //   perfil de colaborador pendiente de activar en el panel y avisa por
 //   email a colaboradores@benditolab.com. Así la solicitud queda guardada
-//   en su apartado dentro de OS, no solo como un email suelto.
+//   en su apartado dentro de OS, no solo como un email suelto. Además se
+//   envía una confirmación al colaborador con la newsletter de colaboradores.
 // Público (sin auth): lo llaman formularios de visitantes, no el admin.
 const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
 
@@ -29,6 +32,26 @@ function valorUtil(v) {
   return v && v !== '-' ? v : '';
 }
 
+const NEWSLETTER_POR_TIPO = {
+  evento: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
+  empresa: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
+};
+
+async function enviarEmailResend(payload) {
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!r.ok) {
+    const detalle = await r.text().catch(() => '');
+    throw new Error('Resend respondió ' + r.status + ': ' + detalle);
+  }
+}
+
 async function enviarContactoEmail(data) {
   if (!RESEND_API_KEY) {
     throw new Error('RESEND_API_KEY no configurada en el servidor');
@@ -48,18 +71,38 @@ async function enviarContactoEmail(data) {
     emailPayload.reply_to = data.email;
   }
 
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-    },
-    body: JSON.stringify(emailPayload),
-  });
-  if (!r.ok) {
-    const detalle = await r.text().catch(() => '');
-    throw new Error('Resend respondió ' + r.status + ': ' + detalle);
+  await enviarEmailResend(emailPayload);
+
+  // Confirmación al visitante: además de avisar que hemos recibido su
+  // mensaje, le enlazamos la newsletter que corresponde según haya
+  // marcado "evento" o "empresa" en el formulario.
+  if (esEmailValido(data.email)) {
+    const newsletter = NEWSLETTER_POR_TIPO[data.tipo_contacto];
+    if (newsletter) {
+      await enviarEmailResend({
+        from: 'Bendito Lab <no-reply@benditolab.com>',
+        to: data.email,
+        subject: 'Hemos recibido tu mensaje · Bendito Lab',
+        html: `<h2>¡Gracias por escribirnos, ${escapeHtml(data.nombre)}!</h2>
+<p>Hemos recibido tu consulta y te responderemos en menos de 24 horas.</p>
+<p>Mientras tanto, échale un vistazo a nuestra newsletter de ${escapeHtml(newsletter.etiqueta)}:</p>
+<p><a href="${newsletter.url}">${newsletter.url}</a></p>`,
+      });
+    }
   }
+}
+
+async function enviarColaboradorConfirmacion(data) {
+  if (!RESEND_API_KEY || !esEmailValido(data.email)) return;
+  await enviarEmailResend({
+    from: 'Bendito Lab <no-reply@benditolab.com>',
+    to: data.email,
+    subject: '¡Gracias por querer colaborar con nosotros! · Bendito Lab',
+    html: `<h2>¡Gracias por tu solicitud, ${escapeHtml(data.nombre)}!</h2>
+<p>Hemos recibido tu solicitud para unirte al programa de colaboradores de Bendito Lab. Estamos revisando tu perfil y te contactaremos en breve.</p>
+<p>Mientras tanto, aquí te contamos cómo funciona la colaboración:</p>
+<p><a href="https://www.benditolab.com/newsletter-colaboradores.html">https://www.benditolab.com/newsletter-colaboradores.html</a></p>`,
+  });
 }
 
 async function enviarColaboradorAOS(data) {
@@ -108,6 +151,7 @@ async function enviarContactoAOS(data) {
     email: data.email,
     telefono: valorUtil(data.telefono) || undefined,
     contactoPreferido: valorUtil(data.contacto_preferido) || undefined,
+    tipoContacto: valorUtil(data.tipo_contacto) || undefined,
     asunto: valorUtil(data.asunto) || undefined,
     mensaje: valorUtil(data.mensaje) || undefined,
   };
@@ -193,6 +237,16 @@ module.exports = async function handler(req, res) {
       await enviarContactoAOS(data);
     } catch (e) {
       console.error('No se pudo crear el prospecto en Bendito OS:', e.message);
+    }
+  }
+
+  // Confirmación al colaborador: no bloquea la respuesta si falla, ya que
+  // la solicitud ya ha quedado registrada en Bendito OS.
+  if (type === 'colaborador') {
+    try {
+      await enviarColaboradorConfirmacion(data);
+    } catch (e) {
+      console.error('No se pudo enviar la confirmación al colaborador:', e.message);
     }
   }
 

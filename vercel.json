@@ -99,6 +99,14 @@
       "dest": "/admin.html"
     },
     {
+      "src": "/newsletter-colaboradores",
+      "dest": "/newsletter-colaboradores.html"
+    },
+    {
+      "src": "/newsletter-como-trabajamos",
+      "dest": "/newsletter-como-trabajamos.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
