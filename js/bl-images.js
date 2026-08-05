@@ -186,6 +186,21 @@
       '.bl-crop-frame{position:absolute;inset:0;pointer-events:none;outline:2px dashed #E8C24A;' +
       'outline-offset:-2px;z-index:99;display:none;}' +
       '.bl-crop-frame.on{display:block;}' +
+      '.bl-text-toolbar{position:fixed;display:none;align-items:center;gap:4px;background:#17233F;' +
+      'border-radius:8px;padding:5px;box-shadow:0 4px 16px rgba(0,0,0,.35);z-index:999997;' +
+      'font-family:Inter,sans-serif;}' +
+      '.bl-text-toolbar.on{display:flex;}' +
+      '.bl-text-toolbar button{background:transparent;color:#FBF4E9;border:none;border-radius:5px;' +
+      'width:28px;height:28px;cursor:pointer;font-size:13px;line-height:1;}' +
+      '.bl-text-toolbar button:hover,.bl-text-toolbar button.active{background:#2F8FEA;}' +
+      '.bl-text-toolbar .bl-tb-sep{width:1px;align-self:stretch;background:rgba(251,244,233,.2);margin:0 2px;}' +
+      '.bl-tb-dd{position:relative;}' +
+      '.bl-tb-dd>button{width:auto;padding:0 8px;font-size:12px;white-space:nowrap;}' +
+      '.bl-tb-dd-menu{position:absolute;top:100%;left:0;margin-top:4px;background:#17233F;' +
+      'border-radius:8px;padding:4px;box-shadow:0 4px 16px rgba(0,0,0,.35);display:none;' +
+      'flex-direction:column;min-width:130px;max-height:220px;overflow-y:auto;z-index:999998;}' +
+      '.bl-tb-dd-menu.on{display:flex;}' +
+      '.bl-tb-dd-menu button{width:100%;text-align:left;padding:6px 8px;height:auto;}' +
       '.bl-link-wrap{position:relative;display:inline-block;}' +
       '.bl-link-toolbar{position:absolute;top:-4px;right:-4px;display:none;gap:3px;z-index:100;transform:translateY(-100%);}' +
       '.bl-link-wrap:hover>.bl-link-toolbar{display:flex;}' +
@@ -211,6 +226,170 @@
   }
 
   // ── TEXTOS ───────────────────────────────────────────────────────────
+  var FONT_CHOICES = [
+    { label: 'Fuente…', value: '' },
+    { label: 'Inter', value: 'Inter, sans-serif' },
+    { label: 'Helvetica', value: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
+    { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+    { label: 'Georgia', value: 'Georgia, serif' }
+  ];
+  var SIZE_CHOICES = ['Tamaño…', '12', '14', '16', '18', '20', '24', '28', '32', '40', '56'];
+
+  var textToolbar = null;
+  var activeTextEl = null;
+
+  function buildTextToolbar() {
+    if (textToolbar) return textToolbar;
+    var bar = document.createElement('div');
+    bar.className = 'bl-text-toolbar';
+
+    function addBtn(label, title, cmd, val) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.innerHTML = label;
+      b.title = title;
+      b.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        document.execCommand(cmd, false, val);
+        if (activeTextEl) activeTextEl.focus();
+      });
+      bar.appendChild(b);
+      return b;
+    }
+
+    addBtn('<b>B</b>', 'Negrita', 'bold');
+    addBtn('<i>I</i>', 'Cursiva', 'italic');
+    addBtn('<u>U</u>', 'Subrayado', 'underline');
+
+    var sep1 = document.createElement('span');
+    sep1.className = 'bl-tb-sep';
+    bar.appendChild(sep1);
+
+    function addDropdown(label, options, onPick) {
+      var wrap = document.createElement('span');
+      wrap.className = 'bl-tb-dd';
+      var toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.textContent = label;
+      var menu = document.createElement('div');
+      menu.className = 'bl-tb-dd-menu';
+      options.forEach(function (opt) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.textContent = opt.label;
+        item.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          onPick(opt.value);
+          menu.classList.remove('on');
+          if (activeTextEl) activeTextEl.focus();
+        });
+        menu.appendChild(item);
+      });
+      toggle.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var wasOn = menu.classList.contains('on');
+        bar.querySelectorAll('.bl-tb-dd-menu.on').forEach(function (m) { m.classList.remove('on'); });
+        if (!wasOn) menu.classList.add('on');
+      });
+      wrap.appendChild(toggle);
+      wrap.appendChild(menu);
+      bar.appendChild(wrap);
+      return wrap;
+    }
+
+    addDropdown('Fuente ▾', FONT_CHOICES.slice(1), function (value) {
+      applyStyleToSelection('fontFamily', value);
+    });
+    addDropdown('Tamaño ▾', SIZE_CHOICES.slice(1).map(function (s) {
+      return { label: s + ' px', value: s + 'px' };
+    }), function (value) {
+      applyStyleToSelection('fontSize', value);
+    });
+
+    document.addEventListener('mousedown', function (e) {
+      if (!bar.contains(e.target)) {
+        bar.querySelectorAll('.bl-tb-dd-menu.on').forEach(function (m) { m.classList.remove('on'); });
+      }
+    });
+
+    var sep2 = document.createElement('span');
+    sep2.className = 'bl-tb-sep';
+    bar.appendChild(sep2);
+
+    var linkBtn = document.createElement('button');
+    linkBtn.type = 'button';
+    linkBtn.innerHTML = '🔗';
+    linkBtn.title = 'Añadir enlace';
+    linkBtn.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      var url = prompt('URL del enlace:', 'https://');
+      if (activeTextEl) activeTextEl.focus();
+      if (!url) return;
+      document.execCommand('createLink', false, url.trim());
+    });
+    bar.appendChild(linkBtn);
+
+    addBtn('🔗∅', 'Quitar enlace', 'unlink');
+
+    document.body.appendChild(bar);
+    textToolbar = bar;
+    return bar;
+  }
+
+  function applyStyleToSelection(prop, value) {
+    var sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    var range = sel.getRangeAt(0);
+    var span = document.createElement('span');
+    span.style[prop] = value;
+    try {
+      range.surroundContents(span);
+    } catch (err) {
+      var frag = range.extractContents();
+      span.appendChild(frag);
+      range.insertNode(span);
+    }
+    sel.removeAllRanges();
+    var newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.addRange(newRange);
+  }
+
+  function positionTextToolbar(el) {
+    var bar = textToolbar;
+    var rect = el.getBoundingClientRect();
+    var barH = bar.offsetHeight || 38;
+    var top = rect.top - barH - 8;
+    if (top < 4) top = rect.bottom + 8;
+    var left = Math.max(4, Math.min(rect.left, window.innerWidth - bar.offsetWidth - 4));
+    bar.style.top = top + 'px';
+    bar.style.left = left + 'px';
+  }
+
+  function showTextToolbar(el) {
+    buildTextToolbar();
+    activeTextEl = el;
+    textToolbar.classList.add('on');
+    positionTextToolbar(el);
+    var reposition = function () { if (activeTextEl === el) positionTextToolbar(el); };
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+    el._tbReposition = reposition;
+  }
+
+  function hideTextToolbar(el) {
+    if (!textToolbar) return;
+    textToolbar.classList.remove('on');
+    if (activeTextEl === el) activeTextEl = null;
+    if (el._tbReposition) {
+      window.removeEventListener('scroll', el._tbReposition, true);
+      window.removeEventListener('resize', el._tbReposition);
+      el._tbReposition = null;
+    }
+  }
+
   function wireTexts() {
     document.querySelectorAll('[data-edit]').forEach(function (el) {
       el.title = 'Clic para editar';
@@ -221,9 +400,14 @@
         e.stopPropagation();
         el.setAttribute('contenteditable', 'true');
         el.focus();
+        showTextToolbar(el);
       });
       el.addEventListener('blur', function () {
+        // Si el foco se movió a la barra de herramientas (clic en un botón),
+        // los botones ya hacen preventDefault en mousedown, así que este
+        // blur solo ocurre al salir de verdad del texto.
         el.removeAttribute('contenteditable');
+        hideTextToolbar(el);
         saveText(el.getAttribute('data-edit'), el.innerHTML.trim());
       });
       el.addEventListener('keydown', function (e) {
