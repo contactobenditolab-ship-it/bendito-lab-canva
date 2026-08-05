@@ -62,10 +62,26 @@
     });
   }
 
+  // Quita del HTML cualquier control que el propio modo edición haya podido
+  // inyectar dentro de un [data-edit] (el círculo de color, la barra de
+  // formato de texto...). Si alguna vez ese control quedó atrapado en el
+  // texto guardado (por estar en el mismo elemento que data-color-*), esto
+  // lo limpia tanto al pintarlo para los visitantes como antes de re-guardar.
+  function limpiarControlesInyectados(html) {
+    if (!html || html.indexOf('<') === -1) return html;
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    tmp.querySelectorAll('.bl-color-btn, .bl-toolbar, .bl-size-badge, .bl-crop-frame, ' +
+      '.bl-link-toolbar, .bl-text-toolbar, input[type="color"], input[type="file"]').forEach(function (n) {
+      n.remove();
+    });
+    return tmp.innerHTML;
+  }
+
   function applyTexts(texts) {
     document.querySelectorAll('[data-edit]').forEach(function (el) {
       var id = el.getAttribute('data-edit');
-      if (texts[id] !== undefined) el.innerHTML = texts[id];
+      if (texts[id] !== undefined) el.innerHTML = limpiarControlesInyectados(texts[id]);
     });
   }
 
@@ -408,7 +424,7 @@
         // blur solo ocurre al salir de verdad del texto.
         el.removeAttribute('contenteditable');
         hideTextToolbar(el);
-        saveText(el.getAttribute('data-edit'), el.innerHTML.trim());
+        saveText(el.getAttribute('data-edit'), limpiarControlesInyectados(el.innerHTML.trim()));
       });
       el.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && el.tagName !== 'P' && !el.hasAttribute('data-edit-multiline')) {
