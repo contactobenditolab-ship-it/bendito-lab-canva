@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies (bloquea solo en severidad crítica)
+        run: npm audit --audit-level=critical
+
+      - name: Audit dependencies (informativo, no bloquea)
+        run: npm audit --audit-level=high || true
+
+      - name: Syntax check (JS)
+        run: |
+          status=0
+          for f in $(find . -name "*.js" -not -path "./node_modules/*"); do
+            node --check "$f" || status=1
+          done
+          exit $status
+
+      - name: Validate JSON config files
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
