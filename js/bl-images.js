@@ -179,6 +179,13 @@
       '[data-color-bg]:hover>.bl-color-btn,[data-color-text]:hover>.bl-color-btn{display:block;}' +
       'img[data-slot][data-reframing]{cursor:grab;}' +
       'img[data-slot][data-reframing][data-panning]{cursor:grabbing;}' +
+      '.bl-size-badge{position:absolute;bottom:6px;left:6px;background:rgba(23,35,63,.85);color:#FBF4E9;' +
+      'font:600 11px/1.3 Inter,sans-serif;padding:4px 8px;border-radius:6px;z-index:100;display:none;' +
+      'pointer-events:none;white-space:nowrap;}' +
+      '.bl-size-badge.on{display:block;}' +
+      '.bl-crop-frame{position:absolute;inset:0;pointer-events:none;outline:2px dashed #E8C24A;' +
+      'outline-offset:-2px;z-index:99;display:none;}' +
+      '.bl-crop-frame.on{display:block;}' +
       '.bl-link-wrap{position:relative;display:inline-block;}' +
       '.bl-link-toolbar{position:absolute;top:-4px;right:-4px;display:none;gap:3px;z-index:100;transform:translateY(-100%);}' +
       '.bl-link-wrap:hover>.bl-link-toolbar{display:flex;}' +
@@ -353,6 +360,17 @@
       .catch(function () { toast('Error de conexión', false); });
   }
 
+  // Tamaño recomendado = el hueco visible en pantalla, escalado a píxeles
+  // reales de pantalla (devicePixelRatio) para que la foto se vea nítida.
+  function recommendedSize(img) {
+    var rect = img.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    return {
+      w: Math.max(1, Math.round(rect.width * dpr)),
+      h: Math.max(1, Math.round(rect.height * dpr))
+    };
+  }
+
   // ── IMÁGENES: cambiar foto + encuadre (zoom/posición) ──────────────────
   function wireImages() {
     var fileInput = document.createElement('input');
@@ -361,6 +379,7 @@
     fileInput.style.display = 'none';
     document.body.appendChild(fileInput);
     var targetImg = null;
+    var reframeBtnBySlot = {};
 
     document.querySelectorAll('img[data-slot]').forEach(function (img) {
       img.draggable = false;
@@ -394,8 +413,29 @@
         host.style.position = host.style.position || 'relative';
       }
       host.appendChild(toolbar);
-      host.addEventListener('mouseenter', function () { toolbar.classList.add('on'); });
-      host.addEventListener('mouseleave', function () { if (!img.hasAttribute('data-reframing')) toolbar.classList.remove('on'); });
+
+      var badge = document.createElement('div');
+      badge.className = 'bl-size-badge';
+      host.appendChild(badge);
+      var updateBadge = function () {
+        var size = recommendedSize(img);
+        badge.textContent = 'Tamaño ideal: ' + size.w + '×' + size.h + ' px';
+      };
+      updateBadge();
+      window.addEventListener('resize', updateBadge);
+
+      var cropFrame = null;
+      if (canReframe) {
+        cropFrame = document.createElement('div');
+        cropFrame.className = 'bl-crop-frame';
+        host.appendChild(cropFrame);
+        img._cropFrame = cropFrame;
+      }
+
+      host.addEventListener('mouseenter', function () { toolbar.classList.add('on'); badge.classList.add('on'); });
+      host.addEventListener('mouseleave', function () {
+        if (!img.hasAttribute('data-reframing')) { toolbar.classList.remove('on'); badge.classList.remove('on'); }
+      });
 
       replaceBtn.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
@@ -404,6 +444,7 @@
       });
 
       if (reframeBtn) {
+        reframeBtnBySlot[img.getAttribute('data-slot')] = reframeBtn;
         reframeBtn.addEventListener('click', function (e) {
           e.preventDefault(); e.stopPropagation();
           if (img.hasAttribute('data-reframing')) exitReframe(img, true);
@@ -419,8 +460,15 @@
       var img = targetImg;
       var slot = img.getAttribute('data-slot');
       var prevSrc = img.src;
+      var canReframe = hasClippingAncestor(img);
+      var needed = recommendedSize(img);
       img.style.opacity = '.5';
       try {
+        var bitmap = await createImageBitmap(file);
+        var tooSmall = bitmap.width < needed.w || bitmap.height < needed.h;
+        var oversized = canReframe && (bitmap.width > needed.w * 1.05 || bitmap.height > needed.h * 1.05);
+        if (bitmap.close) bitmap.close();
+
         var dataUrl = await resizeImageToDataUrl(file);
         var r = await fetch('/api/upload-image', {
           method: 'POST',
@@ -430,7 +478,14 @@
         var d = await r.json();
         if (!d.ok) throw new Error(d.error || 'Error al subir');
         img.src = d.url;
-        toast('Imagen actualizada ✓', true);
+        if (tooSmall) {
+          toast('Imagen actualizada, pero es más pequeña de lo ideal (' + needed.w + '×' + needed.h + ' px) y puede verse borrosa', true);
+        } else if (oversized) {
+          toast('Imagen actualizada ✓ — es más grande de lo necesario, elige qué parte mostrar', true);
+          if (reframeBtnBySlot[slot]) reframeBtnBySlot[slot].click();
+        } else {
+          toast('Imagen actualizada ✓', true);
+        }
       } catch (err) {
         img.src = prevSrc;
         toast('Error: ' + err.message, false);
@@ -448,6 +503,9 @@
     reframeState[slot] = view;
     img.setAttribute('data-reframing', '');
     applyViewTransform(img, view);
+    if (img._cropFrame) img._cropFrame.classList.add('on');
+    var badgeEl = img.parentElement && img.parentElement.querySelector('.bl-size-badge');
+    if (badgeEl) badgeEl.classList.add('on');
 
     var rect;
     var start;
@@ -505,6 +563,9 @@
     img.removeAttribute('data-panning');
     var toolbar = img.parentElement && img.parentElement.querySelector('.bl-toolbar');
     if (toolbar) toolbar.classList.remove('on');
+    if (img._cropFrame) img._cropFrame.classList.remove('on');
+    var badgeEl2 = img.parentElement && img.parentElement.querySelector('.bl-size-badge');
+    if (badgeEl2) badgeEl2.classList.remove('on');
     if (commit && reframeState[slot]) {
       var v = reframeState[slot];
       CONTENT.imageView[slot] = v;
