@@ -4,7 +4,6 @@ Disallow: /admin
 Disallow: /area-clientes
 Disallow: /portal
 Disallow: /catalogo
-Disallow: /coleccion
 Disallow: /api/
 
 Sitemap: https://www.benditolab.com/sitemap.xml
