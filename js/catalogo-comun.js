@@ -16,6 +16,63 @@ function escapeHtml(value) {
   });
 }
 
+// Estilos añadidos por JS (compartidos entre catalogo.html y coleccion.html)
+// para no duplicarlos en cada página: tooltip de nombre de color al pasar el
+// cursor, botón de guía de tallas y su modal.
+(function injectCatalogoComunStyles(){
+  var s = document.createElement('style');
+  s.textContent =
+    '.color-swatch{position:relative;}' +
+    '.color-swatch::after{content:attr(data-color-nombre);position:absolute;bottom:calc(100% + 7px);left:50%;' +
+    'transform:translateX(-50%);background:#17233F;color:#FBF4E9;font-size:11px;font-weight:600;' +
+    'padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;' +
+    'transition:opacity .12s;z-index:10;}' +
+    '.color-swatch::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);' +
+    'border:4px solid transparent;border-top-color:#17233F;opacity:0;pointer-events:none;transition:opacity .12s;z-index:10;}' +
+    '.color-swatch:hover::after,.color-swatch:hover::before{opacity:1;}' +
+    '.btn-guia-tallas{display:inline-block;background:none;border:1px solid var(--baby,#8FA3C2);' +
+    'color:var(--baby,#8FA3C2);font-size:12px;font-weight:700;letter-spacing:.3px;padding:8px 14px;' +
+    'border-radius:20px;cursor:pointer;margin:0 0 18px;}' +
+    '.btn-guia-tallas:hover{background:var(--baby,#8FA3C2);color:#fff;}' +
+    '#modal-tallas{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100001;' +
+    'align-items:center;justify-content:center;padding:24px 16px;}' +
+    '#modal-tallas.on{display:flex;}' +
+    '.mt-caja{background:#FBF4E9;border-radius:12px;max-width:480px;width:100%;max-height:85vh;' +
+    'overflow-y:auto;padding:28px;position:relative;}' +
+    '.mt-caja h3{margin:0 0 14px;color:#17233F;}' +
+    '.mt-caja img{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;}' +
+    '.mt-caja .btn-cerrar{position:absolute;top:10px;right:10px;background:none;border:none;' +
+    'font-size:20px;cursor:pointer;color:#17233F;line-height:1;padding:6px;}';
+  document.head.appendChild(s);
+})();
+
+var MODAL_TALLAS_HTML =
+  '<div id="modal-tallas"><div class="mt-caja">' +
+    '<button type="button" class="btn-cerrar" id="btn-cerrar-tallas">✕</button>' +
+    '<div id="mt-contenido"></div>' +
+  '</div></div>';
+document.body.insertAdjacentHTML('beforeend', MODAL_TALLAS_HTML);
+document.getElementById('btn-cerrar-tallas').addEventListener('click', cerrarModalTallas);
+document.getElementById('modal-tallas').addEventListener('click', function(e){ if (e.target === this) cerrarModalTallas(); });
+
+function abrirModalTallas(nombreProducto, guiaTallas) {
+  var esImagen = /^https?:\/\/.+\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(guiaTallas || '');
+  document.getElementById('mt-contenido').innerHTML =
+    '<h3>Guía de tallas' + (nombreProducto ? ' · ' + escapeHtml(nombreProducto) : '') + '</h3>' +
+    (esImagen
+      ? '<img src="' + escapeHtml(guiaTallas) + '" alt="Guía de tallas">'
+      : '<p>' + escapeHtml(guiaTallas) + '</p>');
+  document.getElementById('modal-tallas').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalTallas() {
+  document.getElementById('modal-tallas').classList.remove('on');
+  // No tocar overflow si el modal de detalle sigue abierto debajo.
+  var detalle = document.getElementById('modal-detalle');
+  if (!detalle || detalle.style.display !== 'block') document.body.style.overflow = '';
+}
+
 // Artículos actualmente pintados en el grid — el modal de detalle/presupuesto
 // busca ahí por id cuando se hace clic en una tarjeta.
 var ARTICULOS_MOSTRADOS = [];
@@ -31,7 +88,8 @@ function renderGridEn(containerId, lista, mensajeVacio) {
 
   cont.innerHTML = lista.map(function(a){
     var img = a.imagen_principal_url
-      ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" loading="lazy">'
+      ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" loading="lazy" ' +
+        'onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'Sin imagen\'}));">'
       : '<span>Sin imagen</span>';
     var desc = a.descripcion_corta || a.descripcion || '';
     return (
@@ -161,7 +219,7 @@ function renderColoresSwatches(coloresResueltos) {
 
     var clase = 'color-swatch' + (sinMatch ? ' color-swatch--sin-match' : '') + (estampado ? ' color-swatch--estampado' : '');
     return '<span class="' + clase + '" style="' + estiloExtra + '" title="' + escapeHtml(c.nombre) + '"' +
-      ' role="radio" aria-checked="false" tabindex="0" data-color-nombre="' + escapeHtml(c.nombre) + '"></span>';
+      ' role="radio" aria-checked="false" tabindex="0" aria-label="' + escapeHtml(c.nombre) + '" data-color-nombre="' + escapeHtml(c.nombre) + '"></span>';
   }).join('');
 
   return '<div class="md-colores"><span class="md-colores-label">Color</span><div class="md-colores-lista" id="md-colores-lista">' + swatches + '</div></div>';
@@ -202,7 +260,8 @@ function abrirModalDetalle(articuloId) {
   if (!a) return;
 
   var img = a.imagen_principal_url
-    ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '">'
+    ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" ' +
+      'onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'Sin imagen\'}));">'
     : '<span>Sin imagen</span>';
 
   var atributos = [
@@ -212,7 +271,6 @@ function abrirModalDetalle(articuloId) {
     ['Formato', a.formato],
     ['Acabados', a.acabados],
     ['Personalización', a.tecnicas_personalizacion && a.tecnicas_personalizacion.length ? a.tecnicas_personalizacion.join(', ') : null],
-    ['Guía de tallas', a.guia_tallas],
   ].filter(function(par){ return !!par[1]; });
 
   var atributosHtml = atributos.length
@@ -223,6 +281,8 @@ function abrirModalDetalle(articuloId) {
 
   var coloresHtml = renderColoresSwatches(a.colores_resueltos);
   var tallaHtml = renderTallaSelect(a.tallas);
+  var guiaTallasHtml = a.guia_tallas
+    ? '<button type="button" class="btn-guia-tallas" id="btn-guia-tallas">📏 Guía de tallas</button>' : '';
   COLOR_SELECCIONADO = null;
   TALLA_SELECCIONADA = null;
 
@@ -237,12 +297,17 @@ function abrirModalDetalle(articuloId) {
       (desc ? '<p class="md-desc">' + escapeHtml(desc) + '</p>' : '') +
       coloresHtml +
       tallaHtml +
+      guiaTallasHtml +
       atributosHtml +
       '<div class="md-calc" id="md-calc"></div>' +
       '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
     '</div>';
 
   document.getElementById('btn-cerrar-detalle').addEventListener('click', cerrarModalDetalle);
+  var btnGuiaTallas = document.getElementById('btn-guia-tallas');
+  if (btnGuiaTallas) {
+    btnGuiaTallas.addEventListener('click', function(){ abrirModalTallas(a.nombre, a.guia_tallas); });
+  }
   activarSelectorColores();
   var tallaSelect = document.getElementById('md-talla-select');
   if (tallaSelect) {
