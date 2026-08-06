@@ -88,6 +88,42 @@
 .field-hint{font-size:11px;color:#aaa;margin-top:3px;}
 input[type="color"]{padding:4px;height:38px;cursor:pointer;}
 
+/* REDES SOCIALES (generador de contenido con IA) */
+.rs-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.rs-tab{font-size:12px;font-weight:700;padding:8px 14px;border-radius:20px;border:1px solid #E0DDD6;background:transparent;color:#17233F;cursor:pointer;}
+.rs-tab.active{background:#17233F;color:#fff;border-color:#17233F;}
+.rs-panel{display:none;}
+.rs-panel.active{display:block;}
+.rs-feed{max-width:440px;display:flex;flex-direction:column;gap:20px;}
+.rs-feed-empty{font-size:13px;color:#888;}
+.rs-post-card{background:#fff;border:1px solid #E0DDD6;border-radius:10px;overflow:hidden;position:relative;}
+.rs-post-del{position:absolute;top:8px;right:8px;z-index:2;width:24px;height:24px;border-radius:50%;background:rgba(23,35,63,.75);color:#fff;border:none;font-size:13px;cursor:pointer;}
+.rs-post-head{display:flex;align-items:center;gap:8px;padding:10px 12px;font-weight:700;font-size:13px;}
+.rs-post-img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+.rs-post-body{padding:12px;}
+.rs-post-body p{font-size:13px;white-space:pre-line;margin:0 0 6px;}
+.rs-post-tags{font-size:13px;color:#2F8FEA;}
+.rs-post-copy-row{display:flex;justify-content:flex-end;padding:8px 12px;}
+.rs-wa-head{background:#25D366;color:#fff;padding:8px 12px;font-weight:700;font-size:13px;}
+.rs-wa-wrap{background:#ECE5DD;padding:12px;}
+.rs-wa-bubble{background:#fff;border-radius:10px;padding:8px;box-shadow:0 1px 2px rgba(0,0,0,.1);}
+.rs-wa-bubble img{width:100%;border-radius:6px;margin-bottom:8px;display:block;}
+.rs-wa-bubble p{font-size:13px;white-space:pre-line;margin:0;}
+.rs-gallery{max-width:440px;}
+.rs-gallery-hint{font-size:11px;color:#888;margin-bottom:10px;}
+.rs-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.rs-gallery-item{position:relative;aspect-ratio:1/1;border-radius:8px;overflow:hidden;background:#eee;}
+.rs-gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.rs-gallery-used{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:#25D366;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.rs-gen-preview{width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:12px;display:none;}
+.rs-gen-status{font-size:12px;color:#888;text-align:center;margin-top:8px;min-height:16px;}
+.rs-result-block{background:#F4F1E6;border-left:4px solid #E3A29C;border-radius:6px;padding:12px;margin-bottom:10px;}
+.rs-result-block .rs-rb-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.rs-result-block .rs-rb-label{font-size:11px;font-weight:800;text-transform:uppercase;color:#E3A29C;}
+.rs-result-block p{font-size:13px;white-space:pre-line;margin:0;}
+.rs-copy-btn{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #ccc;background:#F4F1E6;color:#17233F;cursor:pointer;}
+.rs-copy-btn.copied{background:#93ACA7;color:#fff;border-color:#93ACA7;}
+
 /* COLOR SWATCHES */
 .color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
 .color-row{display:flex;align-items:center;gap:10px;padding:10px;background:#FAFAF8;border:1px solid #E0DDD6;}
@@ -295,6 +331,9 @@ input[type="file"]{display:none;}
       <div class="sb-lbl">Ajustes generales</div>
       <div class="sb-item" data-action="show" data-panel="colores-globales"><span>🌈</span> Colores y tipografías</div>
       <div class="sb-item" data-action="show" data-panel="ajustes"><span>⚙️</span> Ajustes</div>
+      <hr class="sb-div">
+      <div class="sb-lbl">Redes sociales</div>
+      <div class="sb-item" data-action="show" data-panel="redes-sociales"><span>📱</span> Generador de contenido</div>
     </nav>
 
     <div class="main">
@@ -616,11 +655,74 @@ input[type="file"]{display:none;}
         </div>
       </div>
 
+      <!-- ══════════ REDES SOCIALES (generador de contenido con IA) ══════════ -->
+      <div class="panel" id="panel-redes-sociales">
+        <div class="panel-title">Redes sociales · Generador de contenido</div>
+        <div class="panel-desc">Genera copy para Instagram, LinkedIn, WhatsApp y Stories a partir de una imagen de inspiración, con Claude. Bendito Lab (B2B) y Dilo Bonito (B2C).</div>
+
+        <div class="rs-tabs">
+          <button class="rs-tab active" data-rs-tab="ig">Instagram</button>
+          <button class="rs-tab" data-rs-tab="li">LinkedIn</button>
+          <button class="rs-tab" data-rs-tab="wa">WhatsApp</button>
+          <button class="rs-tab" data-rs-tab="ai">🤖 Generador IA</button>
+          <button class="rs-tab" data-rs-tab="insp">Inspiración</button>
+        </div>
+
+        <div class="rs-panel active" data-rs-panel="ig"><div class="rs-feed" id="rs-feed-ig"></div></div>
+        <div class="rs-panel" data-rs-panel="li"><div class="rs-feed" id="rs-feed-li"></div></div>
+        <div class="rs-panel" data-rs-panel="wa"><div class="rs-feed" id="rs-feed-wa"></div></div>
+        <div class="rs-panel" data-rs-panel="insp"><div class="rs-gallery" id="rs-gallery"></div></div>
+
+        <div class="rs-panel" data-rs-panel="ai">
+          <div class="card" style="max-width:480px;">
+            <div class="card-title">🤖 Generador con IA</div>
+
+            <div class="field">
+              <label>Cuenta</label>
+              <select id="rs-gen-cuenta">
+                <option value="bendito_lab">Bendito Lab (B2B)</option>
+                <option value="dilobonito">Dilo Bonito (B2C)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Imagen de inspiración</label>
+              <input type="file" accept="image/*" id="rs-gen-file">
+            </div>
+            <img id="rs-gen-preview" class="rs-gen-preview">
+
+            <div class="field">
+              <label>Prompt</label>
+              <textarea id="rs-gen-prompt" placeholder="Se genera solo al subir la imagen. Puedes editarlo."></textarea>
+            </div>
+
+            <div class="field">
+              <label>Formato principal</label>
+              <select id="rs-gen-formato">
+                <option value="instagram">Post Instagram</option>
+                <option value="linkedin">Post LinkedIn</option>
+                <option value="stories">Stories</option>
+                <option value="whatsapp">Canal de WhatsApp</option>
+              </select>
+            </div>
+
+            <button class="save-btn" id="rs-gen-btn" data-action="rs-generate" style="width:100%;">Generar con IA</button>
+            <div class="rs-gen-status" id="rs-gen-status"></div>
+
+            <div id="rs-gen-result" style="display:none;margin-top:20px;padding-top:16px;border-top:1px dashed #E0DDD6;">
+              <div id="rs-gen-blocks"></div>
+              <button class="save-btn" data-action="rs-save-post" style="width:100%;margin-top:8px;">✓ Guardar en el archivo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script src="/js/bl-api.js"></script>
 <script src="/js/admin-1.js"></script>
+<script src="/js/bendito-app-1.js"></script>
 </body>
 </html>
