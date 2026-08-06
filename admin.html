@@ -713,11 +713,11 @@ input[type="file"]{display:none;}
               <div id="rs-gen-blocks"></div>
 
               <div class="field" style="margin-top:6px;">
-                <label>Arte final para publicar (opcional)</label>
+                <label>Logo / marca a superponer (opcional)</label>
                 <input type="file" accept="image/*" id="rs-gen-art-file">
-                <div class="field-hint">Si no subes nada, se publica con la imagen de inspiración. Súbelo si quieres un diseño propio (sin el logo de Bendito Lab, para otra marca, etc.) en vez de la foto de inspiración.</div>
+                <div class="field-hint">Si subes un logo (PNG con fondo transparente recomendado), se superpone en la esquina inferior derecha de la imagen antes de guardar el post — en vez del logo de Bendito Lab. Si no subes nada, se publica con la imagen de inspiración tal cual.</div>
               </div>
-              <img id="rs-gen-art-preview" class="rs-gen-preview">
+              <img id="rs-gen-art-preview" class="rs-gen-preview" style="max-height:100px;object-fit:contain;background:#F4F1E6;">
 
               <button class="save-btn" data-action="rs-save-post" style="width:100%;margin-top:8px;">✓ Guardar en el archivo</button>
             </div>

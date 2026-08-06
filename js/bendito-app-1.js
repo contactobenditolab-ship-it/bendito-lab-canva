@@ -11,7 +11,7 @@
     imageUrl: null,
     inspirationId: null,
     genResult: null,
-    artUrl: null,      // imagen final subida aparte, sustituye a imageUrl al guardar el post
+    logoInfo: null,     // { dataUrl } del logo a superponer, sin subir todavía
   };
 
   function el(id) { return document.getElementById(id); }
@@ -159,7 +159,7 @@
     var info = await fileToBase64(file);
     state.imageInfo = info;
     state.genResult = null;
-    state.artUrl = null;
+    state.logoInfo = null;
     el('rs-gen-result').style.display = 'none';
     el('rs-gen-art-file').value = '';
     el('rs-gen-art-preview').style.display = 'none';
@@ -189,19 +189,40 @@
   async function handleArtFileChange(e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
-
     var info = await fileToBase64(file);
+    state.logoInfo = info;
     el('rs-gen-art-preview').src = info.dataUrl;
     el('rs-gen-art-preview').style.display = 'block';
-    setGenStatus('Subiendo arte final…');
-    try {
-      var up = await BL_API.benditoPost({ accion: 'subirImagen', base64: info.base64, mediaType: info.mediaType, filename: 'arte-final' });
-      state.artUrl = up.url;
-      setGenStatus('✓ Arte final listo — se usará esta imagen al guardar.');
-    } catch (err) {
-      state.artUrl = null;
-      setGenStatus('Error subiendo el arte final: ' + err.message);
-    }
+    setGenStatus('✓ Logo listo — se superpondrá sobre la imagen al guardar.');
+  }
+
+  function loadImageEl(src) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  // Combina la imagen base con el logo (esquina inferior derecha) en un
+  // <canvas> y devuelve el PNG resultante listo para subir.
+  async function composeImageWithLogo(baseDataUrl, logoDataUrl) {
+    var base = await loadImageEl(baseDataUrl);
+    var logo = await loadImageEl(logoDataUrl);
+    var canvas = document.createElement('canvas');
+    canvas.width = base.naturalWidth;
+    canvas.height = base.naturalHeight;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(base, 0, 0, canvas.width, canvas.height);
+
+    var margin = canvas.width * 0.04;
+    var logoW = canvas.width * 0.22;
+    var logoH = logoW * (logo.naturalHeight / logo.naturalWidth);
+    ctx.drawImage(logo, canvas.width - logoW - margin, canvas.height - logoH - margin, logoW, logoH);
+
+    var dataUrl = canvas.toDataURL('image/png');
+    return { base64: dataUrl.split(',')[1], mediaType: 'image/png' };
   }
 
   async function handleGenerate() {
@@ -255,12 +276,28 @@
     var isDilo = cuenta === 'dilobonito';
     var prompt = el('rs-gen-prompt').value;
     var r = state.genResult;
+    var saveBtn = document.querySelector('[data-action="rs-save-post"]');
+
+    var finalImageUrl = state.imageUrl;
+    if (state.logoInfo) {
+      saveBtn.disabled = true;
+      setGenStatus('Componiendo logo sobre la imagen…');
+      try {
+        var composed = await composeImageWithLogo(state.imageInfo.dataUrl, state.logoInfo.dataUrl);
+        var up = await BL_API.benditoPost({ accion: 'subirImagen', base64: composed.base64, mediaType: composed.mediaType, filename: 'post-con-logo' });
+        finalImageUrl = up.url;
+      } catch (err) {
+        saveBtn.disabled = false;
+        setGenStatus('Error al superponer el logo: ' + err.message);
+        return;
+      }
+    }
 
     var post = {
       cuenta: cuenta,
       handle: isDilo ? 'dilobonito.es' : 'bendito_lab',
       sub: prompt.slice(0, 60),
-      image_url: state.artUrl || state.imageUrl,
+      image_url: finalImageUrl,
       ig_caption: r.caption_ig,
       ig_hashtags: r.hashtags_ig,
       li_name: isDilo ? 'Dilo Bonito' : 'Bendito Lab',
@@ -281,6 +318,8 @@
       switchTab('ig');
     } catch (e) {
       setGenStatus('Error al guardar el post: ' + e.message);
+    } finally {
+      saveBtn.disabled = false;
     }
   }
 
@@ -289,7 +328,7 @@
     state.imageUrl = null;
     state.inspirationId = null;
     state.genResult = null;
-    state.artUrl = null;
+    state.logoInfo = null;
     el('rs-gen-file').value = '';
     el('rs-gen-preview').style.display = 'none';
     el('rs-gen-prompt').value = '';
