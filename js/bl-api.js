@@ -4,12 +4,12 @@
   const TOKEN_KEY = 'bl_session_token';
 
   function getToken() {
-    return sessionStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY);
   }
 
   function setToken(token) {
-    if (token) sessionStorage.setItem(TOKEN_KEY, token);
-    else sessionStorage.removeItem(TOKEN_KEY);
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
   }
 
   function authHeaders(extra) {
