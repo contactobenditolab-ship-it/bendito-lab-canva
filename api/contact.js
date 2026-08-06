@@ -33,9 +33,9 @@ function valorUtil(v) {
 }
 
 const NEWSLETTER_POR_TIPO = {
-  evento: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
-  empresa: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
-  colaborador: { url: 'https://www.benditolab.com/newsletter-colaboradores.html', etiqueta: 'colaboradores' },
+  eventos: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
+  b2b: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
+  colaboradores: { url: 'https://www.benditolab.com/newsletter-colaboradores.html', etiqueta: 'colaboradores' },
 };
 
 async function enviarEmailResend(payload) {
@@ -76,7 +76,7 @@ async function enviarContactoEmail(data) {
 
   // Confirmación al visitante: además de avisar que hemos recibido su
   // mensaje, le enlazamos la newsletter que corresponde según haya
-  // marcado "evento" o "empresa" en el formulario.
+  // marcado "eventos", "b2b" o "colaboradores" en el formulario.
   if (esEmailValido(data.email)) {
     const newsletter = NEWSLETTER_POR_TIPO[data.tipo_contacto];
     if (newsletter) {
