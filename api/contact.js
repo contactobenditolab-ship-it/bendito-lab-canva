@@ -32,10 +32,13 @@ function valorUtil(v) {
   return v && v !== '-' ? v : '';
 }
 
+// La newsletter de colaboradores NO va aquí a propósito: solo debe
+// enviarse cuando la solicitud llega desde el formulario "Únete"
+// (type === 'colaborador', ver enviarColaboradorConfirmacion), no desde
+// el formulario general de contacto aunque el visitante marque esa opción.
 const NEWSLETTER_POR_TIPO = {
   eventos: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
   b2b: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
-  colaboradores: { url: 'https://www.benditolab.com/newsletter-colaboradores.html', etiqueta: 'colaboradores' },
 };
 
 async function enviarEmailResend(payload) {
@@ -76,7 +79,9 @@ async function enviarContactoEmail(data) {
 
   // Confirmación al visitante: además de avisar que hemos recibido su
   // mensaje, le enlazamos la newsletter que corresponde según haya
-  // marcado "eventos", "b2b" o "colaboradores" en el formulario.
+  // marcado "eventos" o "b2b" en el formulario. La opción "colaboradores"
+  // no enlaza newsletter aquí: esa solo se envía desde el formulario
+  // Únete (ver enviarColaboradorConfirmacion).
   if (esEmailValido(data.email)) {
     const newsletter = NEWSLETTER_POR_TIPO[data.tipo_contacto];
     if (newsletter) {
