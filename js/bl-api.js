@@ -223,26 +223,3 @@
     syncRecordatorioToCalendar,
   });
 })();
-
-// ── BENDITO APP (generador de contenido con IA) ─────────
-(function () {
-  async function benditoGet(tipo) {
-    const r = await fetch('/api/bendito?tipo=' + encodeURIComponent(tipo), { headers: BL_API.authHeaders() });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d;
-  }
-
-  async function benditoPost(body) {
-    const r = await fetch('/api/bendito', {
-      method: 'POST',
-      headers: BL_API.authHeaders(),
-      body: JSON.stringify(body),
-    });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d;
-  }
-
-  Object.assign(window.BL_API, { benditoGet, benditoPost });
-})();

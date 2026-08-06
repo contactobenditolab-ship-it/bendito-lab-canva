@@ -22,14 +22,6 @@
       "continue": true
     },
     {
-      "src": "/bendito-app(\\.html)?",
-      "headers": {
-        "X-Robots-Tag": "noindex, nofollow",
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.public.blob.vercel-storage.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
-      },
-      "continue": true
-    },
-    {
       "src": "/area-clientes(\\.html)?",
       "headers": { "X-Robots-Tag": "noindex, nofollow" },
       "continue": true
@@ -91,10 +83,6 @@
     {
       "src": "/admin",
       "dest": "/admin.html"
-    },
-    {
-      "src": "/bendito-app",
-      "dest": "/bendito-app.html"
     },
     {
       "src": "/newsletter-colaboradores",
