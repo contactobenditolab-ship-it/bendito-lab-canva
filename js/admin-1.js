@@ -355,6 +355,9 @@ var EDITOR_PAGINAS = [
   {archivo:'articulo-personalizacion-directo-empresa.html',nombre:'Art. Personalización en empresa',   color:'#E8C24A', grupo:'Newsletter'},
   {archivo:'articulo-regalo-corporativo.html',              nombre:'Art. Regalo corporativo',           color:'#E8C24A', grupo:'Newsletter'},
   {archivo:'articulo-packs-estacionales.html',              nombre:'Art. Packs estacionales',           color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-comision-evento.html',                 nombre:'Art. Comisión por evento',          color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-servicio-exclusivo.html',              nombre:'Art. Servicio exclusivo',           color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'articulo-cero-gestion.html',                    nombre:'Art. Cero gestión',                 color:'#E8C24A', grupo:'Newsletter'},
 ];
 var editorActiveIdx=0;
 
