@@ -302,7 +302,11 @@ input[type="file"]{display:none;}
         <h1 id="editor-pagename">Portada</h1>
         <span class="editor-hint">— haz clic en cualquier foto, texto o color para editarlo</span>
       </div>
-      <a id="editor-open-tab" href="#" target="_blank" style="font-size:12px;font-weight:700;color:#2F8FEA;white-space:nowrap;">Ver en pestaña nueva↗</a>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <span id="editor-save-status" style="font-size:12px;font-weight:700;white-space:nowrap;color:#5A6470;">Sin cambios todavía</span>
+        <button id="editor-verify-save" title="Recarga la página desde el servidor para confirmar que los últimos cambios quedaron guardados" style="font-size:12px;font-weight:700;color:#17233F;background:#FBF4E9;border:1px solid #E3DFCF;border-radius:8px;padding:7px 14px;cursor:pointer;white-space:nowrap;">↻ Comprobar guardado</button>
+        <a id="editor-open-tab" href="#" target="_blank" style="font-size:12px;font-weight:700;color:#2F8FEA;white-space:nowrap;">Ver en pestaña nueva↗</a>
+      </div>
     </div>
     <iframe id="editor-frame" title="Vista editable"></iframe>
   </main>
