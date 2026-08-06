@@ -347,6 +347,7 @@ var EDITOR_PAGINAS = [
   {archivo:'area-clientes.html',nombre:'Área Clientes',     color:'#E2704A'},
   {archivo:'newsletter-eventos.html',                      nombre:'Newsletter · Eventos',              color:'#E8C24A', grupo:'Newsletter'},
   {archivo:'newsletter-empresas.html',                     nombre:'Newsletter · Empresas',             color:'#E8C24A', grupo:'Newsletter'},
+  {archivo:'newsletter-colaboradores.html',                nombre:'Newsletter · Colaboradores',        color:'#E8C24A', grupo:'Newsletter'},
   {archivo:'articulo-stand-boda.html',                     nombre:'Art. Stand en boda',                color:'#E8C24A', grupo:'Newsletter'},
   {archivo:'articulo-elige-articulos.html',                nombre:'Art. Elige artículos',              color:'#E8C24A', grupo:'Newsletter'},
   {archivo:'articulo-uniformes.html',                      nombre:'Art. Uniformes',                    color:'#E8C24A', grupo:'Newsletter'},
