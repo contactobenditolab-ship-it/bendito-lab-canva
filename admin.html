@@ -711,6 +711,14 @@ input[type="file"]{display:none;}
 
             <div id="rs-gen-result" style="display:none;margin-top:20px;padding-top:16px;border-top:1px dashed #E0DDD6;">
               <div id="rs-gen-blocks"></div>
+
+              <div class="field" style="margin-top:6px;">
+                <label>Arte final para publicar (opcional)</label>
+                <input type="file" accept="image/*" id="rs-gen-art-file">
+                <div class="field-hint">Si no subes nada, se publica con la imagen de inspiración. Súbelo si quieres un diseño propio (sin el logo de Bendito Lab, para otra marca, etc.) en vez de la foto de inspiración.</div>
+              </div>
+              <img id="rs-gen-art-preview" class="rs-gen-preview">
+
               <button class="save-btn" data-action="rs-save-post" style="width:100%;margin-top:8px;">✓ Guardar en el archivo</button>
             </div>
           </div>

@@ -11,6 +11,7 @@
     imageUrl: null,
     inspirationId: null,
     genResult: null,
+    artUrl: null,      // imagen final subida aparte, sustituye a imageUrl al guardar el post
   };
 
   function el(id) { return document.getElementById(id); }
@@ -158,7 +159,10 @@
     var info = await fileToBase64(file);
     state.imageInfo = info;
     state.genResult = null;
+    state.artUrl = null;
     el('rs-gen-result').style.display = 'none';
+    el('rs-gen-art-file').value = '';
+    el('rs-gen-art-preview').style.display = 'none';
     el('rs-gen-preview').src = info.dataUrl;
     el('rs-gen-preview').style.display = 'block';
     setGenStatus('Subiendo imagen…');
@@ -179,6 +183,24 @@
       setGenStatus('✓ Prompt sugerido — edítalo si quieres.');
     } catch (err) {
       setGenStatus('Error: ' + err.message);
+    }
+  }
+
+  async function handleArtFileChange(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    var info = await fileToBase64(file);
+    el('rs-gen-art-preview').src = info.dataUrl;
+    el('rs-gen-art-preview').style.display = 'block';
+    setGenStatus('Subiendo arte final…');
+    try {
+      var up = await BL_API.benditoPost({ accion: 'subirImagen', base64: info.base64, mediaType: info.mediaType, filename: 'arte-final' });
+      state.artUrl = up.url;
+      setGenStatus('✓ Arte final listo — se usará esta imagen al guardar.');
+    } catch (err) {
+      state.artUrl = null;
+      setGenStatus('Error subiendo el arte final: ' + err.message);
     }
   }
 
@@ -238,7 +260,7 @@
       cuenta: cuenta,
       handle: isDilo ? 'dilobonito.es' : 'bendito_lab',
       sub: prompt.slice(0, 60),
-      image_url: state.imageUrl,
+      image_url: state.artUrl || state.imageUrl,
       ig_caption: r.caption_ig,
       ig_hashtags: r.hashtags_ig,
       li_name: isDilo ? 'Dilo Bonito' : 'Bendito Lab',
@@ -267,10 +289,13 @@
     state.imageUrl = null;
     state.inspirationId = null;
     state.genResult = null;
+    state.artUrl = null;
     el('rs-gen-file').value = '';
     el('rs-gen-preview').style.display = 'none';
     el('rs-gen-prompt').value = '';
     el('rs-gen-result').style.display = 'none';
+    el('rs-gen-art-file').value = '';
+    el('rs-gen-art-preview').style.display = 'none';
   }
 
   // ── WIRING ─────────────────────────────────────────────
@@ -281,6 +306,7 @@
       b.addEventListener('click', function () { switchTab(b.dataset.rsTab); });
     });
     el('rs-gen-file').addEventListener('change', handleFileChange);
+    el('rs-gen-art-file').addEventListener('change', handleArtFileChange);
     el('rs-gen-btn').addEventListener('click', handleGenerate);
     document.querySelector('[data-action="rs-save-post"]').addEventListener('click', handleSavePost);
 
