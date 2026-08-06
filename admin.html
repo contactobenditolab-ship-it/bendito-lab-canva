@@ -111,6 +111,8 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer;}
 .rs-folder-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;max-width:440px;}
 .rs-folder-bar label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#888;}
 .rs-folder-bar select{flex:1;padding:8px 10px;border:1.5px solid #E0DDD6;background:#FAFAF8;font-size:13px;color:#222;}
+.rs-checkbox-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#17233F;text-transform:none;letter-spacing:0;cursor:pointer;}
+.rs-checkbox-label input{width:auto;}
 .rs-wa-head{background:#25D366;color:#fff;padding:8px 12px;font-weight:700;font-size:13px;}
 .rs-wa-wrap{background:#ECE5DD;padding:12px;}
 .rs-wa-bubble{background:#fff;border-radius:10px;padding:8px;box-shadow:0 1px 2px rgba(0,0,0,.1);}
@@ -723,6 +725,21 @@ input[type="file"]{display:none;}
               <input type="text" id="rs-gen-carpeta" placeholder="Ej: Boda García, Campaña Navidad…" list="rs-carpetas-list">
               <datalist id="rs-carpetas-list"></datalist>
               <div class="field-hint">Para agrupar por cliente, proyecto o campaña. Podrás filtrar por ella en el archivo.</div>
+            </div>
+
+            <div class="field">
+              <label class="rs-checkbox-label"><input type="checkbox" id="rs-gen-web-toggle"> También subir esta imagen a la página web</label>
+            </div>
+            <div id="rs-web-fields" style="display:none;">
+              <div class="field">
+                <label>Sección de la web</label>
+                <select id="rs-gen-web-grupo"></select>
+              </div>
+              <div class="field">
+                <label>Foto a sustituir</label>
+                <select id="rs-gen-web-slot"></select>
+                <div class="field-hint">Sustituye esa foto por la imagen final del post (con el logo superpuesto, si has subido uno). Se aplica al guardar y tarda ~30s en verse en la web.</div>
+              </div>
             </div>
 
             <button class="save-btn" id="rs-gen-btn" data-action="rs-generate" style="width:100%;">Generar con IA</button>

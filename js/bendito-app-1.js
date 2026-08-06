@@ -331,17 +331,40 @@
     var saveBtn = document.querySelector('[data-action="rs-save-post"]');
 
     var finalImageUrl = state.imageUrl;
+    var finalImageDataUrl = state.imageInfo.dataUrl;
     if (state.logoInfo) {
       saveBtn.disabled = true;
       setGenStatus('Componiendo logo sobre la imagen…');
       try {
         var composed = await composeImageWithLogo(state.imageInfo.dataUrl, state.logoInfo.dataUrl);
+        finalImageDataUrl = 'data:' + composed.mediaType + ';base64,' + composed.base64;
         var up = await BL_API.benditoPost({ accion: 'subirImagen', base64: composed.base64, mediaType: composed.mediaType, filename: 'post-con-logo' });
         finalImageUrl = up.url;
       } catch (err) {
         saveBtn.disabled = false;
         setGenStatus('Error al superponer el logo: ' + err.message);
         return;
+      }
+    }
+
+    if (el('rs-gen-web-toggle').checked) {
+      var slotPath = el('rs-gen-web-slot').value;
+      if (slotPath) {
+        saveBtn.disabled = true;
+        setGenStatus('Subiendo imagen a la página web…');
+        try {
+          var webRes = await fetch('/api/upload-image', {
+            method: 'POST',
+            headers: BL_API.authHeaders(),
+            body: JSON.stringify({ path: slotPath, dataUrl: finalImageDataUrl }),
+          });
+          var webData = await webRes.json();
+          if (!webData.ok) throw new Error(webData.error || 'Error al subir la imagen a la web');
+        } catch (err) {
+          saveBtn.disabled = false;
+          setGenStatus('Error al subir a la web: ' + err.message);
+          return;
+        }
       }
     }
 
@@ -389,6 +412,36 @@
     el('rs-gen-art-file').value = '';
     el('rs-gen-art-preview').style.display = 'none';
     el('rs-gen-carpeta').value = '';
+    el('rs-gen-web-toggle').checked = false;
+    el('rs-web-fields').style.display = 'none';
+  }
+
+  // ── SUBIR A LA WEB (reutiliza IMG_GROUPS, definido en js/admin-1.js) ───
+  var WEB_GROUP_LABELS = {
+    logos: 'Logos',
+    portada_carrusel: 'Portada',
+    db_carrusel: 'Dilo Bonito — Galería',
+    dilo_bonito: 'Dilo Bonito — Servicios',
+    colaboradores: 'Colaboradores',
+    bendito_lab: 'Bendito Lab — Productos',
+  };
+
+  function populateWebGroupSelect() {
+    var groups = (typeof IMG_GROUPS !== 'undefined') ? IMG_GROUPS : {};
+    var select = el('rs-gen-web-grupo');
+    select.innerHTML = Object.keys(groups).map(function (g) {
+      return '<option value="' + esc(g) + '">' + esc(WEB_GROUP_LABELS[g] || g) + '</option>';
+    }).join('');
+    populateWebSlotSelect();
+  }
+
+  function populateWebSlotSelect() {
+    var groups = (typeof IMG_GROUPS !== 'undefined') ? IMG_GROUPS : {};
+    var grupo = el('rs-gen-web-grupo').value;
+    var items = groups[grupo] || [];
+    el('rs-gen-web-slot').innerHTML = items.map(function (it) {
+      return '<option value="' + esc(it.path) + '">' + esc(it.name) + '</option>';
+    }).join('');
   }
 
   // ── WIRING ─────────────────────────────────────────────
@@ -402,6 +455,11 @@
     el('rs-gen-art-file').addEventListener('change', handleArtFileChange);
     el('rs-gen-btn').addEventListener('click', handleGenerate);
     document.querySelector('[data-action="rs-save-post"]').addEventListener('click', handleSavePost);
+    populateWebGroupSelect();
+    el('rs-gen-web-grupo').addEventListener('change', populateWebSlotSelect);
+    el('rs-gen-web-toggle').addEventListener('change', function (e) {
+      el('rs-web-fields').style.display = e.target.checked ? 'block' : 'none';
+    });
     el('rs-folder-filter').addEventListener('change', function (e) {
       state.folderFilter = e.target.value;
       renderAllFeeds();
