@@ -12,6 +12,8 @@
     inspirationId: null,
     genResult: null,
     logoInfo: null,     // { dataUrl } del logo a superponer, sin subir todavía
+    allPosts: [],
+    folderFilter: '',
   };
 
   function el(id) { return document.getElementById(id); }
@@ -29,6 +31,7 @@
     document.querySelectorAll('.rs-panel').forEach(function (p) {
       p.classList.toggle('active', p.dataset.rsPanel === tab);
     });
+    el('rs-folder-bar').style.display = (tab === 'ig' || tab === 'li' || tab === 'wa') ? 'flex' : 'none';
   }
 
   function ensureLoaded() {
@@ -43,16 +46,40 @@
     ['ig', 'li', 'wa'].forEach(function (ch) {
       el('rs-feed-' + ch).innerHTML = '<p class="rs-feed-empty">Cargando…</p>';
     });
-    var posts;
     try {
       var d = await BL_API.benditoGet('posts');
-      posts = d.data || [];
+      state.allPosts = d.data || [];
     } catch (e) {
       ['ig', 'li', 'wa'].forEach(function (ch) {
         el('rs-feed-' + ch).innerHTML = '<p class="rs-feed-empty">Error cargando publicaciones: ' + esc(e.message) + '</p>';
       });
       return;
     }
+    renderFolderFilter();
+    renderAllFeeds();
+  }
+
+  function renderFolderFilter() {
+    var carpetas = [];
+    state.allPosts.forEach(function (p) {
+      if (p.carpeta && carpetas.indexOf(p.carpeta) === -1) carpetas.push(p.carpeta);
+    });
+    carpetas.sort();
+
+    var select = el('rs-folder-filter');
+    var prev = state.folderFilter;
+    select.innerHTML = '<option value="">Todas las carpetas</option>' +
+      carpetas.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+    select.value = carpetas.indexOf(prev) !== -1 ? prev : '';
+    state.folderFilter = select.value;
+
+    el('rs-carpetas-list').innerHTML = carpetas.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
+  }
+
+  function renderAllFeeds() {
+    var posts = state.folderFilter
+      ? state.allPosts.filter(function (p) { return p.carpeta === state.folderFilter; })
+      : state.allPosts;
     ['ig', 'li', 'wa'].forEach(function (ch) { renderFeed(ch, posts); });
   }
 
@@ -69,6 +96,18 @@
     box.querySelectorAll('[data-copy-text]').forEach(function (btn) {
       btn.addEventListener('click', function () { copyToClipboard(btn.dataset.copyText, btn); });
     });
+    box.querySelectorAll('[data-publish-id]').forEach(function (btn) {
+      btn.addEventListener('click', function () { togglePublicado(btn.dataset.publishId, btn.dataset.publicado !== 'true'); });
+    });
+  }
+
+  function metaRowHtml(p) {
+    var publicado = !!p.publicado;
+    return '<div class="rs-post-meta">' +
+      (p.carpeta ? '<span class="rs-folder-badge">' + esc(p.carpeta) + '</span>' : '') +
+      '<button class="rs-publish-toggle' + (publicado ? ' on' : '') + '" data-publish-id="' + p.id + '" data-publicado="' + publicado + '">' +
+      (publicado ? '✓ Publicado' : 'Marcar como publicado') + '</button>' +
+      '</div>';
   }
 
   function postCardHtml(channel, p) {
@@ -81,6 +120,7 @@
         '<p>' + esc(p.wa_text || '(sin copy de WhatsApp)') + '</p>' +
         '</div></div>' +
         '<div class="rs-post-copy-row"><button class="rs-copy-btn" data-copy-text="' + esc(p.wa_text || '') + '">Copiar copy</button></div>' +
+        metaRowHtml(p) +
         '</div>';
     }
     var isIg = channel === 'ig';
@@ -93,6 +133,7 @@
       '<img class="rs-post-img" src="' + esc(p.image_url) + '">' +
       '<div class="rs-post-body"><p>' + esc(caption) + '</p><p class="rs-post-tags">' + esc(hashtags) + '</p></div>' +
       '<div class="rs-post-copy-row"><button class="rs-copy-btn" data-copy-text="' + esc(full) + '">Copiar copy</button></div>' +
+      metaRowHtml(p) +
       '</div>';
   }
 
@@ -103,6 +144,17 @@
       loadFeeds();
     } catch (e) {
       alert('Error al eliminar: ' + e.message);
+    }
+  }
+
+  async function togglePublicado(id, publicado) {
+    try {
+      await BL_API.benditoPost({ accion: 'actualizarPost', id: id, publicado: publicado });
+      var p = state.allPosts.find(function (x) { return x.id === id; });
+      if (p) p.publicado = publicado;
+      renderAllFeeds();
+    } catch (e) {
+      alert('Error al actualizar: ' + e.message);
     }
   }
 
@@ -307,6 +359,7 @@
       wa_text: r.caption_wa,
       stories_text: r.stories_text,
       fecha: 'Generado con IA',
+      carpeta: el('rs-gen-carpeta').value.trim() || null,
     };
 
     try {
@@ -335,6 +388,7 @@
     el('rs-gen-result').style.display = 'none';
     el('rs-gen-art-file').value = '';
     el('rs-gen-art-preview').style.display = 'none';
+    el('rs-gen-carpeta').value = '';
   }
 
   // ── WIRING ─────────────────────────────────────────────
@@ -348,6 +402,10 @@
     el('rs-gen-art-file').addEventListener('change', handleArtFileChange);
     el('rs-gen-btn').addEventListener('click', handleGenerate);
     document.querySelector('[data-action="rs-save-post"]').addEventListener('click', handleSavePost);
+    el('rs-folder-filter').addEventListener('change', function (e) {
+      state.folderFilter = e.target.value;
+      renderAllFeeds();
+    });
 
     // Carga perezosa: la primera vez que se entra al panel "Redes sociales"
     // desde el sidebar (data-panel="redes-sociales").

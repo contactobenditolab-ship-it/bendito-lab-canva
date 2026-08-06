@@ -136,6 +136,7 @@ module.exports = async function handler(req, res) {
           wa_text: d.wa_text || null,
           stories_text: d.stories_text || null,
           fecha: d.fecha || null,
+          carpeta: d.carpeta ? String(d.carpeta).slice(0, 120) : null,
         };
         const { data, error } = await supabase.from('posts').insert(post).select().single();
         if (error) throw error;
@@ -152,6 +153,17 @@ module.exports = async function handler(req, res) {
         const { error } = await supabase.from('posts').delete().eq('id', id);
         if (error) throw error;
         return res.status(200).json({ ok: true });
+      }
+
+      if (accion === 'actualizarPost') {
+        const id = body.id;
+        if (!id) return res.status(400).json({ error: 'Falta id' });
+        const patch = {};
+        if (body.publicado !== undefined) patch.publicado = !!body.publicado;
+        if (body.carpeta !== undefined) patch.carpeta = body.carpeta ? String(body.carpeta).slice(0, 120) : null;
+        const { data, error } = await supabase.from('posts').update(patch).eq('id', id).select().single();
+        if (error) throw error;
+        return res.status(200).json({ ok: true, data });
       }
 
       return res.status(400).json({ error: 'Acción desconocida' });

@@ -19,6 +19,8 @@ create table if not exists posts (
   wa_text text,
   stories_text text,
   fecha text,
+  publicado boolean not null default false,
+  carpeta text,
   created_at timestamptz not null default now()
 );
 
