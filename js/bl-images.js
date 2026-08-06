@@ -126,6 +126,9 @@
   });
 
   function toast(msg, ok) {
+    try {
+      window.parent.postMessage({ type: 'bl-save-status', ok: ok !== false, msg: msg }, '*');
+    } catch (e) {}
     var t = document.getElementById('bl-edit-toast');
     if (!t) {
       t = document.createElement('div');
@@ -140,6 +143,12 @@
     t.style.opacity = '1';
     clearTimeout(t._hideTimer);
     t._hideTimer = setTimeout(function () { t.style.opacity = '0'; }, 2000);
+  }
+
+  function notifySaving() {
+    try {
+      window.parent.postMessage({ type: 'bl-save-status', saving: true }, '*');
+    } catch (e) {}
   }
 
   async function resizeImageToDataUrl(file, maxDim, quality) {
@@ -441,6 +450,7 @@
     if (!id) return;
     if (savingText[id] === text) return;
     savingText[id] = text;
+    notifySaving();
     fetch('/api/save-text', {
       method: 'POST',
       headers: BL_API.authHeaders(),
@@ -483,6 +493,7 @@
   }
 
   function saveColor(id, value) {
+    notifySaving();
     fetch('/api/save-color', {
       method: 'POST',
       headers: BL_API.authHeaders(),
@@ -550,6 +561,7 @@
 
   function saveLink(id, patch) {
     if (!id) return;
+    notifySaving();
     fetch('/api/save-color', {
       method: 'POST',
       headers: BL_API.authHeaders(),
@@ -670,6 +682,7 @@
         if (bitmap.close) bitmap.close();
 
         var dataUrl = await resizeImageToDataUrl(file);
+        notifySaving();
         var r = await fetch('/api/upload-image', {
           method: 'POST',
           headers: BL_API.authHeaders(),
@@ -782,6 +795,7 @@
     if (commit && reframeState[slot]) {
       var v = reframeState[slot];
       CONTENT.imageView[slot] = v;
+      notifySaving();
       fetch('/api/save-image-view', {
         method: 'POST',
         headers: BL_API.authHeaders(),

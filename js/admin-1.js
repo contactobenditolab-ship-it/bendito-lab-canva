@@ -407,8 +407,57 @@ function selectPagina(i){
   document.getElementById('editor-pagename').textContent=p.nombre;
   document.getElementById('editor-frame').src=p.archivo+'?admin=1';
   document.getElementById('editor-open-tab').href=p.archivo;
+  setSaveStatus('idle','Sin cambios todavía');
   if(window.innerWidth<=700) closeEditorSidebar();
 }
+
+// ── Estado de guardado del editor visual ──────────────────────────────
+// bl-images.js (dentro del iframe) avisa por postMessage cada vez que
+// empieza o termina de guardar un cambio (texto, color, enlace, imagen o
+// encuadre). No hay un guardado "pendiente" real que confirmar aquí: cada
+// campo se guarda solo, así que esto es solo el reflejo visual de eso.
+var saveStatusTimer=null;
+function setSaveStatus(kind,msg){
+  var el=document.getElementById('editor-save-status');
+  if(!el)return;
+  el.textContent=msg;
+  var colors={idle:'#5A6470',saving:'#E2704A',ok:'#27AE60',error:'#B3261E'};
+  el.style.color=colors[kind]||colors.idle;
+}
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d||d.type!=='bl-save-status')return;
+  clearTimeout(saveStatusTimer);
+  if(d.saving){
+    setSaveStatus('saving','Guardando…');
+    return;
+  }
+  if(d.ok===false){
+    setSaveStatus('error','⚠ ' + (d.msg||'Error al guardar'));
+    return;
+  }
+  setSaveStatus('ok','✓ Guardado ahora mismo');
+  saveStatusTimer=setTimeout(function(){
+    setSaveStatus('ok','✓ Todo guardado');
+  },3000);
+});
+document.addEventListener('DOMContentLoaded',function(){
+  var btn=document.getElementById('editor-verify-save');
+  if(!btn)return;
+  btn.addEventListener('click',function(){
+    var frame=document.getElementById('editor-frame');
+    if(!frame||!frame.src)return;
+    setSaveStatus('saving','Recargando desde el servidor…');
+    btn.disabled=true;
+    var url=frame.src.split('#')[0].split('&_v=')[0];
+    frame.src=url+(url.indexOf('?')>-1?'&':'?')+'_v='+Date.now();
+    frame.onload=function(){
+      btn.disabled=false;
+      setSaveStatus('ok','✓ Confirmado: así está guardado en el servidor');
+      frame.onload=null;
+    };
+  });
+});
 
 function toggleEditorSidebar(){
   var sb=document.getElementById('editor-sidebar');
