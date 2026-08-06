@@ -701,8 +701,9 @@ input[type="file"]{display:none;}
 
             <div class="field">
               <label>Imagen de inspiración</label>
-              <input type="file" accept="image/*" id="rs-gen-file">
             </div>
+            <label class="img-btn" for="rs-gen-file" style="display:inline-block;margin-bottom:14px;">📤 Elegir imagen</label>
+            <input type="file" accept="image/*" id="rs-gen-file">
             <img id="rs-gen-preview" class="rs-gen-preview">
 
             <div class="field">
@@ -750,10 +751,11 @@ input[type="file"]{display:none;}
 
               <div class="field" style="margin-top:6px;">
                 <label>Logo / marca a superponer (opcional)</label>
-                <input type="file" accept="image/*" id="rs-gen-art-file">
-                <div class="field-hint">Si subes un logo (PNG con fondo transparente recomendado), se superpone en la esquina inferior derecha de la imagen antes de guardar el post — en vez del logo de Bendito Lab. Si no subes nada, se publica con la imagen de inspiración tal cual.</div>
               </div>
-              <img id="rs-gen-art-preview" class="rs-gen-preview" style="max-height:100px;object-fit:contain;background:#F4F1E6;">
+              <label class="img-btn" for="rs-gen-art-file" style="display:inline-block;">📤 Elegir logo</label>
+              <input type="file" accept="image/*" id="rs-gen-art-file">
+              <div class="field-hint" style="margin-top:6px;">Si subes un logo (PNG con fondo transparente recomendado), se superpone en la esquina inferior derecha de la imagen antes de guardar el post — en vez del logo de Bendito Lab. Si no subes nada, se publica con la imagen de inspiración tal cual.</div>
+              <img id="rs-gen-art-preview" class="rs-gen-preview" style="max-height:100px;object-fit:contain;background:#F4F1E6;margin-top:10px;">
 
               <button class="save-btn" data-action="rs-save-post" style="width:100%;margin-top:8px;">✓ Guardar en el archivo</button>
             </div>
