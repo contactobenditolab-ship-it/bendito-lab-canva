@@ -70,6 +70,13 @@ module.exports = async function handler(req, res) {
   data.images = data.images || {};
   const prevUrl = data.images[path];
   data.images[path] = result.url;
+  // La foto nueva no tiene por qué encajar con el zoom/posición guardado
+  // para la foto anterior en este mismo hueco, así que se resetea aquí
+  // mismo: si esto se hiciera en una segunda petición a /api/save-image-view
+  // (como antes), su propio readContent()/writeContent() podía leer una
+  // copia todavía no propagada del content.json (el blob es público y pasa
+  // por CDN) y sobrescribir esta imagen recién subida con la versión vieja.
+  if (data.imageView && data.imageView[path]) delete data.imageView[path];
   data.updatedAt = new Date().toISOString();
   await writeContent(data);
 
