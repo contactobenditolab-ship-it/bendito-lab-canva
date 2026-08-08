@@ -5,7 +5,7 @@
 // redimensionado en el cliente (ver resizeImageToDataUrl en admin.html).
 const { put, del } = require('@vercel/blob');
 const { requireAuth } = require('../lib/auth');
-const { readContent, writeContent } = require('../lib/content-store');
+const { updateContent } = require('../lib/content-store');
 
 const MAX_BYTES = 4 * 1024 * 1024; // 4MB tras decodificar — deja margen bajo el límite de 4.5MB de body de Vercel
 const EXT_BY_MIME = {
@@ -66,12 +66,19 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'Error subiendo a Blob: ' + e.message });
   }
 
-  const data = await readContent();
-  data.images = data.images || {};
-  const prevUrl = data.images[path];
-  data.images[path] = result.url;
-  data.updatedAt = new Date().toISOString();
-  await writeContent(data);
+  var prevUrl;
+  await updateContent(function (data) {
+    data.images = data.images || {};
+    prevUrl = data.images[path];
+    data.images[path] = result.url;
+    // La foto nueva no tiene por qué encajar con el zoom/posición guardado
+    // para la foto anterior en este mismo hueco, así que se resetea aquí
+    // mismo: si esto se hiciera en una segunda petición a /api/save-image-view
+    // (como antes), su propio readContent()/writeContent() podía leer una
+    // copia todavía no propagada del content.json (el blob es público y pasa
+    // por CDN) y sobrescribir esta imagen recién subida con la versión vieja.
+    if (data.imageView && data.imageView[path]) delete data.imageView[path];
+  });
 
   if (prevUrl && prevUrl !== result.url) {
     del(prevUrl).catch(() => {});

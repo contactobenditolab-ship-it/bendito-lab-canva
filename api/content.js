@@ -1,6 +1,6 @@
 // GET  /api/content            — mapa público { images: { slotPath: blobUrl }, updatedAt }
 // POST /api/content (auth)     — { path, url } asigna/quita una entrada suelta (uso interno/manual)
-const { readContent, writeContent } = require('../lib/content-store');
+const { readContent, updateContent } = require('../lib/content-store');
 const { requireAuth } = require('../lib/auth');
 
 const { createClient } = require('@supabase/supabase-js');
@@ -47,13 +47,14 @@ module.exports = async function handler(req, res) {
     if (typeof path !== 'string' || !path) {
       return res.status(400).json({ error: 'Falta path' });
     }
-    const data = await readContent();
-    data.images = data.images || {};
-    if (url) data.images[path] = url;
-    else delete data.images[path];
-    data.updatedAt = new Date().toISOString();
-    await writeContent(data);
-    return res.status(200).json({ ok: true, images: data.images });
+    var images;
+    await updateContent(function (data) {
+      data.images = data.images || {};
+      if (url) data.images[path] = url;
+      else delete data.images[path];
+      images = data.images;
+    });
+    return res.status(200).json({ ok: true, images: images });
   }
 
   res.setHeader('Allow', 'GET, POST');

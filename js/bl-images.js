@@ -457,8 +457,18 @@
       body: JSON.stringify({ id: id, text: text })
     })
       .then(function (r) { return r.json(); })
-      .then(function (d) { toast(d.ok ? 'Guardado ✓' : ('Error: ' + d.error), d.ok); })
-      .catch(function () { toast('Error de conexión', false); });
+      .then(function (d) {
+        // Si falla, se limpia el guard: si no, reescribir exactamente el
+        // mismo texto tras un fallo no reintentaría el guardado (savingText
+        // seguiría marcando ese texto como "ya guardado" aunque el POST
+        // nunca tuvo éxito).
+        if (!d.ok && savingText[id] === text) delete savingText[id];
+        toast(d.ok ? 'Guardado ✓' : ('Error: ' + d.error), d.ok);
+      })
+      .catch(function () {
+        if (savingText[id] === text) delete savingText[id];
+        toast('Error de conexión', false);
+      });
   }
 
   // ── COLORES ──────────────────────────────────────────────────────────
@@ -695,14 +705,11 @@
         // La foto nueva no tiene por qué encajar con el zoom/posición que se
         // hubiera guardado para la foto anterior en este mismo hueco — sin
         // este reseteo, se seguía aplicando el encuadre viejo sobre la
-        // imagen nueva y se veía descuadrada o "rota".
+        // imagen nueva y se veía descuadrada o "rota". El reseteo en sí ya
+        // lo hace /api/upload-image en la misma escritura (ver ahí el porqué
+        // de no lanzar aquí una segunda petición a /api/save-image-view).
         img.style.transform = '';
         delete CONTENT.imageView[slot];
-        fetch('/api/save-image-view', {
-          method: 'POST',
-          headers: BL_API.authHeaders(),
-          body: JSON.stringify({ path: slot, s: 1, x: 0, y: 0 })
-        }).catch(function () {});
 
         if (tooSmall) {
           toast('Imagen actualizada, pero es más pequeña de lo ideal (' + needed.w + '×' + needed.h + ' px) y puede verse borrosa', true);

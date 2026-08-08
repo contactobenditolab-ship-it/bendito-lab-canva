@@ -425,6 +425,10 @@ function setSaveStatus(kind,msg){
   el.style.color=colors[kind]||colors.idle;
 }
 window.addEventListener('message',function(e){
+  // El editor solo carga páginas propias (mismo origen) en el iframe, así
+  // que cualquier mensaje de otro origen no puede venir de bl-images.js —
+  // se ignora para que nada pueda falsificar un "Guardado ✓" desde fuera.
+  if(e.origin!==window.location.origin)return;
   var d=e.data;
   if(!d||d.type!=='bl-save-status')return;
   clearTimeout(saveStatusTimer);
