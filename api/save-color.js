@@ -5,9 +5,12 @@
 // data.links (mismo store, endpoint compartido para no pasar del límite de
 // Serverless Functions del plan).
 const { requireAuth } = require('../lib/auth');
-const { readContent, writeContent } = require('../lib/content-store');
+const { updateContent } = require('../lib/content-store');
 
-const COLOR_RE = /^#[0-9a-fA-F]{3,8}$|^rgba?\([\d.,%\s]+\)$/;
+// Longitudes válidas de un hex CSS: #RGB, #RGBA, #RRGGBB, #RRGGBBAA (3/4/6/8
+// dígitos). Antes se aceptaba cualquier longitud de 3 a 8 (p.ej. 5 o 7
+// dígitos), que el navegador simplemente ignora sin avisar.
+const COLOR_RE = /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$|^rgba?\([\d.,%\s]+\)$/;
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -36,12 +39,13 @@ module.exports = async function handler(req, res) {
     if (body.hidden !== undefined) {
       patch.hidden = !!body.hidden;
     }
-    const data = await readContent();
-    data.links = data.links || {};
-    data.links[id] = Object.assign({}, data.links[id] || {}, patch);
-    data.updatedAt = new Date().toISOString();
-    await writeContent(data);
-    return res.status(200).json({ ok: true, id, link: data.links[id] });
+    var savedLink;
+    await updateContent(function (data) {
+      data.links = data.links || {};
+      data.links[id] = Object.assign({}, data.links[id] || {}, patch);
+      savedLink = data.links[id];
+    });
+    return res.status(200).json({ ok: true, id, link: savedLink });
   }
 
   const value = body && body.value;
@@ -49,11 +53,12 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Color inválido' });
   }
 
-  const data = await readContent();
-  data.colors = data.colors || {};
-  data.colors[id] = value.trim();
-  data.updatedAt = new Date().toISOString();
-  await writeContent(data);
+  var savedValue;
+  await updateContent(function (data) {
+    data.colors = data.colors || {};
+    data.colors[id] = value.trim();
+    savedValue = data.colors[id];
+  });
 
-  return res.status(200).json({ ok: true, id, value: data.colors[id] });
+  return res.status(200).json({ ok: true, id, value: savedValue });
 };

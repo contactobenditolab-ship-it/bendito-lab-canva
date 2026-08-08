@@ -3,7 +3,7 @@
 // Body JSON: { path }.
 const { del } = require('@vercel/blob');
 const { requireAuth } = require('../lib/auth');
-const { readContent, writeContent } = require('../lib/content-store');
+const { updateContent } = require('../lib/content-store');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,14 +21,20 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Falta path' });
   }
 
-  const data = await readContent();
-  data.images = data.images || {};
-  const url = data.images[path];
-  if (url) {
-    delete data.images[path];
-    data.updatedAt = new Date().toISOString();
-    await writeContent(data);
-    del(url).catch(() => {});
-  }
+  var url;
+  await updateContent(function (data) {
+    data.images = data.images || {};
+    url = data.images[path];
+    if (url) {
+      delete data.images[path];
+      // La foto sustituida podía tener su propio encuadre/zoom guardado;
+      // si no se borra también aquí, al restaurarse la foto original
+      // estática se le sigue aplicando ese zoom/posición viejo y se ve
+      // recortada o descuadrada (mismo bug que se arregló en
+      // upload-image.js para el caso de reemplazo).
+      if (data.imageView && data.imageView[path]) delete data.imageView[path];
+    }
+  });
+  if (url) del(url).catch(() => {});
   return res.status(200).json({ ok: true });
 };

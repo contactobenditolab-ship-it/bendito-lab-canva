@@ -2,7 +2,7 @@
 // una foto dentro de su hueco. Body JSON: { path, s, x, y }.
 // s = escala (1 = tamaño base), x/y = desplazamiento en % del hueco.
 const { requireAuth } = require('../lib/auth');
-const { readContent, writeContent } = require('../lib/content-store');
+const { updateContent } = require('../lib/content-store');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -29,11 +29,12 @@ module.exports = async function handler(req, res) {
   const clampedX = Math.max(-60, Math.min(60, x));
   const clampedY = Math.max(-60, Math.min(60, y));
 
-  const data = await readContent();
-  data.imageView = data.imageView || {};
-  data.imageView[path] = { s: clampedS, x: clampedX, y: clampedY };
-  data.updatedAt = new Date().toISOString();
-  await writeContent(data);
+  var savedView;
+  await updateContent(function (data) {
+    data.imageView = data.imageView || {};
+    data.imageView[path] = { s: clampedS, x: clampedX, y: clampedY };
+    savedView = data.imageView[path];
+  });
 
-  return res.status(200).json({ ok: true, view: data.imageView[path] });
+  return res.status(200).json({ ok: true, view: savedView });
 };

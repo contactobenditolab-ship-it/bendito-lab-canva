@@ -2,7 +2,7 @@
 // página. Body JSON: { id, text }. `id` es el valor del atributo
 // data-edit="..." del elemento en la página pública.
 const { requireAuth } = require('../lib/auth');
-const { readContent, writeContent } = require('../lib/content-store');
+const { updateContent } = require('../lib/content-store');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -27,11 +27,10 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Texto demasiado largo' });
   }
 
-  const data = await readContent();
-  data.texts = data.texts || {};
-  data.texts[id] = text;
-  data.updatedAt = new Date().toISOString();
-  await writeContent(data);
+  await updateContent(function (data) {
+    data.texts = data.texts || {};
+    data.texts[id] = text;
+  });
 
   return res.status(200).json({ ok: true, id, text });
 };

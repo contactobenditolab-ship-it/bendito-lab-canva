@@ -457,8 +457,18 @@
       body: JSON.stringify({ id: id, text: text })
     })
       .then(function (r) { return r.json(); })
-      .then(function (d) { toast(d.ok ? 'Guardado ✓' : ('Error: ' + d.error), d.ok); })
-      .catch(function () { toast('Error de conexión', false); });
+      .then(function (d) {
+        // Si falla, se limpia el guard: si no, reescribir exactamente el
+        // mismo texto tras un fallo no reintentaría el guardado (savingText
+        // seguiría marcando ese texto como "ya guardado" aunque el POST
+        // nunca tuvo éxito).
+        if (!d.ok && savingText[id] === text) delete savingText[id];
+        toast(d.ok ? 'Guardado ✓' : ('Error: ' + d.error), d.ok);
+      })
+      .catch(function () {
+        if (savingText[id] === text) delete savingText[id];
+        toast('Error de conexión', false);
+      });
   }
 
   // ── COLORES ──────────────────────────────────────────────────────────
