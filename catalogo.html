@@ -42,6 +42,13 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .intro h1{font-weight:800;font-size:clamp(32px,5vw,48px);margin:0 0 16px;}
 .intro p{max-width:640px;margin:0 auto;font-size:17px;line-height:1.6;}
 
+.necesidades{max-width:1200px;margin:28px auto 0;padding:0 5vw;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.nec-btn{border:1px solid var(--deep);background:var(--white);color:var(--deep);font-weight:700;font-size:13px;padding:11px 20px;border-radius:24px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.nec-btn.activo{background:var(--deep);color:var(--white);}
+.nec-icono{font-size:16px;line-height:1;}
+.necesidad-banner{max-width:1200px;margin:18px auto 0;padding:0 5vw;text-align:center;font-size:13px;}
+.necesidad-banner button{background:none;border:none;color:var(--captain);font-weight:700;font-size:13px;cursor:pointer;text-decoration:underline;padding:0;}
+
 .categorias{max-width:1200px;margin:32px auto 0;padding:0 5vw;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
 .cat-btn{border:1px solid var(--deep);background:var(--cream);color:var(--deep);font-weight:700;font-size:12px;letter-spacing:.5px;padding:9px 18px;border-radius:22px;cursor:pointer;}
 .cat-btn.activo{background:var(--deep);color:var(--white);}
@@ -152,6 +159,8 @@ footer{background:var(--rose);}
   <p>Todavía no tenemos tienda online — explora los artículos que trabajamos y pide presupuesto sin compromiso. Te lo preparamos a medida para tu marca o evento.</p>
 </section>
 
+<div class="necesidades" id="necesidades" style="display:none;"></div>
+<div class="necesidad-banner" id="necesidad-banner" style="display:none;"></div>
 <div class="categorias" id="categorias" style="display:none;"></div>
 
 <section class="catalogo-grid" id="catalogo-grid">
