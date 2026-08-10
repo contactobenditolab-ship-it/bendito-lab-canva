@@ -659,6 +659,19 @@
         if (!img.hasAttribute('data-reframing')) { toolbar.classList.remove('on'); badge.classList.remove('on'); }
       });
 
+      // En móvil no hay mouseenter/mouseleave, así que el toolbar (Cambiar/
+      // Encuadre) nunca aparecía: tocar la imagen lo muestra u oculta. Se
+      // filtra por pointerType==='touch' para no interferir con el hover
+      // normal en ratón (si no, un click con el toolbar ya visible por
+      // hover lo ocultaría de golpe aunque el ratón siguiera encima).
+      img.addEventListener('pointerup', function (e) {
+        if (e.pointerType !== 'touch') return;
+        if (img.hasAttribute('data-reframing')) return; // ya encuadrando: el toque hace pan, no toggle
+        e.preventDefault(); e.stopPropagation();
+        var showing = toolbar.classList.toggle('on');
+        badge.classList.toggle('on', showing);
+      });
+
       replaceBtn.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
         targetImg = img;
