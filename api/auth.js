@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!dentroDelLimite('auth:' + ipDesdeRequest(req), 10, 15 * 60 * 1000)) {
+  if (!(await dentroDelLimite('auth:' + ipDesdeRequest(req), 10, 15 * 60 * 1000))) {
     return res.status(429).json({ error: 'Demasiados intentos, inténtalo más tarde' });
   }
 

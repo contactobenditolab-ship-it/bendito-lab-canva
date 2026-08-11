@@ -389,13 +389,6 @@ input[type="file"]{display:none;}
         <div class="panel-title">Imágenes</div>
         <div class="panel-desc">Sube imágenes directamente al servidor. Visibles en ~30 segundos.</div>
 
-        <div class="token-bar">
-          <span>🔑 Token GitHub:</span>
-          <input type="password" id="gh-token" placeholder="ghp_XXXXXXXXXXXXXXXX">
-          <button data-action="save-token">Guardar</button>
-          <span id="tok-ok" style="color:#27AE60;display:none;">✓</span>
-        </div>
-
         <div class="card"><div class="card-title">Logos (nav de todas las páginas)</div><div id="grp-logos"></div></div>
         <div class="card"><div class="card-title">Portada · Fotos del carrusel</div><div id="grp-portada_carrusel"></div></div>
         <div class="card">
@@ -590,13 +583,6 @@ input[type="file"]{display:none;}
       <div class="panel" id="panel-ajustes">
         <div class="panel-title">Ajustes del sistema</div>
         <div class="panel-desc">Configuración técnica.</div>
-        <div class="card">
-          <div class="card-title">Token de GitHub</div>
-          <p style="font-size:12px;color:#888;margin-bottom:12px;">Necesario para subir imágenes. Se guarda solo en este navegador.<br>GitHub → Settings → Developer settings → Personal access tokens → scope: repo</p>
-          <div class="field"><label>Token</label><input type="password" id="gh-token-2" placeholder="ghp_XXXXXXXXXXXXXXXX"><div class="field-hint">No se envía a ningún servidor — queda solo en esta pestaña (se borra al cerrarla).</div></div>
-          <button data-action="save-token2" style="background:#17233F;color:#E8C24A;border:none;padding:10px 24px;font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:900;font-size:13px;cursor:pointer;margin-top:4px;">Guardar token</button>
-          <span id="tok-ok-2" style="color:#27AE60;font-size:12px;margin-left:10px;display:none;">✓ Guardado</span>
-        </div>
         <div class="card">
           <div class="card-title">🔌 Conexiones</div>
           <p style="font-size:12px;color:#888;margin-bottom:16px;">Cómo está montada la web por dentro. Son datos de referencia, no editables desde aquí.</p>
