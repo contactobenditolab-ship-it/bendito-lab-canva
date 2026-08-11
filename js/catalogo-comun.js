@@ -108,7 +108,7 @@ function renderGridEn(containerId, lista, mensajeVacio) {
   }).join('');
 
   cont.querySelectorAll('.btn-presupuesto').forEach(function(btn){
-    btn.addEventListener('click', function(){ abrirModalPresupuesto(btn.dataset.articuloId); });
+    btn.addEventListener('click', function(){ abrirModalDetalle(btn.dataset.articuloId); });
   });
   cont.querySelectorAll('.prod-clicable').forEach(function(el){
     el.addEventListener('click', function(){ abrirModalDetalle(el.dataset.detalleId); });
@@ -225,9 +225,13 @@ function renderColoresSwatches(coloresResueltos) {
   return '<div class="md-colores"><span class="md-colores-label">Color</span><div class="md-colores-lista" id="md-colores-lista">' + swatches + '</div></div>';
 }
 
-function activarSelectorColores() {
+function activarSelectorColores(articulo) {
   var lista = document.getElementById('md-colores-lista');
   if (!lista) return;
+  var imgEl = document.querySelector('#md-contenido .md-img img');
+  var imgPorDefecto = imgEl ? imgEl.src : null;
+  var imagenesPorColor = (articulo && articulo.imagenes_por_color) || {};
+
   lista.addEventListener('click', function(e){
     var swatch = e.target.closest('[data-color-nombre]');
     if (!swatch) return;
@@ -238,10 +242,12 @@ function activarSelectorColores() {
     });
     if (yaActivo) {
       COLOR_SELECCIONADO = null;
+      if (imgEl && imgPorDefecto) imgEl.src = imgPorDefecto;
     } else {
       swatch.classList.add('color-swatch--activo');
       swatch.setAttribute('aria-checked', 'true');
       COLOR_SELECCIONADO = swatch.dataset.colorNombre;
+      if (imgEl && imagenesPorColor[COLOR_SELECCIONADO]) imgEl.src = imagenesPorColor[COLOR_SELECCIONADO];
     }
   });
 }
@@ -308,7 +314,7 @@ function abrirModalDetalle(articuloId) {
   if (btnGuiaTallas) {
     btnGuiaTallas.addEventListener('click', function(){ abrirModalTallas(a.nombre, a.guia_tallas); });
   }
-  activarSelectorColores();
+  activarSelectorColores(a);
   var tallaSelect = document.getElementById('md-talla-select');
   if (tallaSelect) {
     tallaSelect.addEventListener('change', function(){ TALLA_SELECCIONADA = tallaSelect.value || null; });
