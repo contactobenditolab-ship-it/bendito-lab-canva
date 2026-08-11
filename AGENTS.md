@@ -29,3 +29,9 @@ Si tenías commits aún no mergeados en esa rama, tráelos con `git cherry-pick 
 ## Cambios quirúrgicos
 
 Al tocar código compartido (funciones en `js/*-comun.js`, estilos globales, endpoints en `api/`), cambia solo lo que el encargo pide y evita tocar de paso otras partes del archivo o de sus consumidores. Si una función se usa en varias páginas, comprueba (`grep`/búsqueda de referencias) todos los usos antes de cambiar su firma o su comportamiento.
+
+## Ser económico con los tokens
+
+- No repitas una comprobación de estado (CI, deploy) más de lo necesario. Espacia los reintentos varios minutos, no segundos, y usa el detalle por pasos en vez de re-consultar el estado agregado en bucle cuando algo "parece atascado" — a veces solo va con retraso en la API, no está realmente parado.
+- Antes de lanzar una investigación cara (subagentes, muchas llamadas de red), comprueba primero la hipótesis más barata (un `grep`, leer el archivo directamente).
+- No relances un subagente para rehacer o releer trabajo que ya se hizo en la misma sesión.
