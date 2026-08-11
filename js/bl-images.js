@@ -11,6 +11,28 @@
 
   var CONTENT = { images: {}, imageView: {}, colors: {}, texts: {}, links: {} };
 
+  // Cache en localStorage del último /api/content recibido: en la primera
+  // visita no hay nada que hacer (toca esperar al fetch), pero en visitas
+  // siguientes evita el parpadeo de "sale la foto vieja del HTML estático y
+  // al momento la sustituye la subida real" — se aplica de forma síncrona,
+  // sin esperar red, y el fetch de abajo la refresca por si cambió algo.
+  var CONTENT_CACHE_KEY = 'bl_content_cache_v1';
+
+  function leerContentCache() {
+    try {
+      var raw = localStorage.getItem(CONTENT_CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function guardarContentCache(data) {
+    try {
+      localStorage.setItem(CONTENT_CACHE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
   function applyImages(images) {
     document.querySelectorAll('img[src]').forEach(function (img) {
       var key = img.getAttribute('data-slot') || normalize(img.getAttribute('src'));
@@ -95,6 +117,19 @@
     });
   }
 
+  // Aplica de inmediato lo último visto (sin esperar red) para no enseñar la
+  // foto/textos por defecto del HTML estático ni un instante en visitas
+  // repetidas; el fetch de abajo la sustituye por la versión fresca en
+  // cuanto llega, y si algo cambió desde la última visita se nota igual.
+  var cache = leerContentCache();
+  if (cache) {
+    if (cache.images) applyImages(cache.images);
+    if (cache.imageView) applyImageViews(cache.imageView);
+    if (cache.colors) applyColors(cache.colors);
+    if (cache.texts) applyTexts(cache.texts);
+    if (cache.links) applyLinks(cache.links);
+  }
+
   var loaded = fetch('/api/content', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
@@ -108,6 +143,7 @@
       applyColors(CONTENT.colors);
       applyTexts(CONTENT.texts);
       applyLinks(CONTENT.links);
+      guardarContentCache(CONTENT);
     })
     .catch(function () {});
 
