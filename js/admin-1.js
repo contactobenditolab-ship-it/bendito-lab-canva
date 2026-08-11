@@ -532,7 +532,6 @@ function loadAll(){
       }
     })
     .catch(function(e){ console.warn('No se pudieron cargar precios desde Supabase:', e); });
-  if(sessionStorage.getItem('bl-gh-token')){document.getElementById('gh-token').value='••••••••••••';document.getElementById('gh-token-2').value='••••••••••••';}
   renderSecciones();
   renderRedes();
   renderProductos();
@@ -921,9 +920,6 @@ async function uploadImg(input,filePath,uid){
   setTimeout(function(){prog.style.display='none';pb.style.width='0%';},3000);
 }
 
-function saveToken(){var v=document.getElementById('gh-token').value;if(v&&!v.startsWith('••')){sessionStorage.setItem('bl-gh-token',v);document.getElementById('gh-token').value='••••••••••••';var ok=document.getElementById('tok-ok');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
-function saveToken2(){var v=document.getElementById('gh-token-2').value;if(v&&!v.startsWith('••')){sessionStorage.setItem('bl-gh-token',v);document.getElementById('gh-token-2').value='••••••••••••';var ok=document.getElementById('tok-ok-2');ok.style.display='inline';setTimeout(function(){ok.style.display='none';},2000);}}
-
 // ══ INIT ═════════════════════════════════════════════════════
 var IMAGE_CONTENT = {}; // slot path -> URL en Vercel Blob (sustituciones subidas desde el admin)
 
@@ -1095,18 +1091,39 @@ function dbcEliminar(idx) {
   showToast('Foto quitada — pulsa "Publicar" para aplicarlo');
 }
 
+// ── Publicación en GitHub ────────────────────────────────────
+// El token de GitHub ya no vive en el navegador: estas funciones piden al
+// servidor (/api/github-publish) que lea/escriba en el repo, usando la
+// sesión de admin ya autenticada (BL_API.authHeaders()).
+async function ghGet(path) {
+  var r = await fetch('/api/github-publish', {
+    method: 'POST',
+    headers: BL_API.authHeaders(),
+    body: JSON.stringify({ op: 'get', path: path })
+  });
+  var d = await r.json();
+  if (!r.ok || d.error) throw new Error(d.error || 'Error leyendo ' + path);
+  return d; // { content, sha }
+}
+async function ghPut(path, content, message, sha) {
+  var r = await fetch('/api/github-publish', {
+    method: 'POST',
+    headers: BL_API.authHeaders(),
+    body: JSON.stringify({ op: 'put', path: path, content: content, message: message, sha: sha })
+  });
+  var d = await r.json();
+  if (!r.ok || d.error) throw new Error(d.error || 'Error escribiendo ' + path);
+  return d; // { ok, sha }
+}
+
 async function publicarCarruselDB() {
-  var token = sessionStorage.getItem('bl-gh-token');
-  if (!token) { alert('Añade el token de GitHub en Ajustes.'); return; }
   var imgs = IMG_GROUPS['db_carrusel'];
   if (!imgs || imgs.length === 0) { alert('No hay fotos en el carrusel.'); return; }
 
   // Leer dilo-bonito.html actual
   showToast('Publicando carrusel...');
   try {
-    var r = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/dilo-bonito.html',
-      { headers: { 'Authorization': 'token ' + token, 'User-Agent': 'BenditoAdmin' } });
-    var fd = await r.json();
+    var fd = await ghGet('dilo-bonito.html');
     var html = atob(fd.content.replace(/\n/g,''));
 
     // Generar nuevo HTML del carrusel
@@ -1140,12 +1157,7 @@ async function publicarCarruselDB() {
 
     // Subir
     var b64 = btoa(unescape(encodeURIComponent(html)));
-    var put = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/dilo-bonito.html', {
-      method: 'PUT',
-      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'BenditoAdmin' },
-      body: JSON.stringify({ message: 'Admin: actualizar carrusel Dilo Bonito', content: b64, sha: fd.sha })
-    });
-    if (!put.ok) throw new Error((await put.json()).message);
+    await ghPut('dilo-bonito.html', b64, 'Admin: actualizar carrusel Dilo Bonito', fd.sha);
     showToast('✓ Carrusel publicado. Visible en ~30s');
   } catch(err) {
     showToast('Error: ' + err.message);
@@ -1256,8 +1268,6 @@ function guardarBanner(i) {
 async function subirImgBanner(input, i) {
   var file = input.files[0];
   if (!file) return;
-  var token = sessionStorage.getItem('bl-gh-token');
-  if (!token) { alert('Añade el token de GitHub en Ajustes.'); return; }
   var ext = file.name.split('.').pop().toLowerCase() || 'jpg';
   var newPath = 'images/banner-' + Date.now() + '.' + ext;
   showToast('Subiendo imagen del banner...');
@@ -1265,12 +1275,7 @@ async function subirImgBanner(input, i) {
   reader.onload = async function(e) {
     var b64 = e.target.result.split(',')[1];
     try {
-      var put = await fetch('https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/' + newPath, {
-        method: 'PUT',
-        headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'BenditoAdmin' },
-        body: JSON.stringify({ message: 'Admin: imagen banner', content: b64 })
-      });
-      if (!put.ok) throw new Error((await put.json()).message);
+      await ghPut(newPath, b64, 'Admin: imagen banner');
       BANNERS[i].imagen = newPath;
       sessionStorage.setItem('bl-banners', JSON.stringify(BANNERS));
       showToast('✓ Imagen subida. Edita el banner para verla.');
@@ -1361,9 +1366,6 @@ function gcReset() {
 }
 
 async function gcPublicar() {
-  var token = sessionStorage.getItem('bl-gh-token');
-  if (!token) { alert('Añade el token de GitHub en Ajustes primero.'); return; }
-
   var colors = {
     '--baby':     document.getElementById('gc-baby').value,
     '--deep':     document.getElementById('gc-deep').value,
@@ -1394,12 +1396,7 @@ async function gcPublicar() {
     status.innerHTML = '⏳ Actualizando ' + filename + ' (' + (i+1) + '/' + pagesToUpdate.length + ')...';
     try {
       // Obtener SHA y contenido
-      var r = await fetch(
-        'https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/' + filename,
-        { headers: { 'Authorization': 'token ' + token, 'User-Agent': 'BenditoAdmin' } }
-      );
-      if (!r.ok) throw new Error('No se pudo leer ' + filename);
-      var fd = await r.json();
+      var fd = await ghGet(filename);
       var html = decodeURIComponent(escape(atob(fd.content.replace(/\n/g,''))));
 
       // Reemplazar cada variable de color en el :root
@@ -1411,15 +1408,7 @@ async function gcPublicar() {
 
       // Subir
       var b64 = btoa(unescape(encodeURIComponent(html)));
-      var put = await fetch(
-        'https://api.github.com/repos/contactobenditolab-ship-it/bendito-lab-canva/contents/' + filename,
-        {
-          method: 'PUT',
-          headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'BenditoAdmin' },
-          body: JSON.stringify({ message: 'Admin: actualizar colores globales', content: b64, sha: fd.sha })
-        }
-      );
-      if (!put.ok) throw new Error((await put.json()).message);
+      await ghPut(filename, b64, 'Admin: actualizar colores globales', fd.sha);
       ok++;
     } catch(err) {
       fail++;
@@ -1564,7 +1553,6 @@ function handleClick(e){
     case 'add-seccion':          addSeccion(); break;
     case 'db-export-css':        dbExportCSS(); break;
     case 'db-reset-all':         dbResetAll(); break;
-    case 'save-token':           saveToken(); break;
     case 'publicar-carrusel-db': publicarCarruselDB(); break;
     case 'crear-banner':         crearBanner(); break;
     case 'agregar-precio-portal':agregarPrecioPortal(); break;
@@ -1573,7 +1561,6 @@ function handleClick(e){
     case 'reset-colores':        resetColores(); break;
     case 'gc-publicar':          gcPublicar(); break;
     case 'gc-reset':             gcReset(); break;
-    case 'save-token2':          saveToken2(); break;
     case 'show':                 show(el.dataset.panel, el); break;
     case 'apply-preset':         applyPreset(el.dataset.preset); break;
     case 'ver-img-grande':       verImgGrande(el.dataset.url); break;
