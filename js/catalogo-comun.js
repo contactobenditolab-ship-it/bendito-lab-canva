@@ -9,6 +9,8 @@ function toggleNav(){ document.body.classList.toggle('nav-open'); }
 document.querySelectorAll('.site-nav a').forEach(function(a){
   a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
 });
+var navHamburger = document.querySelector('.nav-hamburger');
+if (navHamburger) navHamburger.addEventListener('click', toggleNav);
 
 function escapeHtml(value) {
   return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) {

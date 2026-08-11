@@ -42,9 +42,6 @@ var btnRechazarCookies = document.getElementById('btn-rechazar-cookies');
 if (btnRechazarCookies) btnRechazarCookies.addEventListener('click', rechazarCookies);
 var btnAceptarCookies = document.getElementById('btn-aceptar-cookies');
 if (btnAceptarCookies) btnAceptarCookies.addEventListener('click', aceptarCookies);
-var navHamburger = document.querySelector('.nav-hamburger');
-if (navHamburger) navHamburger.addEventListener('click', toggleNav);
-
 function aceptarCookies() {
   localStorage.setItem('bl_cookie_consent','accepted');
   document.getElementById('cookie-banner').style.display = 'none';
