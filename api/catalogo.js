@@ -218,13 +218,23 @@ module.exports = async function handler(req, res) {
       if (error) throw error;
 
       const ids = (data || []).map((a) => a.id);
-      const { data: variantesTalla } = ids.length
-        ? await supabase.from('catalogo_variantes').select('articulo_id, valor').eq('tipo', 'talla').in('articulo_id', ids).order('orden')
-        : { data: [] };
+      const [{ data: variantesTalla }, { data: imagenesColor }] = await Promise.all([
+        ids.length
+          ? supabase.from('catalogo_variantes').select('articulo_id, valor').eq('tipo', 'talla').in('articulo_id', ids).order('orden')
+          : Promise.resolve({ data: [] }),
+        ids.length
+          ? supabase.from('catalogo_imagenes').select('articulo_id, url, color').in('articulo_id', ids).not('color', 'is', null)
+          : Promise.resolve({ data: [] }),
+      ]);
       const tallasPorArticulo = new Map();
       (variantesTalla || []).forEach((v) => {
         if (!tallasPorArticulo.has(v.articulo_id)) tallasPorArticulo.set(v.articulo_id, []);
         tallasPorArticulo.get(v.articulo_id).push(v.valor);
+      });
+      const imagenesPorColorPorArticulo = new Map();
+      (imagenesColor || []).forEach((img) => {
+        if (!imagenesPorColorPorArticulo.has(img.articulo_id)) imagenesPorColorPorArticulo.set(img.articulo_id, {});
+        imagenesPorColorPorArticulo.get(img.articulo_id)[img.color] = img.url;
       });
 
       const articulos = await Promise.all(
@@ -232,6 +242,7 @@ module.exports = async function handler(req, res) {
           ...a,
           colores_resueltos: a.colores && a.colores.length ? await resolverColores(a.colores) : [],
           tallas: tallasPorArticulo.get(a.id) || [],
+          imagenes_por_color: imagenesPorColorPorArticulo.get(a.id) || {},
         }))
       );
 
