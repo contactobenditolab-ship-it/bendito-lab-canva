@@ -45,11 +45,19 @@ async function cargarCatalogo() {
     TODOS_LOS_ARTICULOS = d.articulos || [];
     renderCategorias(TODOS_LOS_ARTICULOS);
     pintarGrid();
+    abrirArticuloDesdeUrl();
   } catch (e) {
     cont.innerHTML = '<p class="catalogo-vacio">No se ha podido cargar el catálogo. Prueba de nuevo o escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>.</p>';
   }
 }
 cargarCatalogo();
+
+// Deep-link: /catalogo?articulo=<id> abre directamente la ficha de ese
+// artículo (usado por el botón "Ver en la web" de Bendito OS).
+function abrirArticuloDesdeUrl() {
+  var id = new URLSearchParams(location.search).get('articulo');
+  if (id) abrirModalDetalle(id);
+}
 
 // ── Menú "¿Qué necesitas?" ──────────────────────────────────
 // Se sirve desde Bendito OS (panel de gestión: Catálogo → ¿Qué necesitas?),
