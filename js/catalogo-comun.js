@@ -263,9 +263,19 @@ function renderTallaSelect(tallas) {
 }
 
 // ── Modal de detalle de producto ──────────────────────────
+function actualizarUrlArticulo(articuloId) {
+  var params = new URLSearchParams(location.search);
+  if (params.get('articulo') === articuloId) return;
+  if (articuloId) params.set('articulo', articuloId); else params.delete('articulo');
+  var qs = params.toString();
+  var url = location.pathname + (qs ? '?' + qs : '') + location.hash;
+  history.pushState({ articulo: articuloId || null }, '', url);
+}
+
 function abrirModalDetalle(articuloId) {
   var a = ARTICULOS_MOSTRADOS.find(function(x){ return x.id === articuloId; });
   if (!a) return;
+  actualizarUrlArticulo(articuloId);
 
   var img = a.imagen_principal_url
     ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" ' +
@@ -460,11 +470,21 @@ async function ejecutarCalculo(articuloId) {
   }
 }
 
-function cerrarModalDetalle() {
+function cerrarModalDetalle(actualizarUrl) {
   document.getElementById('modal-detalle').style.display = 'none';
   document.body.style.overflow = '';
+  if (actualizarUrl !== false) actualizarUrlArticulo(null);
 }
 
 document.getElementById('modal-detalle').addEventListener('click', function(e){
   if (e.target === this) cerrarModalDetalle();
+});
+
+// Mantiene la URL sincronizada con el modal: atrás cierra la ficha, adelante
+// la vuelve a abrir. No se llama a actualizarUrlArticulo desde aquí (el
+// cambio de URL ya lo disparó el propio navegador) para no generar una
+// entrada de historial extra.
+window.addEventListener('popstate', function(){
+  var id = new URLSearchParams(location.search).get('articulo');
+  if (id) abrirModalDetalle(id); else cerrarModalDetalle(false);
 });
