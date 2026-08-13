@@ -173,6 +173,57 @@ function pvpMedioFicha(ficha) {
   return suma / vars.length;
 }
 
+const CAMPOS_COSTE_LISTADO = [
+  'id', 'precio_coste', 'pack_coste', 'coste_envio', 'coste_manipulacion',
+  'coste_personalizacion', 'coste_diseno', 'coste_mano_obra', 'coste_electricidad',
+  'coste_mermas_pct', 'coste_comisiones_pct', 'costes_generales_pct', 'margen_pct_b2b',
+  'proveedor_id', 'grupo_tramos_id',
+];
+
+// "PVP desde" (precio a cantidad=1, tramo base) para cada artículo del
+// listado público — permite ordenar por precio sin exponer coste/margen.
+// Réplica en lote de la misma lógica que /api/catalogo POST calcularPrecio,
+// para no hacer una consulta por artículo.
+async function calcularPreciosDesde(supabase, ids) {
+  if (!ids.length) return new Map();
+
+  const [{ data: filasCoste, error: eCoste }, { data: overrides, error: eOverride }] = await Promise.all([
+    supabase.from('catalogo_articulos').select(CAMPOS_COSTE_LISTADO.join(', ')).in('id', ids),
+    supabase.from('catalogo_precios_override').select('articulo_id, tramos').eq('canal', 'b2c').in('articulo_id', ids),
+  ]);
+  if (eCoste) throw eCoste;
+  if (eOverride) throw eOverride;
+
+  const proveedorIds = [...new Set((filasCoste || []).map((a) => a.proveedor_id).filter(Boolean))];
+  const grupoIds = [...new Set((filasCoste || []).map((a) => a.grupo_tramos_id).filter(Boolean))];
+
+  const [{ data: proveedores, error: eProv }, { data: grupos, error: eGrupo }] = await Promise.all([
+    proveedorIds.length
+      ? supabase.from('catalogo_proveedores').select('id, coste_envio, unidades_tipicas_pedido').in('id', proveedorIds)
+      : Promise.resolve({ data: [] }),
+    grupoIds.length
+      ? supabase.from('catalogo_grupos_tramos').select('id, tramos').in('id', grupoIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+  if (eProv) throw eProv;
+  if (eGrupo) throw eGrupo;
+
+  const proveedorPorId = new Map((proveedores || []).map((p) => [p.id, p]));
+  const gruposPorId = new Map((grupos || []).map((g) => [g.id, g]));
+  const overridePorArticulo = new Map((overrides || []).map((o) => [o.articulo_id, o.tramos || []]));
+
+  const resultado = new Map();
+  (filasCoste || []).forEach((articulo) => {
+    const contexto = {
+      proveedor: proveedorPorId.get(articulo.proveedor_id) || null,
+      tramos: (gruposPorId.get(articulo.grupo_tramos_id) || {}).tramos || TRAMOS_MARGEN_DEFECTO,
+      overrideB2c: overridePorArticulo.get(articulo.id) || [],
+    };
+    resultado.set(articulo.id, precioUnitarioProducto(articulo, 1, contexto));
+  });
+  return resultado;
+}
+
 module.exports = async function handler(req, res) {
   const supabase = client();
 
@@ -208,7 +259,12 @@ module.exports = async function handler(req, res) {
         .order('nombre', { ascending: true });
       if (error) throw error;
 
-      const articulos = await enriquecerArticulos(supabase, data || []);
+      const articulosEnriquecidos = await enriquecerArticulos(supabase, data || []);
+      const preciosDesde = await calcularPreciosDesde(supabase, articulosEnriquecidos.map((a) => a.id));
+      const articulos = articulosEnriquecidos.map((a) => ({
+        ...a,
+        precio_desde: preciosDesde.has(a.id) ? Math.round(preciosDesde.get(a.id) * 100) / 100 : null,
+      }));
 
       res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
       return res.status(200).json({ articulos });

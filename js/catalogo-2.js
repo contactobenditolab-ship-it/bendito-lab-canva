@@ -6,6 +6,7 @@
 
 var TODOS_LOS_ARTICULOS = [];
 var categoriaActiva = '';
+var leerOrdenActiva = null;
 
 function renderCategorias(articulos) {
   var cats = [];
@@ -33,7 +34,8 @@ function pintarGrid() {
   var lista = categoriaActiva
     ? TODOS_LOS_ARTICULOS.filter(function(a){ return a.categoria === categoriaActiva; })
     : TODOS_LOS_ARTICULOS;
-  renderGridEn('catalogo-grid', lista, 'No hay artículos disponibles ahora mismo en esta categoría.');
+  var criterio = leerOrdenActiva ? leerOrdenActiva() : 'nombre';
+  renderGridEn('catalogo-grid', ordenarArticulos(lista, criterio), 'No hay artículos disponibles ahora mismo en esta categoría.');
 }
 
 async function cargarCatalogo() {
@@ -43,6 +45,7 @@ async function cargarCatalogo() {
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Error al cargar el catálogo');
     TODOS_LOS_ARTICULOS = d.articulos || [];
+    leerOrdenActiva = montarOrdenSelect('catalogo-grid', pintarGrid);
     renderCategorias(TODOS_LOS_ARTICULOS);
     pintarGrid();
     abrirArticuloDesdeUrl();

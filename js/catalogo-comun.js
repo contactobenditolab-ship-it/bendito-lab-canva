@@ -12,6 +12,22 @@ document.querySelectorAll('.site-nav a').forEach(function(a){
 var navHamburger = document.querySelector('.nav-hamburger');
 if (navHamburger) navHamburger.addEventListener('click', toggleNav);
 
+/** "Camiseta Esencial Roly" -> "camiseta-esencial-roly" (misma lógica que lib/articulo-publico.js) */
+function slugificarCliente(texto) {
+  return String(texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
+function urlProducto(articulo) {
+  var slug = slugificarCliente(articulo.nombre) || 'producto';
+  return '/producto/' + slug + '-' + articulo.id;
+}
+
 function escapeHtml(value) {
   return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -166,15 +182,18 @@ function renderGridEn(containerId, lista, mensajeVacio) {
         'onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'Sin imagen\'}));">'
       : '<span>Sin imagen</span>';
     var desc = a.descripcion_corta || a.descripcion || '';
+    var href = urlProducto(a);
+    var precio = (a.precio_desde != null) ? '<p class="prod-precio">Desde ' + a.precio_desde.toFixed(2) + '€</p>' : '';
     return (
       '<div class="prod-card">' +
-        '<div class="prod-clicable" data-detalle-id="' + escapeHtml(a.id) + '">' +
+        '<a class="prod-clicable" href="' + escapeHtml(href) + '" data-detalle-id="' + escapeHtml(a.id) + '">' +
           '<div class="prod-card-img">' + img + '</div>' +
-        '</div>' +
+        '</a>' +
         '<div class="prod-card-body">' +
           (a.categoria ? '<p class="prod-cat">' + escapeHtml(a.categoria) + '</p>' : '') +
-          '<p class="prod-nombre prod-clicable" data-detalle-id="' + escapeHtml(a.id) + '">' + escapeHtml(a.nombre) + '</p>' +
+          '<a class="prod-nombre prod-clicable" href="' + escapeHtml(href) + '" data-detalle-id="' + escapeHtml(a.id) + '">' + escapeHtml(a.nombre) + '</a>' +
           (desc ? '<p class="prod-desc">' + escapeHtml(desc) + '</p>' : '') +
+          precio +
           '<button type="button" class="btn-presupuesto" data-articulo-id="' + escapeHtml(a.id) + '">Pedir presupuesto</button>' +
         '</div>' +
       '</div>'
@@ -184,9 +203,46 @@ function renderGridEn(containerId, lista, mensajeVacio) {
   cont.querySelectorAll('.btn-presupuesto').forEach(function(btn){
     btn.addEventListener('click', function(){ abrirModalDetalle(btn.dataset.articuloId); });
   });
-  cont.querySelectorAll('.prod-clicable').forEach(function(el){
-    el.addEventListener('click', function(){ abrirModalDetalle(el.dataset.detalleId); });
-  });
+}
+
+// ── Ordenación del listado (nombre A-Z, precio asc/desc) ──────────────────
+function ordenarArticulos(lista, criterio) {
+  var copia = lista.slice();
+  switch (criterio) {
+    case 'precio-asc':
+      copia.sort(function(a, b){ return (a.precio_desde == null ? Infinity : a.precio_desde) - (b.precio_desde == null ? Infinity : b.precio_desde); });
+      break;
+    case 'precio-desc':
+      copia.sort(function(a, b){ return (b.precio_desde == null ? -Infinity : b.precio_desde) - (a.precio_desde == null ? -Infinity : a.precio_desde); });
+      break;
+    case 'nombre':
+    default:
+      copia.sort(function(a, b){ return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'); });
+      break;
+  }
+  return copia;
+}
+
+var ORDEN_SELECT_HTML =
+  '<div class="orden-catalogo">' +
+    '<label for="orden-select">Ordenar por</label>' +
+    '<select id="orden-select">' +
+      '<option value="nombre">Nombre (A-Z)</option>' +
+      '<option value="precio-asc">Precio: más barato primero</option>' +
+      '<option value="precio-desc">Precio: más caro primero</option>' +
+    '</select>' +
+  '</div>';
+
+// Inserta el desplegable de ordenación justo antes del grid indicado y
+// devuelve una función para leer el criterio activo. onCambio se llama con
+// el nuevo criterio cada vez que el usuario cambia la selección.
+function montarOrdenSelect(containerId, onCambio) {
+  var grid = document.getElementById(containerId);
+  if (!grid || document.getElementById('orden-select')) return function(){ return 'nombre'; };
+  grid.insertAdjacentHTML('beforebegin', ORDEN_SELECT_HTML);
+  var select = document.getElementById('orden-select');
+  select.addEventListener('change', function(){ onCambio(select.value); });
+  return function(){ return select.value; };
 }
 
 // ── Modal de presupuesto ──────────────────────────────────
