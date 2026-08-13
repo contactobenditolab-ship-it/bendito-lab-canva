@@ -116,7 +116,7 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .nav-hamburger{display:none;}
 
 .volver{display:inline-block;margin:32px 0 20px;font-weight:700;font-size:13px;color:var(--captain);}
-.ficha-seccion{max-width:760px;margin:0 auto;padding:0 5vw 60px;}
+.ficha-seccion{max-width:1100px;margin:0 auto;padding:0 5vw 60px;}
 
 #modal-presupuesto{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;}
 .mp-box{background:#fff;max-width:480px;margin:0 auto;border-radius:12px;padding:32px;position:relative;}
@@ -127,7 +127,7 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .field{padding:12px 16px;border-radius:8px;border:1px solid #D9D3C0;background:#fff;font-size:14px;color:var(--deep);width:100%;}
 textarea.field{resize:vertical;}
 
-.md-box{background:#fff;max-width:760px;margin:0 auto;border-radius:12px;padding:32px;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.md-box{background:#fff;max-width:1100px;margin:0 auto;border-radius:12px;padding:32px;position:relative;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;}
 .md-box .btn-cerrar{display:none;}
 .md-img{aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--baby);display:flex;align-items:center;justify-content:center;}
 .md-img img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -177,7 +177,7 @@ textarea.field{resize:vertical;}
 .md-calc-tramos td{padding:4px 6px;border-bottom:1px solid #EFEDE6;color:var(--deep);}
 .md-calc-tramos tr.tramo-activo td{font-weight:700;background:#EFE9DC;}
 .btn-presupuesto{background:var(--captain);color:var(--white);font-weight:700;font-size:12px;padding:11px 16px;border-radius:20px;border:none;cursor:pointer;text-align:center;}
-@media(max-width:640px){ .md-box{grid-template-columns:1fr;padding:24px;} }
+@media(max-width:800px){ .md-box{grid-template-columns:1fr;padding:24px;} }
 @media(max-width:900px){
   .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
   .site-nav a{font-size:20px;color:var(--white)!important;}
@@ -419,7 +419,7 @@ ${CABECERA}
   <div class="md-box" id="md-contenido">${contenidoFicha}</div>
 </section>
 ${PIE}
-<script>window.__ARTICULO__ = ${jsonParaScript(a)};</script>
+<script type="application/json" id="datos-articulo">${jsonParaScript(a)}</script>
 <script src="/js/catalogo-1.js"></script>
 <script src="/js/catalogo-comun.js"></script>
 <script src="/js/catalogo-producto.js"></script>
