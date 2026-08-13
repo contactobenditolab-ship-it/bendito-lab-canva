@@ -44,7 +44,16 @@ function escapeHtml(value) {
     '.mt-caja h3{margin:0 0 14px;color:#17233F;}' +
     '.mt-caja img{width:100%;height:auto;border-radius:8px;display:block;margin-top:10px;}' +
     '.mt-caja .btn-cerrar{position:absolute;top:10px;right:10px;background:none;border:none;' +
-    'font-size:20px;cursor:pointer;color:#17233F;line-height:1;padding:6px;}';
+    'font-size:20px;cursor:pointer;color:#17233F;line-height:1;padding:6px;}' +
+    '.mt-tabla-scroll{overflow-x:auto;margin-top:4px;}' +
+    '.mt-tabla{width:100%;border-collapse:collapse;font-size:13px;}' +
+    '.mt-tabla th,.mt-tabla td{padding:9px 12px;text-align:center;white-space:nowrap;}' +
+    '.mt-tabla th{background:#17233F;color:#FBF4E9;font-weight:700;text-transform:uppercase;' +
+    'font-size:11px;letter-spacing:.3px;}' +
+    '.mt-tabla th:first-child,.mt-tabla td:first-child{text-align:left;font-weight:700;}' +
+    '.mt-tabla tbody tr:nth-child(even){background:rgba(143,163,194,.12);}' +
+    '.mt-tabla tbody tr:hover{background:rgba(143,163,194,.25);}' +
+    '.mt-tabla td{border-bottom:1px solid rgba(23,35,63,.08);}';
   document.head.appendChild(s);
 })();
 
@@ -57,13 +66,76 @@ document.body.insertAdjacentHTML('beforeend', MODAL_TALLAS_HTML);
 document.getElementById('btn-cerrar-tallas').addEventListener('click', cerrarModalTallas);
 document.getElementById('modal-tallas').addEventListener('click', function(e){ if (e.target === this) cerrarModalTallas(); });
 
+// Muchos proveedores mandan la guía de tallas como texto plano tabular,
+// p.ej. "TALLA ANCHO (CM) ALTO (CM)\nXS 46 66\nS 49 69\n...": una fila por
+// línea, columnas separadas por espacios. La cabecera suele tener más
+// tokens que las filas de datos porque sus nombres de columna llevan
+// espacios ("ANCHO (CM)"), así que el número de columnas real se calcula
+// por la moda de tokens entre todas las líneas, y el resto de líneas con
+// más tokens de los que tocan se reparten a partes iguales en las últimas
+// columnas. Si el texto no tiene pinta de tabla (menos de 2 líneas, o los
+// tokens no convergen en un recuento común), se devuelve null y se
+// muestra como texto plano.
+function parseTablaTallas(texto) {
+  if (!texto) return null;
+  var lineas = String(texto).split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+  if (lineas.length < 2) return null;
+
+  var filas = lineas.map(function (l) { return l.split(/\s+/).filter(Boolean); });
+
+  var conteo = {};
+  filas.forEach(function (f) { conteo[f.length] = (conteo[f.length] || 0) + 1; });
+  var dataCols = Object.keys(conteo).reduce(function (mejor, k) {
+    return conteo[k] > (conteo[mejor] || 0) ? k : mejor;
+  }, Object.keys(conteo)[0]);
+  dataCols = parseInt(dataCols, 10);
+  if (!dataCols || dataCols < 2) return null;
+
+  function normalizarFila(tokens) {
+    if (tokens.length === dataCols) return tokens;
+    if (tokens.length < dataCols) return null;
+    var resto = tokens.slice(1);
+    var grupos = dataCols - 1;
+    var base = Math.floor(resto.length / grupos);
+    var extra = resto.length % grupos;
+    var salida = [tokens[0]];
+    var idx = 0;
+    for (var g = 0; g < grupos; g++) {
+      var tam = base + (g < extra ? 1 : 0);
+      salida.push(resto.slice(idx, idx + tam).join(' '));
+      idx += tam;
+    }
+    return salida;
+  }
+
+  var normalizadas = filas.map(normalizarFila).filter(Boolean);
+  if (normalizadas.length < 2) return null;
+
+  return { cabecera: normalizadas[0], filas: normalizadas.slice(1) };
+}
+
+function renderTablaTallas(tabla) {
+  return (
+    '<div class="mt-tabla-scroll"><table class="mt-tabla"><thead><tr>' +
+    tabla.cabecera.map(function (c) { return '<th>' + escapeHtml(c) + '</th>'; }).join('') +
+    '</tr></thead><tbody>' +
+    tabla.filas.map(function (f) {
+      return '<tr>' + f.map(function (c) { return '<td>' + escapeHtml(c) + '</td>'; }).join('') + '</tr>';
+    }).join('') +
+    '</tbody></table></div>'
+  );
+}
+
 function abrirModalTallas(nombreProducto, guiaTallas) {
   var esImagen = /^https?:\/\/.+\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(guiaTallas || '');
+  var tabla = !esImagen ? parseTablaTallas(guiaTallas) : null;
+  var cuerpo = esImagen
+    ? '<img src="' + escapeHtml(guiaTallas) + '" alt="Guía de tallas">'
+    : tabla
+      ? renderTablaTallas(tabla)
+      : '<p>' + escapeHtml(guiaTallas).replace(/\n/g, '<br>') + '</p>';
   document.getElementById('mt-contenido').innerHTML =
-    '<h3>Guía de tallas' + (nombreProducto ? ' · ' + escapeHtml(nombreProducto) : '') + '</h3>' +
-    (esImagen
-      ? '<img src="' + escapeHtml(guiaTallas) + '" alt="Guía de tallas">'
-      : '<p>' + escapeHtml(guiaTallas) + '</p>');
+    '<h3>Guía de tallas' + (nombreProducto ? ' · ' + escapeHtml(nombreProducto) : '') + '</h3>' + cuerpo;
   document.getElementById('modal-tallas').classList.add('on');
   document.body.style.overflow = 'hidden';
 }
