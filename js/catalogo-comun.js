@@ -344,11 +344,12 @@ function actualizarUrlArticulo(articuloId) {
   history.pushState({ articulo: articuloId || null }, '', url);
 }
 
-function abrirModalDetalle(articuloId) {
-  var a = ARTICULOS_MOSTRADOS.find(function(x){ return x.id === articuloId; });
-  if (!a) return;
-  actualizarUrlArticulo(articuloId);
-
+// Construye la ficha de un artículo dentro de #md-contenido y engancha su
+// interactividad (colores, talla, guía de tallas, calculadora, presupuesto).
+// La usan tanto el modal de detalle del catálogo (abrirModalDetalle) como
+// la página de producto independiente (catalogo-producto.js), que rellena
+// #md-contenido directamente en la página en vez de dentro de un modal.
+function renderFichaProducto(a) {
   var img = a.imagen_principal_url
     ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" ' +
       'onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'Sin imagen\'}));">'
@@ -411,7 +412,13 @@ function abrirModalDetalle(articuloId) {
   });
 
   renderCalculadora(a);
+}
 
+function abrirModalDetalle(articuloId) {
+  var a = ARTICULOS_MOSTRADOS.find(function(x){ return x.id === articuloId; });
+  if (!a) return;
+  actualizarUrlArticulo(articuloId);
+  renderFichaProducto(a);
   document.getElementById('modal-detalle').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -543,14 +550,22 @@ async function ejecutarCalculo(articuloId) {
 }
 
 function cerrarModalDetalle(actualizarUrl) {
-  document.getElementById('modal-detalle').style.display = 'none';
+  // En la página de producto independiente #modal-detalle no existe (la
+  // ficha se renderiza directamente en la página, no en un modal) — sigue
+  // siendo válido pulsar "Pedir presupuesto" ahí, así que esto debe ser un
+  // no-op seguro en vez de lanzar.
+  var modal = document.getElementById('modal-detalle');
+  if (modal) modal.style.display = 'none';
   document.body.style.overflow = '';
   if (actualizarUrl !== false) actualizarUrlArticulo(null);
 }
 
-document.getElementById('modal-detalle').addEventListener('click', function(e){
-  if (e.target === this) cerrarModalDetalle();
-});
+var elModalDetalle = document.getElementById('modal-detalle');
+if (elModalDetalle) {
+  elModalDetalle.addEventListener('click', function(e){
+    if (e.target === elModalDetalle) cerrarModalDetalle();
+  });
+}
 
 // Mantiene la URL sincronizada con el modal: atrás cierra la ficha, adelante
 // la vuelve a abrir. No se llama a actualizarUrlArticulo desde aquí (el
