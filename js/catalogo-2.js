@@ -54,9 +54,26 @@ cargarCatalogo();
 
 // Deep-link: /catalogo?articulo=<id> abre directamente la ficha de ese
 // artículo (usado por el botón "Ver en la web" de Bendito OS).
+// Busca en TODOS_LOS_ARTICULOS, no en ARTICULOS_MOSTRADOS, para que funcione
+// aunque el usuario tenga una categoría filtrada activa.
 function abrirArticuloDesdeUrl() {
   var id = new URLSearchParams(location.search).get('articulo');
-  if (id) abrirModalDetalle(id);
+  if (!id) return;
+  
+  // Busca el artículo en el listado completo (no filtrado)
+  var articulo = TODOS_LOS_ARTICULOS.find(function(a){ return a.id === id; });
+  if (!articulo) return; // Artículo no existe
+  
+  // Si hay una categoría filtrada activa y el artículo no es de esa categoría,
+  // cambia el filtro a la categoría del artículo para que esté en ARTICULOS_MOSTRADOS
+  if (categoriaActiva && articulo.categoria !== categoriaActiva) {
+    categoriaActiva = articulo.categoria || '';
+    renderCategorias(TODOS_LOS_ARTICULOS);
+    pintarGrid();
+  }
+  
+  // Abre el modal (ahora el artículo seguro estará en ARTICULOS_MOSTRADOS)
+  abrirModalDetalle(id);
 }
 
 // ── Menú "¿Qué necesitas?" ──────────────────────────────────
