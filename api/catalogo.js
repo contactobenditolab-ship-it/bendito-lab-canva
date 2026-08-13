@@ -12,7 +12,7 @@
 // Mismo proyecto Supabase que usa Bendito OS. Sin autenticación (de solo
 // lectura salvo el cálculo, que no escribe nada).
 const { createClient } = require('@supabase/supabase-js');
-const { resolverColores } = require('../lib/colores');
+const { CAMPOS_PUBLICOS, enriquecerArticulos } = require('../lib/articulo-publico');
 
 let cachedClient = null;
 function client() {
@@ -25,15 +25,6 @@ function client() {
   cachedClient = createClient(url, key, { auth: { persistSession: false } });
   return cachedClient;
 }
-
-const CAMPOS_PUBLICOS = [
-  'id', 'nombre', 'categoria', 'subcategoria', 'etiquetas',
-  'descripcion', 'descripcion_corta',
-  'material', 'colores', 'medidas', 'capacidad', 'formato', 'acabados',
-  'tecnicas_personalizacion', 'guia_tallas',
-  'imagen_principal_url',
-  'personalizacion_incluida', 'personalizacion_medidas',
-].join(', ');
 
 // ── Fórmula de precios (copia fiel de src/lib/catalogo/pricing.ts en bendito-os) ──
 const MARGEN_MINIMO = 0.45;
@@ -217,34 +208,7 @@ module.exports = async function handler(req, res) {
         .order('nombre', { ascending: true });
       if (error) throw error;
 
-      const ids = (data || []).map((a) => a.id);
-      const [{ data: variantesTalla }, { data: imagenesColor }] = await Promise.all([
-        ids.length
-          ? supabase.from('catalogo_variantes').select('articulo_id, valor').eq('tipo', 'talla').in('articulo_id', ids).order('orden')
-          : Promise.resolve({ data: [] }),
-        ids.length
-          ? supabase.from('catalogo_imagenes').select('articulo_id, url, color').in('articulo_id', ids).not('color', 'is', null)
-          : Promise.resolve({ data: [] }),
-      ]);
-      const tallasPorArticulo = new Map();
-      (variantesTalla || []).forEach((v) => {
-        if (!tallasPorArticulo.has(v.articulo_id)) tallasPorArticulo.set(v.articulo_id, []);
-        tallasPorArticulo.get(v.articulo_id).push(v.valor);
-      });
-      const imagenesPorColorPorArticulo = new Map();
-      (imagenesColor || []).forEach((img) => {
-        if (!imagenesPorColorPorArticulo.has(img.articulo_id)) imagenesPorColorPorArticulo.set(img.articulo_id, {});
-        imagenesPorColorPorArticulo.get(img.articulo_id)[img.color] = img.url;
-      });
-
-      const articulos = await Promise.all(
-        (data || []).map(async (a) => ({
-          ...a,
-          colores_resueltos: a.colores && a.colores.length ? await resolverColores(a.colores) : [],
-          tallas: tallasPorArticulo.get(a.id) || [],
-          imagenes_por_color: imagenesPorColorPorArticulo.get(a.id) || {},
-        }))
-      );
+      const articulos = await enriquecerArticulos(supabase, data || []);
 
       res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
       return res.status(200).json({ articulos });

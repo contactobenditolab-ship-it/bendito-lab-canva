@@ -65,6 +65,10 @@
       "dest": "/catalogo.html"
     },
     {
+      "src": "/producto/(?:[^/]*-)?([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})",
+      "dest": "/api/producto?id=$1"
+    },
+    {
       "src": "/area-clientes",
       "dest": "/area-clientes.html"
     },
