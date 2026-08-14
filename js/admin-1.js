@@ -37,15 +37,6 @@ var dirty = false;
   setInterval(checkVersion, 120000);
 })();
 
-// ── COLORES ──────────────────────────────────────────────
-// ── SECCIONES EDITABLES ──────────────────────────────────
-var SEC_STYLES = [
-  {id:'sec-hero',       name:'Hero — Bloque principal',     bgDef:'#17233F', colorDef:'#FBF4E9'},
-  {id:'sec-lineas',     name:'Dos líneas de negocio',       bgDef:'',        colorDef:''},
-  {id:'sec-cotizacion', name:'Solicitar cotización',        bgDef:'#F4F1E6', colorDef:'#17233F'},
-  {id:'sec-redes',      name:'Síguenos en redes',           bgDef:'#17233F', colorDef:'#FBF4E9'},
-];
-
 function showToast(msg) {
   var t = document.getElementById('bl-toast');
   if (!t) {
@@ -77,136 +68,6 @@ function copiarCodigoBanner() {
     .then(function(){ showToast('Código copiado ✓'); })
     .catch(function(){ showToast('Error al copiar'); });
 }
-
-function renderSecColorList() {
-  var d = getData();
-  var estilos = d.sec_styles || {};
-  var list = document.getElementById('sec-color-list');
-  if (!list) return;
-  list.innerHTML = '';
-  SEC_STYLES.forEach(function(s, idx) {
-    var saved = estilos[s.id] || {};
-    var bg    = saved.bg    || s.bgDef    || '#ffffff';
-    var color = saved.color || s.colorDef || '#17233F';
-
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'padding:14px;border:1px solid #E0DDD6;margin-bottom:10px;background:#FAFAF8;';
-
-    // Título
-    var title = document.createElement('div');
-    title.style.cssText = 'font-family:\'Helvetica World\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-weight:800;font-size:13px;color:#17233F;margin-bottom:10px;';
-    title.textContent = s.name;
-    wrap.appendChild(title);
-
-    // Grid 2 columnas
-    var grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px;';
-
-    // Helper para crear una fila de color
-    function crearFilaColor(prop, label, val, idPicker, idText) {
-      var col = document.createElement('div');
-      var lbl = document.createElement('div');
-      lbl.style.cssText = 'font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:6px;';
-      lbl.textContent = label;
-      col.appendChild(lbl);
-
-      var row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;';
-
-      // Color picker
-      var picker = document.createElement('input');
-      picker.type = 'color';
-      picker.value = val;
-      picker.id = idPicker;
-      picker.style.cssText = 'width:40px;height:36px;padding:2px;border:1.5px solid #E0DDD6;cursor:pointer;';
-      picker.addEventListener('input', (function(sid, p){ return function(){ aplicarEstiloSeccion(sid, p, this.value); }; })(s.id, prop));
-      row.appendChild(picker);
-
-      // Text input
-      var txt = document.createElement('input');
-      txt.type = 'text';
-      txt.value = val;
-      txt.id = idText;
-      txt.maxLength = 9;
-      txt.style.cssText = 'flex:1;padding:8px;border:1.5px solid #E0DDD6;font-family:monospace;font-size:12px;';
-      txt.addEventListener('input', (function(sid, p){ return function(){ aplicarEstiloSeccionTxt(sid, p, this.value); }; })(s.id, prop));
-      row.appendChild(txt);
-
-      // Reset
-      var reset = document.createElement('button');
-      reset.textContent = '↩';
-      reset.title = 'Restablecer';
-      reset.style.cssText = 'background:none;border:1px solid #ddd;color:#aaa;padding:6px 8px;cursor:pointer;font-size:14px;';
-      reset.addEventListener('click', (function(sid, p, def){ return function(){ resetEstilo(sid, p, def); }; })(s.id, prop, prop==='bg'?s.bgDef:s.colorDef));
-      row.appendChild(reset);
-
-      col.appendChild(row);
-      return col;
-    }
-
-    grid.appendChild(crearFilaColor('bg',    'Fondo', bg,    'bg-'+s.id,  'bgtxt-'+s.id));
-    grid.appendChild(crearFilaColor('color', 'Texto', color, 'col-'+s.id, 'coltxt-'+s.id));
-    wrap.appendChild(grid);
-
-    // Vista previa
-    var preview = document.createElement('div');
-    preview.id = 'preview-'+s.id;
-    preview.style.cssText = 'margin-top:10px;padding:12px;font-size:13px;font-weight:700;text-align:center;background:'+bg+';color:'+color+';';
-    preview.textContent = 'Vista previa · ' + s.name;
-    wrap.appendChild(preview);
-
-    list.appendChild(wrap);
-  });
-}
-
-function aplicarEstiloSeccion(secId, prop, val) {
-  // Actualizar texto
-  document.getElementById((prop==='bg'?'bgtxt-':'coltxt-')+secId).value = val;
-  // Vista previa
-  var prev = document.getElementById('preview-'+secId);
-  if (prev) prev.style[prop==='bg'?'background':'color'] = val;
-  // Guardar
-  var d = getData();
-  if (!d.sec_styles) d.sec_styles = {};
-  if (!d.sec_styles[secId]) d.sec_styles[secId] = {};
-  d.sec_styles[secId][prop] = val;
-  setData(d);
-  markDirty();
-  // Enviar a portada via postMessage
-  broadcastToPortada(buildPortadaData());
-}
-
-function aplicarEstiloSeccionTxt(secId, prop, val) {
-  if (val.length < 4) return;
-  document.getElementById((prop==='bg'?'bg-':'col-')+secId).value = val;
-  aplicarEstiloSeccion(secId, prop, val);
-}
-
-function resetEstilo(secId, prop, defVal) {
-  if (!defVal) return;
-  document.getElementById((prop==='bg'?'bg-':'col-')+secId).value = defVal;
-  document.getElementById((prop==='bg'?'bgtxt-':'coltxt-')+secId).value = defVal;
-  aplicarEstiloSeccion(secId, prop, defVal);
-}
-
-var COLOR_DEFS = [
-  {id:'deep',    name:'Azul marino (fondo oscuro)',  def:'#17233F'},
-  {id:'captain', name:'Azul medio (acento)',         def:'#2F8FEA'},
-  {id:'baby',    name:'Azul cielo (fondo claro)',    def:'#93ACA7'},
-  {id:'sunshine',name:'Amarillo (acento brillante)', def:'#E8C24A'},
-  {id:'poppy',   name:'Coral (hover/acento)',        def:'#E2704A'},
-  {id:'cream',   name:'Crema (fondo principal)',     def:'#F4F1E6'},
-  {id:'white',   name:'Blanco (tarjetas)',           def:'#FBF4E9'},
-  {id:'mid',     name:'Gris texto',                  def:'#666666'},
-  {id:'gray',    name:'Gris bordes',                 def:'#E3DFCF'},
-];
-
-var PRESETS = {
-  marble: {deep:'#17233F',captain:'#2F8FEA',baby:'#93ACA7',sunshine:'#E8C24A',poppy:'#E2704A',cream:'#F4F1E6',white:'#FBF4E9',mid:'#666',gray:'#E3DFCF'},
-  tierra: {deep:'#5C3D2E',captain:'#8B6355',baby:'#D4A574',sunshine:'#F5C842',poppy:'#C0392B',cream:'#FAF0E6',white:'#FDF8F0',mid:'#7A6155',gray:'#D4C4B0'},
-  verde:  {deep:'#1B4332',captain:'#2D6A4F',baby:'#95D5B2',sunshine:'#F2D024',poppy:'#D62828',cream:'#D8F3DC',white:'#F0FFF4',mid:'#40916C',gray:'#B7E4C7'},
-  negro:  {deep:'#111111',captain:'#333333',baby:'#666666',sunshine:'#E8C24A',poppy:'#E2704A',cream:'#F5F5F0',white:'#FFFFFF',mid:'#888',gray:'#CCCCCC'},
-};
 
 // ── SECCIONES ─────────────────────────────────────────────
 var SECCIONES_DEFAULT = [
@@ -514,7 +375,6 @@ var TEXT_IDS=['t-eyebrow','t-h1','t-sub','t-cta1','t-cta2','t-db-tag','t-db-titl
 function loadAll(){
   var d=getData();
   TEXT_IDS.forEach(function(id){var el=document.getElementById(id);if(el&&d[id]!==undefined)el.value=d[id];});
-  if(d.colores){Object.keys(d.colores).forEach(function(k){var el=document.getElementById('col-picker-'+k);var tex=document.getElementById('col-text-'+k);if(el)el.value=d.colores[k];if(tex)tex.value=d.colores[k];});}
   if(d.secciones)secciones=d.secciones;
   if(d.seccionesExtra)seccionesExtra=d.seccionesExtra;
   if(d.redes)redes=d.redes;
@@ -536,18 +396,11 @@ function loadAll(){
   renderSecciones();
   renderRedes();
   renderProductos();
-  renderColorGrid();
-  renderSecColorList();
-  renderColorGrid();
 }
 
 function saveAll(){
   var d=getData();
   TEXT_IDS.forEach(function(id){var el=document.getElementById(id);if(el)d[id]=el.value;});
-  // Colores
-  var colores={};
-  COLOR_DEFS.forEach(function(c){var el=document.getElementById('col-text-'+c.id);if(el)colores[c.id]=el.value;});
-  d.colores=colores;
   d.secciones=secciones;
   d.seccionesExtra=seccionesExtra;
   d.redes=redes;
@@ -579,15 +432,10 @@ function buildPortadaData(){
   // Textos
   var map={'p-eyebrow':'t-eyebrow','p-h1':'t-h1','p-sub':'t-sub','p-db-tag':'t-db-tag','p-db-title':'t-db-title','p-db-desc':'t-db-desc','p-db-cta':'t-db-cta','p-bl-tag':'t-bl-tag','p-bl-title':'t-bl-title','p-bl-desc':'t-bl-desc','p-bl-cta':'t-bl-cta','p-cot-title':'t-cot-title','p-redes-sub':'t-redes-sub'};
   Object.keys(map).forEach(function(pid){var el=document.getElementById(map[pid]);if(el&&el.value)out[pid]=el.value;});
-  // Colores
-  COLOR_DEFS.forEach(function(c){var el=document.getElementById('col-text-'+c.id);if(el&&el.value)out['color-'+c.id]=el.value;});
   // Secciones visibilidad
   secciones.forEach(function(s){out[s.id+'_visible']=s.visible;});
   // Redes
   out.redes=redes;
-  // Estilos de sección
-  var d2=getData();
-  out.sec_styles = d2.sec_styles || {};
   return out;
 }
 
@@ -598,53 +446,6 @@ function broadcastToPortada(data){
   }catch(e){}
   // También guardar en sessionStorage para que la portada lo recoja al cargar
   sessionStorage.setItem('bl-portada-v1',JSON.stringify(data));
-}
-
-// ══ COLORES ════════════════════════════════════════════════
-function renderColorGrid(){
-  var d=getData();
-  var colores=d.colores||{};
-  var grid=document.getElementById('color-grid');
-  grid.innerHTML='';
-  COLOR_DEFS.forEach(function(c){
-    var val=colores[c.id]||c.def;
-    var row=document.createElement('div');
-    row.className='color-row';
-    row.innerHTML=
-      '<input type="color" id="col-picker-'+c.id+'" value="'+val+'" data-action="sync-color" data-id="'+c.id+'">'+
-      '<div class="color-info"><span class="color-name">'+c.name+'</span><input type="text" id="col-text-'+c.id+'" value="'+val+'" maxlength="9" data-action="sync-color-text" data-id="'+c.id+'" style="margin-top:4px;padding:4px 8px;border:1.5px solid #E0DDD6;font-family:monospace;font-size:12px;width:100%;outline:none;"></div>';
-    grid.appendChild(row);
-  });
-}
-
-function syncColor(id,val){
-  var tex=document.getElementById('col-text-'+id);
-  if(tex)tex.value=val;
-  // Preview en vivo en esta ventana
-  document.documentElement.style.setProperty('--'+id,val);
-  markDirty();
-}
-
-function syncColorText(id,val){
-  if(val.length===7&&val.startsWith('#')){
-    var picker=document.getElementById('col-picker-'+id);
-    if(picker)picker.value=val;
-    document.documentElement.style.setProperty('--'+id,val);
-    markDirty();
-  }
-}
-
-function applyPreset(name){
-  var p=PRESETS[name];
-  if(!p)return;
-  Object.keys(p).forEach(function(k){
-    var picker=document.getElementById('col-picker-'+k);
-    var tex=document.getElementById('col-text-'+k);
-    if(picker)picker.value=p[k];
-    if(tex)tex.value=p[k];
-    document.documentElement.style.setProperty('--'+k,p[k]);
-  });
-  markDirty();
 }
 
 // ══ SECCIONES ══════════════════════════════════════════════
@@ -937,9 +738,6 @@ function init(){
   loadImageContent().then(function(){
     Object.keys(IMG_GROUPS).forEach(function(g){renderImages(g,IMG_GROUPS[g]);});
   });
-  // Colores
-  renderColorGrid();
-  renderSecColorList();
   // Secciones
   renderSecciones();
   // Productos
@@ -1559,11 +1357,9 @@ function handleClick(e){
     case 'agregar-precio-portal':agregarPrecioPortal(); break;
     case 'add-producto':         addProducto(); break;
     case 'publicar-colores':     publicarColores(); break;
-    case 'reset-colores':        resetColores(); break;
     case 'gc-publicar':          gcPublicar(); break;
     case 'gc-reset':             gcReset(); break;
     case 'show':                 show(el.dataset.panel, el); break;
-    case 'apply-preset':         applyPreset(el.dataset.preset); break;
     case 'ver-img-grande':       verImgGrande(el.dataset.url); break;
     case 'eliminar-img':         eliminarImg(el.dataset.grp, parseInt(el.dataset.i,10), el.dataset.path, el.dataset.uid); break;
     case 'toggle-sec-card':      toggleSecCard(el); break;
@@ -1607,18 +1403,6 @@ function handleChange(e){
   }
 }
 document.addEventListener('change', handleChange);
-
-function handleInput(e){
-  const el=e.target.closest('[data-action]');
-  if(!el)return;
-  const i=el.dataset.i!==undefined?parseInt(el.dataset.i,10):undefined;
-  const ti=el.dataset.ti!==undefined?parseInt(el.dataset.ti,10):undefined;
-  switch(el.dataset.action){
-    case 'sync-color':      syncColor(el.dataset.id, el.value); break;
-    case 'sync-color-text': syncColorText(el.dataset.id, el.value); break;
-  }
-}
-document.addEventListener('input', handleInput);
 
 document.getElementById('pwd').addEventListener('keydown', function(e){
   if(e.key==='Enter') checkLogin();
