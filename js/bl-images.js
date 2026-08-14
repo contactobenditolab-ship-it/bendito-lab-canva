@@ -220,8 +220,37 @@
 
   var inIframe = window.self !== window.top;
 
+  // Paleta de marca: los mismos 9 colores con nombre que ya usa el resto del
+  // sitio (--deep, --captain...). Se ofrecen como sugerencias en cualquier
+  // <input type="color"> del editor vía <datalist>, para no tener que ir a
+  // ciegas con el selector nativo cada vez que se quiere un color de marca.
+  var BRAND_COLORS = [
+    { name: 'Azul marino',  hex: '#17233F' },
+    { name: 'Azul medio',   hex: '#2F8FEA' },
+    { name: 'Azul cielo',   hex: '#93ACA7' },
+    { name: 'Amarillo',     hex: '#E8C24A' },
+    { name: 'Coral',        hex: '#E2704A' },
+    { name: 'Crema',        hex: '#F4F1E6' },
+    { name: 'Blanco cálido',hex: '#FBF4E9' },
+    { name: 'Gris texto',   hex: '#666666' },
+    { name: 'Gris bordes',  hex: '#E3DFCF' }
+  ];
+  function injectBrandColorsDatalist() {
+    if (document.getElementById('bl-brand-colors')) return;
+    var dl = document.createElement('datalist');
+    dl.id = 'bl-brand-colors';
+    BRAND_COLORS.forEach(function (c) {
+      var opt = document.createElement('option');
+      opt.value = c.hex;
+      opt.label = c.name;
+      dl.appendChild(opt);
+    });
+    document.body.appendChild(dl);
+  }
+
   function initEditMode() {
     injectStyles();
+    injectBrandColorsDatalist();
     if (!inIframe) injectExitPill();
     wireImages();
     wireTexts();
@@ -351,6 +380,7 @@
       var input = document.createElement('input');
       input.type = 'color';
       input.value = /^#[0-9a-fA-F]{6}$/.test(current) ? current : '#000000';
+      input.setAttribute('list', 'bl-brand-colors');
       input.style.cssText = 'width:28px;height:28px;padding:0;border:none;border-radius:6px;cursor:pointer;flex-shrink:0;';
       var label = document.createElement('span');
       label.textContent = name;
@@ -493,15 +523,13 @@
     colorInput.addEventListener('change', function () {
       var el = savedTextEl;
       if (!el || !savedTextSelection) return;
-      el.setAttribute('contenteditable', 'true');
       var sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(savedTextSelection);
       applyStyleToSelection('color', colorInput.value);
       saveText(el.getAttribute('data-edit'), limpiarControlesInyectados(el.innerHTML.trim()));
-      el.focus();
-      showTextToolbar(el);
     });
+    colorInput.setAttribute('list', 'bl-brand-colors');
     bar.appendChild(colorInput);
 
     document.addEventListener('mousedown', function (e) {
@@ -598,10 +626,16 @@
         el.focus();
         showTextToolbar(el);
       });
-      el.addEventListener('blur', function () {
-        // Si el foco se movió a la barra de herramientas (clic en un botón),
-        // los botones ya hacen preventDefault en mousedown, así que este
-        // blur solo ocurre al salir de verdad del texto.
+      el.addEventListener('blur', function (e) {
+        // Los botones de la barra (B/I/U, fuente, tamaño) hacen preventDefault
+        // en mousedown y por eso nunca roban el foco. El selector de color de
+        // texto es un <input type="color"> nativo: SÍ necesita quedarse con el
+        // foco para abrir el selector del sistema, así que este blur si se
+        // dispara. Si el foco fue a parar a la propia barra (relatedTarget),
+        // no se trata de una salida real del texto: no lo demos por
+        // terminado ni ocultemos la barra, o el selector nativo se cierra a
+        // medio elegir el color.
+        if (e.relatedTarget && textToolbar && textToolbar.contains(e.relatedTarget)) return;
         el.removeAttribute('contenteditable');
         hideTextToolbar(el);
         saveText(el.getAttribute('data-edit'), limpiarControlesInyectados(el.innerHTML.trim()));
@@ -649,6 +683,7 @@
       var btn = document.createElement('input');
       btn.type = 'color';
       btn.className = 'bl-color-btn';
+      btn.setAttribute('list', 'bl-brand-colors');
       var bgId = el.getAttribute('data-color-bg');
       var textId = el.getAttribute('data-color-text');
       btn.value = toHex(getComputedStyle(el)[bgId ? 'backgroundColor' : 'color']) || '#000000';
