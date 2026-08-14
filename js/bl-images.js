@@ -74,6 +74,15 @@
   }
 
   function applyColors(colors) {
+    // Los colores de la paleta global (deep, poppy, cream...) se guardan con
+    // el mismo id que la variable CSS `--<id>` que ya usan casi todas las
+    // secciones del sitio (`background:var(--deep)`, etc.) en su :root. Basta
+    // con reaplicar esa variable en el elemento raíz para que todas las
+    // secciones que la usan cambien de color a la vez, sin marcar cada una
+    // con data-color-bg.
+    Object.keys(colors).forEach(function (id) {
+      if (colors[id]) document.documentElement.style.setProperty('--' + id, colors[id]);
+    });
     document.querySelectorAll('[data-color-bg]').forEach(function (el) {
       var id = el.getAttribute('data-color-bg');
       if (colors[id]) el.style.backgroundColor = colors[id];
@@ -218,6 +227,7 @@
     wireTexts();
     wireColors();
     wireLinks();
+    injectPaletteButton();
   }
 
   function injectStyles() {
@@ -284,6 +294,103 @@
       '<span style="flex:1;"></span>' +
       '<a href="admin.html" style="color:#FBF4E9;border:1px solid #FBF4E9;padding:6px 12px;border-radius:14px;">Ir al panel→</a>';
     document.body.prepend(bar);
+  }
+
+  // ── PALETA DE COLORES DEL SITIO ─────────────────────────────────────
+  // Casi todas las secciones de cada página pintan su fondo/texto con
+  // `var(--nombre)` definidas en el :root de esa misma página (--deep,
+  // --poppy, --cream...). En vez de exigir marcar cada sección a mano con
+  // data-color-bg, este panel descubre esas variables leyendo la propia
+  // regla :root del <style> de la página y deja editarlas todas — el cambio
+  // se aplica a todas las secciones que usan esa variable a la vez.
+  function discoverRootVars() {
+    var names = [];
+    var seen = {};
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var sheet = document.styleSheets[i];
+      var rules;
+      try { rules = sheet.cssRules; } catch (e) { continue; } // hoja externa/cross-origin, se ignora
+      if (!rules) continue;
+      for (var j = 0; j < rules.length; j++) {
+        var rule = rules[j];
+        if (!rule || rule.selectorText !== ':root' || !rule.style) continue;
+        for (var k = 0; k < rule.style.length; k++) {
+          var prop = rule.style[k];
+          if (prop.indexOf('--') === 0) {
+            var name = prop.slice(2);
+            if (!seen[name]) { seen[name] = true; names.push(name); }
+          }
+        }
+      }
+    }
+    return names;
+  }
+
+  var palettePanel = null;
+  function buildPalettePanel() {
+    if (palettePanel) return palettePanel;
+    var names = discoverRootVars();
+    var panel = document.createElement('div');
+    panel.id = 'bl-palette-panel';
+    panel.style.cssText = 'position:fixed;top:' + (inIframe ? '60px' : '104px') + ';right:12px;' +
+      'width:220px;max-height:80vh;overflow-y:auto;background:#fff;border-radius:12px;' +
+      'box-shadow:0 6px 24px rgba(0,0,0,.25);padding:14px;z-index:999998;display:none;' +
+      'font-family:Inter,sans-serif;';
+    panel.innerHTML = '<div style="font:700 13px/1 Inter,sans-serif;color:#17233F;margin-bottom:10px;">' +
+      'Colores del sitio</div>';
+    if (!names.length) {
+      panel.innerHTML += '<div style="font:12px/1.4 Inter,sans-serif;color:#888;">' +
+        'Esta página no define variables de color en :root.</div>';
+    }
+    names.forEach(function (name) {
+      var current = (CONTENT.colors && CONTENT.colors[name]) ||
+        toHex(getComputedStyle(document.documentElement).getPropertyValue('--' + name)) ||
+        getComputedStyle(document.documentElement).getPropertyValue('--' + name).trim() || '#000000';
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;';
+      var input = document.createElement('input');
+      input.type = 'color';
+      input.value = /^#[0-9a-fA-F]{6}$/.test(current) ? current : '#000000';
+      input.style.cssText = 'width:28px;height:28px;padding:0;border:none;border-radius:6px;cursor:pointer;flex-shrink:0;';
+      var label = document.createElement('span');
+      label.textContent = name;
+      label.style.cssText = 'font:12px/1.3 Inter,sans-serif;color:#17233F;word-break:break-word;';
+      input.addEventListener('input', function () {
+        document.documentElement.style.setProperty('--' + name, input.value);
+      });
+      input.addEventListener('change', function () {
+        CONTENT.colors[name] = input.value;
+        saveColor(name, input.value);
+      });
+      row.appendChild(input);
+      row.appendChild(label);
+      panel.appendChild(row);
+    });
+    document.body.appendChild(panel);
+    document.addEventListener('mousedown', function (e) {
+      if (panel.style.display !== 'none' && !panel.contains(e.target) && e.target.id !== 'bl-palette-btn') {
+        panel.style.display = 'none';
+      }
+    });
+    palettePanel = panel;
+    return panel;
+  }
+
+  function injectPaletteButton() {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'bl-palette-btn';
+    btn.title = 'Colores del sitio';
+    btn.textContent = '🎨';
+    btn.style.cssText = 'position:fixed;top:' + (inIframe ? '12px' : '56px') + ';right:12px;' +
+      'width:40px;height:40px;border-radius:50%;border:none;background:#17233F;color:#fff;' +
+      'font-size:18px;cursor:pointer;z-index:999999;box-shadow:0 2px 10px rgba(0,0,0,.3);';
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var panel = buildPalettePanel();
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+    document.body.appendChild(btn);
   }
 
   // ── TEXTOS ───────────────────────────────────────────────────────────
