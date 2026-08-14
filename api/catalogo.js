@@ -216,7 +216,9 @@ async function calcularPreciosDesde(supabase, ids) {
   (filasCoste || []).forEach((articulo) => {
     const contexto = {
       proveedor: proveedorPorId.get(articulo.proveedor_id) || null,
-      tramos: (gruposPorId.get(articulo.grupo_tramos_id) || {}).tramos || TRAMOS_MARGEN_DEFECTO,
+      tramos: ((gruposPorId.get(articulo.grupo_tramos_id) || {}).tramos || []).length
+        ? gruposPorId.get(articulo.grupo_tramos_id).tramos
+        : TRAMOS_MARGEN_DEFECTO,
       overrideB2c: overridePorArticulo.get(articulo.id) || [],
     };
     resultado.set(articulo.id, precioUnitarioProducto(articulo, 1, contexto));
