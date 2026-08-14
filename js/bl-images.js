@@ -292,12 +292,16 @@
     { label: 'Inter', value: 'Inter, sans-serif' },
     { label: 'Helvetica', value: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
     { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
-    { label: 'Georgia', value: 'Georgia, serif' }
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+    { label: 'Verdana', value: 'Verdana, Geneva, sans-serif' }
   ];
   var SIZE_CHOICES = ['Tamaño…', '12', '14', '16', '18', '20', '24', '28', '32', '40', '56'];
 
   var textToolbar = null;
   var activeTextEl = null;
+  var savedTextSelection = null;
+  var savedTextEl = null;
 
   function buildTextToolbar() {
     if (textToolbar) return textToolbar;
@@ -368,6 +372,30 @@
     }), function (value) {
       applyStyleToSelection('fontSize', value);
     });
+
+    var colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.title = 'Color del texto';
+    colorInput.style.cssText = 'width:26px;height:26px;padding:0;border:none;border-radius:5px;' +
+      'background:transparent;cursor:pointer;';
+    colorInput.addEventListener('mousedown', function () {
+      var sel = window.getSelection();
+      savedTextSelection = (sel && sel.rangeCount && !sel.isCollapsed) ? sel.getRangeAt(0).cloneRange() : null;
+      savedTextEl = activeTextEl;
+    });
+    colorInput.addEventListener('change', function () {
+      var el = savedTextEl;
+      if (!el || !savedTextSelection) return;
+      el.setAttribute('contenteditable', 'true');
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(savedTextSelection);
+      applyStyleToSelection('color', colorInput.value);
+      saveText(el.getAttribute('data-edit'), limpiarControlesInyectados(el.innerHTML.trim()));
+      el.focus();
+      showTextToolbar(el);
+    });
+    bar.appendChild(colorInput);
 
     document.addEventListener('mousedown', function (e) {
       if (!bar.contains(e.target)) {
