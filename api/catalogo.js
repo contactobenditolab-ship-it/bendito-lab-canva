@@ -128,8 +128,13 @@ function infoTramos(articulo, cantidad, contexto) {
   const precioSinDescuento = tabla[0].precio_unitario;
   const precioActual = precioUnitarioProducto(articulo, cantidad, contexto);
   const tramoActual = [...tramos].reverse().find((t) => cantidad >= t.cantidadMin) || tramos[0];
+  // Con tramos configurados a mano (override B2C) el precio por unidad no
+  // tiene por qué ser decreciente; si sale mayor que el de partida, esto
+  // daría un "descuento" negativo. Se acota a 0 en vez de dejarlo pasar: la
+  // UI solo pinta la línea de ahorro si es > 0, así que un valor negativo se
+  // ocultaba en vez de avisar de la configuración anómala.
   const descuentoPct = precioSinDescuento > 0
-    ? Math.round((1 - precioActual / precioSinDescuento) * 100)
+    ? Math.max(0, Math.round((1 - precioActual / precioSinDescuento) * 100))
     : 0;
   return {
     tiene_tramos: true,
