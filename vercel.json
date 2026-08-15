@@ -36,6 +36,13 @@
       "continue": true
     },
     {
+      "src": "/newsletter-.*",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow"
+      },
+      "continue": true
+    },
+    {
       "src": "/index\\.html",
       "status": 301,
       "headers": {
