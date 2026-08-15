@@ -23,13 +23,24 @@
     },
     {
       "src": "/area-clientes(\\.html)?",
-      "headers": { "X-Robots-Tag": "noindex, nofollow" },
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow"
+      },
       "continue": true
     },
     {
       "src": "/catalogo(\\.html)?",
-      "headers": { "X-Robots-Tag": "noindex, nofollow" },
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow"
+      },
       "continue": true
+    },
+    {
+      "src": "/index\\.html",
+      "status": 301,
+      "headers": {
+        "Location": "/"
+      }
     },
     {
       "src": "/",
@@ -50,7 +61,9 @@
     {
       "src": "/unete",
       "status": 301,
-      "headers": { "Location": "/colaboradores#unete-form" }
+      "headers": {
+        "Location": "/colaboradores#unete-form"
+      }
     },
     {
       "src": "/faq",
