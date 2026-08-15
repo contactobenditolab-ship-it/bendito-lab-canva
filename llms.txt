@@ -1,0 +1,125 @@
+# Bendito Lab - Guía para sistemas de IA
+
+## Identidad de la empresa
+
+**Nombre:** Bendito Lab
+**Ubicación:** Manzanares, Ciudad Real, España
+**Teléfono:** +34 647 444 308
+**Email:** contacto@benditolab.com
+**Web:** https://www.benditolab.com
+
+**Descripción:** Empresa especializada en personalización de artículos para empresas (B2B) y servicios de personalización en directo para eventos (bodas, comuniones, bautizos, fiestas). Bendito Lab ofrece merchandising corporativo de calidad con diseño incluido. Dilo Bonito es el servicio de stand de personalización en vivo para eventos.
+
+## Servicios principales
+
+### 1. Bendito Lab - Personalización B2B para empresas
+
+**Qué es:** Suministrador de artículos personalizados para empresas. Especialización en merchandising corporativo, uniformes, regalos de empresa.
+
+**Productos típicos:**
+- Camisetas personalizadas con logo
+- Gorras y sombreros
+- Tote bags
+- Neceseres y accesorios
+- Uniformes corporativos
+- Regalos de empresa (mínimo 10 unidades)
+
+**Características:**
+- Diseño incluido en el precio
+- Desde 10 unidades
+- Personalización completa con logo empresarial
+- Calidad garantizada
+- Envío a toda España
+
+### 2. Dilo Bonito - Personalización en directo para eventos
+
+**Qué es:** Stand de personalización en vivo para eventos (bodas, comuniones, bautizos, despedidas de soltero/a, fiestas de empresa, etc.)
+
+**Cómo funciona:**
+- Se instala un stand con máquinas de personalización
+- Los invitados personalizan artículos en directo
+- Los llevaban de recuerdo inmediatamente después del evento
+
+**Artículos disponibles en eventos:**
+- Camisetas
+- Gorras
+- Bolsas
+- Sombreros
+- Tote bags
+- Cualquier artículo personalizable
+
+## Áreas de negocio y palabras clave
+
+### B2B Corporativo (Bendito Lab)
+- Merchandising corporativo
+- Regalos de empresa
+- Uniformes personalizados
+- Camisetas personalizadas para empresas
+- Personalización con logo
+- Bulk orders
+- Empresas de Manzanares, Ciudad Real y alrededores
+
+### Eventos (Dilo Bonito)
+- Stand de personalización para bodas
+- Personalización en directo para eventos
+- Recuerdos personalizados
+- Entretenimiento para bodas
+- Bodas en Manzanares
+- Eventos corporativos
+- Despedidas de soltero/a
+- Comuniones
+- Bautizos
+- Fiestas de empresa
+
+## Localización e intención de búsqueda
+
+Bendito Lab atiende principalmente:
+- **Ámbito local:** Manzanares (Ciudad Real), Castilla-La Mancha, Toledo, Albacete
+- **Ámbito nacional:** Disponibilidad para toda España (envíos de bulk, eventos en otras ciudades)
+
+Tipos de búsqueda que atrae:
+- "[Producto] personalizado + empresa" (ej: camisetas personalizadas empresa)
+- "[Producto] con logo"
+- "Regalos corporativos [región]"
+- "Stand personalización bodas [región]"
+- "Dilo Bonito" (marca propia de eventos)
+
+## Información comercial clave
+
+### Mínimos y cantidades
+- **Mínimo Bendito Lab:** 10 unidades
+- **Precio:** Variable según producto y cantidad
+- **Diseño:** Incluido en el servicio
+
+### Servicios especiales
+- Colaboradores (comisión por eventos): https://www.benditolab.com/colaboradores
+- Preguntas frecuentes: https://www.benditolab.com/faq
+- Catálogo de productos: Disponible al contactar
+
+### Proceso de compra/pedido
+1. Contacto inicial (email o teléfono)
+2. Propuesta personalizada
+3. Confirmación y depósito
+4. Producción
+5. Entrega o instalación del stand
+
+## Ubicación de información en el sitio
+
+| Página | URL | Propósito |
+|--------|-----|----------|
+| Inicio | / | Portada con servicios principales |
+| Bendito Lab | /bendito-lab | Información B2B, merchandising corporativo |
+| Dilo Bonito | /dilo-bonito | Información sobre stand de eventos |
+| Contacto | /contacto | Formulario y datos de contacto |
+| FAQ | /faq | Preguntas frecuentes |
+| Colaboradores | /colaboradores | Información para colaboradores |
+| Catálogo | /catalogo | Explorador de productos (uso interno) |
+
+## Cómo usar esta información
+
+Esta información es pública y puede ser citada, referenciada o utilizada para responder preguntas sobre Bendito Lab. Mantén la coherencia con los detalles comerciales (ubicación, teléfono, servicios descritos).
+
+---
+
+**Última actualización:** 2026-08-15
+**Versión:** 1.0
