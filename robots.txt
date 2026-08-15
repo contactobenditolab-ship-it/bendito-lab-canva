@@ -1,58 +1,9 @@
-# Robots.txt for benditolab.com
-# Permite rastreo selectivo, bloquea áreas privadas
-
 User-agent: *
 Allow: /
-Allow: /llms.txt
 Disallow: /admin
-Disallow: /admin.html
 Disallow: /area-clientes
-Disallow: /area-clientes.html
 Disallow: /portal
 Disallow: /catalogo
-Disallow: /catalogo.html
 Disallow: /api/
-Disallow: /js/
-Disallow: /css/
-Disallow: /*.json
-Disallow: /newsletter-*
 
-# Permitir bots de búsqueda y IA
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: LinkedInBot
-Allow: /
-
-# Claude Web (Anthropic crawler)
-User-agent: Claude-Web
-Allow: /
-
-# Otros LLM crawlers
-User-agent: GPTBot
-Allow: /
-
-User-agent: Perplexity
-Allow: /
-
-User-agent: GeminiBot
-Allow: /
-
-# Sitemap
 Sitemap: https://www.benditolab.com/sitemap.xml
-Sitemap: https://www.benditolab.es/sitemap.xml
-
-# Crawl-delay para no sobrecargar servidor
-Crawl-delay: 1
