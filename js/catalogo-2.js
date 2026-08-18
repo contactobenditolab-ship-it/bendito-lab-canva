@@ -6,36 +6,90 @@
 
 var TODOS_LOS_ARTICULOS = [];
 var categoriaActiva = '';
+var subcategoriaActiva = '';
 var leerOrdenActiva = null;
 
-function renderCategorias(articulos) {
+function obtenerCategoriasUnicas(articulos) {
   var cats = [];
   articulos.forEach(function(a){ if (a.categoria && cats.indexOf(a.categoria) === -1) cats.push(a.categoria); });
-  cats.sort();
+  return cats.sort();
+}
+
+function obtenerSubcategoriasDeCategoria(articulos, categoria) {
+  var subs = [];
+  articulos.forEach(function(a){
+    if (a.categoria === categoria && a.subcategoria && subs.indexOf(a.subcategoria) === -1) {
+      subs.push(a.subcategoria);
+    }
+  });
+  return subs.sort();
+}
+
+function renderCategorias(articulos) {
+  var cats = obtenerCategoriasUnicas(articulos);
   var cont = document.getElementById('categorias');
   if (!cats.length) { cont.style.display = 'none'; return; }
 
-  var html = '<button type="button" class="cat-btn' + (!categoriaActiva ? ' activo' : '') + '" data-cat="">Todos</button>';
-  cats.forEach(function(c){
-    html += '<button type="button" class="cat-btn' + (categoriaActiva === c ? ' activo' : '') + '" data-cat="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
-  });
-  cont.innerHTML = html;
-  cont.style.display = 'flex';
-  cont.querySelectorAll('.cat-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      categoriaActiva = btn.dataset.cat || '';
-      renderCategorias(TODOS_LOS_ARTICULOS);
-      pintarGrid();
+  // Si no hay categoría activa, mostrar lista de categorías
+  if (!categoriaActiva) {
+    var html = cats.map(function(c){
+      return '<button type="button" class="cat-btn" data-cat="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
+    }).join('');
+    cont.innerHTML = html;
+    cont.style.display = 'flex';
+    cont.querySelectorAll('.cat-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        categoriaActiva = btn.dataset.cat || '';
+        subcategoriaActiva = '';
+        renderCategorias(articulos);
+      });
     });
-  });
+  } else {
+    // Si hay categoría activa, mostrar subcategorías de esa categoría
+    var subs = obtenerSubcategoriasDeCategoria(articulos, categoriaActiva);
+    
+    var html = '<button type="button" class="cat-btn" data-back="true">← ' + escapeHtml(categoriaActiva) + '</button>';
+    
+    if (subs.length) {
+      html += subs.map(function(s){
+        return '<button type="button" class="cat-btn' + (subcategoriaActiva === s ? ' activo' : '') + '" data-subcat="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>';
+      }).join('');
+    } else {
+      // Si no hay subcategorías, mostrar botón "Ver todos"
+      html += '<button type="button" class="cat-btn' + (!subcategoriaActiva ? ' activo' : '') + '" data-subcat="">Ver todos</button>';
+    }
+    
+    cont.innerHTML = html;
+    cont.style.display = 'flex';
+    
+    // Botón atrás
+    cont.querySelector('[data-back="true"]').addEventListener('click', function(){
+      categoriaActiva = '';
+      subcategoriaActiva = '';
+      renderCategorias(articulos);
+    });
+    
+    // Botones de subcategoría
+    cont.querySelectorAll('[data-subcat]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        subcategoriaActiva = btn.dataset.subcat || '';
+        renderCategorias(articulos);
+        pintarGrid();
+      });
+    });
+  }
 }
 
 function pintarGrid() {
-  var lista = categoriaActiva
-    ? TODOS_LOS_ARTICULOS.filter(function(a){ return a.categoria === categoriaActiva; })
-    : TODOS_LOS_ARTICULOS;
+  var lista = TODOS_LOS_ARTICULOS;
+  if (categoriaActiva) {
+    lista = lista.filter(function(a){ return a.categoria === categoriaActiva; });
+  }
+  if (subcategoriaActiva) {
+    lista = lista.filter(function(a){ return a.subcategoria === subcategoriaActiva; });
+  }
   var criterio = leerOrdenActiva ? leerOrdenActiva() : 'nombre';
-  renderGridEn('catalogo-grid', ordenarArticulos(lista, criterio), 'No hay artículos disponibles ahora mismo en esta categoría.');
+  renderGridEn('catalogo-grid', ordenarArticulos(lista, criterio), 'No hay artículos disponibles ahora mismo en esta sección.');
 }
 
 async function cargarCatalogo() {
@@ -68,14 +122,20 @@ function abrirArticuloDesdeUrl() {
   if (!articulo) return; // Artículo no existe
   
   // Si hay una categoría filtrada activa y el artículo no es de esa categoría,
-  // cambia el filtro a la categoría del artículo para que esté en ARTICULOS_MOSTRADOS
+  // cambia el filtro a la categoría del artículo
   if (categoriaActiva && articulo.categoria !== categoriaActiva) {
     categoriaActiva = articulo.categoria || '';
+    subcategoriaActiva = articulo.subcategoria || '';
+    renderCategorias(TODOS_LOS_ARTICULOS);
+    pintarGrid();
+  } else if (categoriaActiva && subcategoriaActiva && articulo.subcategoria !== subcategoriaActiva) {
+    // Si la subcategoría activa no coincide, actualizar
+    subcategoriaActiva = articulo.subcategoria || '';
     renderCategorias(TODOS_LOS_ARTICULOS);
     pintarGrid();
   }
   
-  // Abre el modal (ahora el artículo seguro estará en ARTICULOS_MOSTRADOS)
+  // Abre el modal
   abrirModalDetalle(id);
 }
 
@@ -121,6 +181,8 @@ function renderNecesidades(necesidades) {
 
 async function aplicarFiltroNecesidad(slug, nombre) {
   necesidadActiva = slug;
+  categoriaActiva = '';
+  subcategoriaActiva = '';
   document.querySelectorAll('.nec-btn').forEach(function(b){ b.classList.toggle('activo', b.dataset.slug === slug); });
 
   var catCont = document.getElementById('categorias');
