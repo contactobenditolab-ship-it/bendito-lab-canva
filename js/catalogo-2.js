@@ -25,6 +25,13 @@ function obtenerSubcategoriasDeCategoria(articulos, categoria) {
   return subs.sort();
 }
 
+function existenPacks(articulos) {
+  return articulos.some(function(a){
+    var cats = (a.etiquetas || []).map(function(e){ return String(e).toLowerCase(); });
+    return (a.categoria && a.categoria.toLowerCase().includes('pack')) || cats.indexOf('pack') !== -1;
+  });
+}
+
 function renderCategorias(articulos) {
   var cats = obtenerCategoriasUnicas(articulos);
   var cont = document.getElementById('categorias');
@@ -35,6 +42,15 @@ function renderCategorias(articulos) {
     var html = cats.map(function(c){
       return '<button type="button" class="cat-btn" data-cat="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
     }).join('');
+    
+    // Agregar sección de Packs si existen
+    if (existenPacks(articulos)) {
+      html += '<div class="pack-section">' +
+        '<span class="pack-title">📦 Packs</span>' +
+        '<button type="button" class="cat-btn" data-cat="__packs__">Ver packs</button>' +
+        '</div>';
+    }
+    
     cont.innerHTML = html;
     cont.style.display = 'flex';
     cont.querySelectorAll('.cat-btn').forEach(function(btn){
@@ -45,51 +61,78 @@ function renderCategorias(articulos) {
       });
     });
   } else {
-    // Si hay categoría activa, mostrar subcategorías de esa categoría
-    var subs = obtenerSubcategoriasDeCategoria(articulos, categoriaActiva);
-    
-    var html = '<button type="button" class="cat-btn" data-back="true">← ' + escapeHtml(categoriaActiva) + '</button>';
-    
-    if (subs.length) {
-      html += subs.map(function(s){
-        return '<button type="button" class="cat-btn' + (subcategoriaActiva === s ? ' activo' : '') + '" data-subcat="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>';
-      }).join('');
-    } else {
-      // Si no hay subcategorías, mostrar botón "Ver todos"
-      html += '<button type="button" class="cat-btn' + (!subcategoriaActiva ? ' activo' : '') + '" data-subcat="">Ver todos</button>';
-    }
-    
-    cont.innerHTML = html;
-    cont.style.display = 'flex';
-    
-    // Botón atrás
-    cont.querySelector('[data-back="true"]').addEventListener('click', function(){
-      categoriaActiva = '';
-      subcategoriaActiva = '';
-      renderCategorias(articulos);
-    });
-    
-    // Botones de subcategoría
-    cont.querySelectorAll('[data-subcat]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        subcategoriaActiva = btn.dataset.subcat || '';
+    // Si es la categoría virtual de Packs
+    if (categoriaActiva === '__packs__') {
+      var html = '<button type="button" class="cat-btn" data-back="true">← Packs</button>' +
+        '<button type="button" class="cat-btn' + (!subcategoriaActiva ? ' activo' : '') + '" data-subcat="">Ver todos</button>';
+      
+      cont.innerHTML = html;
+      cont.style.display = 'flex';
+      
+      cont.querySelector('[data-back="true"]').addEventListener('click', function(){
+        categoriaActiva = '';
+        subcategoriaActiva = '';
         renderCategorias(articulos);
+      });
+      
+      cont.querySelector('[data-subcat]').addEventListener('click', function(){
+        subcategoriaActiva = '';
         pintarGrid();
       });
-    });
+    } else {
+      // Mostrar subcategorías de categoría normal
+      var subs = obtenerSubcategoriasDeCategoria(articulos, categoriaActiva);
+      
+      var html = '<button type="button" class="cat-btn" data-back="true">← ' + escapeHtml(categoriaActiva) + '</button>';
+      
+      if (subs.length) {
+        html += subs.map(function(s){
+          return '<button type="button" class="cat-btn' + (subcategoriaActiva === s ? ' activo' : '') + '" data-subcat="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>';
+        }).join('');
+      } else {
+        html += '<button type="button" class="cat-btn' + (!subcategoriaActiva ? ' activo' : '') + '" data-subcat="">Ver todos</button>';
+      }
+      
+      cont.innerHTML = html;
+      cont.style.display = 'flex';
+      
+      cont.querySelector('[data-back="true"]').addEventListener('click', function(){
+        categoriaActiva = '';
+        subcategoriaActiva = '';
+        renderCategorias(articulos);
+      });
+      
+      cont.querySelectorAll('[data-subcat]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          subcategoriaActiva = btn.dataset.subcat || '';
+          renderCategorias(articulos);
+          pintarGrid();
+        });
+      });
+    }
   }
 }
 
 function pintarGrid() {
   var lista = TODOS_LOS_ARTICULOS;
-  if (categoriaActiva) {
+  
+  // Filtro especial para Packs
+  if (categoriaActiva === '__packs__') {
+    lista = lista.filter(function(a){
+      var cats = (a.etiquetas || []).map(function(e){ return String(e).toLowerCase(); });
+      return (a.categoria && a.categoria.toLowerCase().includes('pack')) || cats.indexOf('pack') !== -1;
+    });
+  } else if (categoriaActiva) {
     lista = lista.filter(function(a){ return a.categoria === categoriaActiva; });
   }
+  
   if (subcategoriaActiva) {
     lista = lista.filter(function(a){ return a.subcategoria === subcategoriaActiva; });
   }
+  
   var criterio = leerOrdenActiva ? leerOrdenActiva() : 'nombre';
-  renderGridEn('catalogo-grid', ordenarArticulos(lista, criterio), 'No hay artículos disponibles ahora mismo en esta sección.');
+  var msgVacio = categoriaActiva === '__packs__' ? 'No hay packs disponibles.' : 'No hay artículos disponibles ahora mismo en esta sección.';
+  renderGridEn('catalogo-grid', ordenarArticulos(lista, criterio), msgVacio);
 }
 
 async function cargarCatalogo() {
