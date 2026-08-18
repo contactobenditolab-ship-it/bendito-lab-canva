@@ -49,17 +49,17 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .necesidad-banner{max-width:1200px;margin:18px auto 0;padding:0 5vw;text-align:center;font-size:13px;}
 .necesidad-banner button{background:none;border:none;color:var(--captain);font-weight:700;font-size:13px;cursor:pointer;text-decoration:underline;padding:0;}
 
-/* Contenedor principal: menú arriba, grid abajo */
-.catalogo-container{display:grid;grid-template-columns:1fr;gap:24px;max-width:100%;margin:32px auto 0;padding:0 5vw 80px;}
+/* Contenedor principal: menú a la izquierda, grid a la derecha */
+.catalogo-container{display:grid;grid-template-columns:240px 1fr;gap:36px;align-items:start;max-width:100%;margin:32px auto 0;padding:0 5vw 80px;}
 
-/* Categorías horizontal (arriba del grid) */
-.categorias-sidebar{display:flex;flex-direction:column;gap:0;width:100%;}
-.categorias{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start;margin:0;padding:0;}
+/* Categorías vertical (izquierda) */
+.categorias-sidebar{display:flex;flex-direction:column;gap:0;width:100%;position:sticky;top:24px;}
+.categorias{display:flex;flex-direction:column;flex-wrap:nowrap;gap:8px;justify-content:flex-start;align-items:stretch;margin:0;padding:0;}
 
-.cat-btn{border:1px solid var(--deep);background:var(--cream);color:var(--deep);font-weight:700;font-size:13px;letter-spacing:.5px;padding:10px 20px;border-radius:24px;cursor:pointer;transition:all .2s;}
+.cat-btn{border:1px solid var(--deep);background:var(--cream);color:var(--deep);font-weight:700;font-size:13px;letter-spacing:.5px;padding:10px 20px;border-radius:24px;cursor:pointer;transition:all .2s;text-align:left;width:100%;}
 .cat-btn:hover{background:var(--deep);color:var(--white);}
 .cat-btn.activo{background:var(--deep);color:var(--white);font-size:14px;}
-.cat-btn[data-back="true"]{border:none;background:transparent;padding:0 8px 0 0;font-size:12px;color:var(--baby);text-transform:uppercase;letter-spacing:.3px;}
+.cat-btn[data-back="true"]{border:none;background:transparent;padding:0 8px 8px 0;font-size:12px;color:var(--baby);text-transform:uppercase;letter-spacing:.3px;width:auto;}
 .cat-btn[data-back="true"]:hover{background:transparent;color:var(--deep);}
 
 /* Subcategorías */
@@ -68,12 +68,12 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .cat-btn[data-subcat].activo{font-weight:700;opacity:1;}
 
 /* Sección Packs */
-.pack-section{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.pack-section{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:12px 0 0;}
 .pack-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--poppy);margin:0;}
 
-/* Grid usa 100% ancho */
+/* Grid de productos: 4 columnas a la derecha */
 .catalogo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;width:100%;}
-@media(max-width:1400px){
+@media(max-width:1100px){
   .catalogo-grid{grid-template-columns:repeat(3,1fr);}
 }
 @media(max-width:768px){
@@ -98,11 +98,15 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .orden-catalogo select{border:1px solid var(--deep);background:var(--white);color:var(--deep);font-weight:600;font-size:13px;padding:8px 12px;border-radius:20px;cursor:pointer;}
 .catalogo-vacio,.catalogo-cargando{text-align:center;padding:60px 20px;font-size:14px;color:var(--deep);opacity:.7;grid-column:1/-1;}
 
-/* Responsive: botones categorías en mobile */
-@media(max-width:768px){
-  .categorias{gap:8px;}
+/* Responsive: menú pasa a horizontal arriba del grid en mobile/tablet */
+@media(max-width:900px){
+  .catalogo-container{grid-template-columns:1fr;gap:20px;}
+  .categorias-sidebar{position:static;}
+  .categorias{flex-direction:row;flex-wrap:wrap;gap:8px;}
+  .cat-btn{width:auto;text-align:center;}
+  .cat-btn[data-back="true"]{padding:0 8px 0 0;}
   .cat-btn{font-size:12px;padding:8px 16px;}
-  .pack-section{flex-direction:column;align-items:flex-start;margin-left:0;margin-top:12px;}
+  .pack-section{flex-direction:row;flex-wrap:wrap;align-items:center;margin-left:auto;margin-top:0;}
 }
 
 #modal-presupuesto,#modal-detalle{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;overflow-y:auto;padding:40px 16px;}
