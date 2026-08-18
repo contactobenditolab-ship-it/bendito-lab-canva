@@ -75,20 +75,21 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .pack-section{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:12px 0 0;}
 .pack-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--poppy);margin:0;}
 
-/* Grid de productos: 4 columnas, ocupa todo el ancho restante a la derecha */
-.catalogo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;width:100%;min-width:0;}
-@media(max-width:1100px){
-  .catalogo-grid{grid-template-columns:repeat(3,1fr);}
-}
+/* Grid de productos: se adapta al ancho disponible (auto-fill) en vez de
+   reservar siempre 4 columnas fijas. Así, con pocos artículos filtrados,
+   las tarjetas se estiran para ocupar todo el ancho restante en lugar de
+   dejar columnas vacías (~4 por fila en desktop, menos en pantallas
+   estrechas). */
+.catalogo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:28px;width:100%;min-width:0;}
 @media(max-width:768px){
-  .catalogo-grid{grid-template-columns:repeat(2,1fr);gap:20px;}
+  .catalogo-grid{gap:20px;}
 }
 @media(max-width:480px){
   .catalogo-grid{grid-template-columns:1fr;gap:16px;}
 }
 .prod-card{background:var(--white);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #E4DEC9;}
-.prod-card-img{height:260px;background:var(--baby);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.prod-card-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.prod-card-img{aspect-ratio:1/1;height:auto;background:var(--baby);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.prod-card-img img{width:100%;height:100%;object-fit:contain;display:block;}
 .prod-card-img span{color:var(--white);font-size:12px;font-weight:700;}
 .prod-card-body{padding:20px;flex:1;display:flex;flex-direction:column;}
 .prod-clicable{cursor:pointer;display:block;}
@@ -154,7 +155,6 @@ textarea.field{resize:vertical;}
 }
 
 @media(max-width:900px){
-  .catalogo-grid{grid-template-columns:repeat(2,1fr);}
   .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
   .site-nav a{font-size:20px;color:var(--white)!important;}
   .nav-hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;position:absolute;top:28px;right:5vw;z-index:1001;}
@@ -166,8 +166,7 @@ textarea.field{resize:vertical;}
   .footer-bottom-links{justify-content:center;}
 }
 @media(max-width:560px){
-  .catalogo-grid{grid-template-columns:1fr 1fr;gap:14px;}
-  .prod-card-img{height:150px;}
+  .catalogo-grid{gap:14px;}
 }
 
 footer{background:var(--rose);}
