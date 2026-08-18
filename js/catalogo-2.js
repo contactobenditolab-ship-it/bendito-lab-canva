@@ -43,10 +43,10 @@ function renderCategorias(articulos) {
       return '<button type="button" class="cat-btn" data-cat="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
     }).join('');
     
-    // Agregar sección de Packs si existen
+    // Agregar sección de Packs a la derecha si existen
     if (existenPacks(articulos)) {
       html += '<div class="pack-section">' +
-        '<span class="pack-title">📦 Packs</span>' +
+        '<span class="pack-title">📦 PACKS</span>' +
         '<button type="button" class="cat-btn" data-cat="__packs__">Ver packs</button>' +
         '</div>';
     }
