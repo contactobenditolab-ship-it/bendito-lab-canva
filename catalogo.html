@@ -80,27 +80,27 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .pack-section{border-top:2px solid var(--poppy);margin-top:16px;padding-top:16px;}
 .pack-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--poppy);padding:0 16px 8px;margin:0;display:block;}
 
-.catalogo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.catalogo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
 @media(max-width:1200px){
-  .catalogo-grid{grid-template-columns:repeat(3,1fr);}
+  .catalogo-grid{grid-template-columns:repeat(3,1fr);gap:28px;}
 }
 @media(max-width:768px){
-  .catalogo-grid{grid-template-columns:repeat(2,1fr);}
+  .catalogo-grid{grid-template-columns:repeat(2,1fr);gap:20px;}
 }
 @media(max-width:480px){
-  .catalogo-grid{grid-template-columns:1fr;}
+  .catalogo-grid{grid-template-columns:1fr;gap:16px;}
 }
 .prod-card{background:var(--white);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #E4DEC9;}
-.prod-card-img{height:200px;background:var(--baby);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.prod-card-img{height:280px;background:var(--baby);display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .prod-card-img img{width:100%;height:100%;object-fit:cover;display:block;}
 .prod-card-img span{color:var(--white);font-size:12px;font-weight:700;}
-.prod-card-body{padding:18px;flex:1;display:flex;flex-direction:column;}
+.prod-card-body{padding:24px;flex:1;display:flex;flex-direction:column;}
 .prod-clicable{cursor:pointer;display:block;}
-.prod-cat{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
-.prod-nombre{font-size:15px;font-weight:700;margin:0 0 8px;}
-.prod-desc{font-size:13px;line-height:1.5;color:var(--deep);opacity:.8;margin:0 0 16px;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.prod-precio{font-size:14px;font-weight:800;color:var(--deep);margin:0 0 12px;}
-.btn-presupuesto{background:var(--captain);color:var(--white);font-weight:700;font-size:12px;padding:11px 16px;border-radius:20px;border:none;cursor:pointer;text-align:center;}
+.prod-cat{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 8px;}
+.prod-nombre{font-size:16px;font-weight:700;margin:0 0 10px;line-height:1.3;}
+.prod-desc{font-size:14px;line-height:1.6;color:var(--deep);opacity:.8;margin:0 0 16px;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.prod-precio{font-size:15px;font-weight:800;color:var(--deep);margin:0 0 14px;}
+.btn-presupuesto{background:var(--captain);color:var(--white);font-weight:700;font-size:13px;padding:13px 18px;border-radius:20px;border:none;cursor:pointer;text-align:center;}
 .orden-catalogo{max-width:1200px;margin:20px auto 0;padding:0 5vw;display:flex;justify-content:flex-end;align-items:center;gap:10px;}
 .orden-catalogo label{font-size:12px;font-weight:700;color:var(--deep);}
 .orden-catalogo select{border:1px solid var(--deep);background:var(--white);color:var(--deep);font-weight:600;font-size:13px;padding:8px 12px;border-radius:20px;cursor:pointer;}
