@@ -66,8 +66,15 @@ function calcularCosteReal(a, proveedor) {
   };
 }
 
+// Réplica de redondearPsicologico() en bendito-os (src/lib/catalogo/pricing.ts)
+// — repo separado, sin código compartido, así que hay que portar el fix a
+// mano. Precios < 10€: redondea al centavo sin ".95", si no tramos
+// contiguos con precios brutos distintos (p.ej. 5.24€ y 5.38€) se veían
+// como el mismo precio final (5.95€) — el bug real detectado 19 Aug 2026
+// en /producto de Bálsamo Labial: 4 tramos seguidos a 4.95€.
 function redondearPsicologico(precio) {
   if (precio <= 0) return 0;
+  if (precio < 10) return Math.round(precio * 100) / 100;
   const entero = Math.floor(precio);
   const conDecimal = entero + 0.95;
   return conDecimal >= precio ? conDecimal : entero + 1 + 0.95;

@@ -194,15 +194,11 @@ function renderGridEn(containerId, lista, mensajeVacio) {
           '<a class="prod-nombre prod-clicable" href="' + escapeHtml(href) + '" data-detalle-id="' + escapeHtml(a.id) + '">' + escapeHtml(a.nombre) + '</a>' +
           (desc ? '<p class="prod-desc">' + escapeHtml(desc) + '</p>' : '') +
           precio +
-          '<button type="button" class="btn-presupuesto" data-articulo-id="' + escapeHtml(a.id) + '">Pedir presupuesto</button>' +
+          '<a class="btn-presupuesto" href="' + escapeHtml(href) + '">Pedir presupuesto</a>' +
         '</div>' +
       '</div>'
     );
   }).join('');
-
-  cont.querySelectorAll('.btn-presupuesto').forEach(function(btn){
-    btn.addEventListener('click', function(){ abrirModalDetalle(btn.dataset.articuloId); });
-  });
 }
 
 // ── Ordenación del listado (nombre A-Z, precio asc/desc) ──────────────────
@@ -494,7 +490,6 @@ async function renderCalculadora(articulo) {
 
   var meta = await cargarMetaPersonalizacion();
   var todasTecnicas = meta.tecnicas || [];
-  var extrasDisponibles = meta.extras || [];
 
   var tecnicasArticulo = (articulo.tecnicas_personalizacion || []).map(function(t){ return String(t).toLowerCase(); });
   var tecnicasAplicables = tecnicasArticulo.length
@@ -503,20 +498,19 @@ async function renderCalculadora(articulo) {
   if (!tecnicasAplicables.length) tecnicasAplicables = todasTecnicas;
 
   // El precio base del artículo (sin personalizar) siempre se puede calcular
-  // con solo la cantidad — la técnica/extras son opcionales. Antes, si no
-  // había fichas de coste de tipo "tecnica"/"extra" en el catálogo interno
+  // con solo la cantidad — la técnica es opcional. Antes, si no había
+  // fichas de coste de tipo "tecnica" en el catálogo interno
   // (fichas_costes), aquí se vaciaba el contenedor entero y la calculadora
   // desaparecía sin más, aunque el precio base sí se pudiera calcular.
+  //
+  // Los "extras" (fichas_costes tipo "extra") son específicos de Dilo
+  // Bonito (eventos) — no se muestran aquí, esto es el catálogo B2B/B2C de
+  // producto: mostrar "Extras de eventos" en todos los artículos (un
+  // bálsamo labial, p.ej.) no tiene sentido para el cliente.
   var tecnicaHtml = tecnicasAplicables.length
     ? '<label>Técnica (opcional)<select id="calc-tecnica"><option value="">Sin personalizar</option>' +
         tecnicasAplicables.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('') +
       '</select></label>'
-    : '';
-  var extrasHtml = extrasDisponibles.length
-    ? '<div class="md-calc-extras">' + extrasDisponibles.map(function(ex, i){
-        return '<label class="md-calc-extra"><input type="checkbox" data-extra-nombre="' + escapeHtml(ex.nombre) + '"> ' +
-          escapeHtml(ex.nombre) + ' (+' + Number(ex.precio || 0).toFixed(2) + '€)</label>';
-      }).join('') + '</div>'
     : '';
 
   cont.innerHTML =
@@ -525,7 +519,6 @@ async function renderCalculadora(articulo) {
       '<label>Cantidad<input type="number" id="calc-cantidad" min="1" value="25"></label>' +
       tecnicaHtml +
     '</div>' +
-    extrasHtml +
     '<button type="button" class="btn-calcular" id="btn-calcular">CALCULAR PRECIO→</button>' +
     '<div class="md-calc-resultado" id="calc-resultado" style="display:none;"></div>';
 
@@ -542,8 +535,7 @@ async function ejecutarCalculo(articuloId) {
   var cantidad = parseInt(document.getElementById('calc-cantidad').value, 10) || 1;
   var tecnicaEl = document.getElementById('calc-tecnica');
   var tecnica = tecnicaEl && tecnicaEl.value ? tecnicaEl.value : null;
-  var extras = Array.prototype.slice.call(document.querySelectorAll('#md-calc [data-extra-nombre]:checked'))
-    .map(function(el){ return el.dataset.extraNombre; });
+  var extras = [];
 
   btn.disabled = true; btn.textContent = 'Calculando...';
   resEl.style.display = 'none';
