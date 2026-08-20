@@ -66,19 +66,6 @@ h1,h2,h3{font-family:'Helvetica World','Helvetica Neue',Helvetica,Arial,sans-ser
 .of-card-body p{margin:0 0 20px;font-size:14px;line-height:1.55;flex:1;text-align:center;}
 .of-card-body a{background:#7D9A74;color:#fff;font-weight:700;font-size:12px;padding:12px 20px;border-radius:999px;display:inline-block;margin:0 auto;}
 
-.unete-section{background:var(--cream);padding:0 5vw 80px;}
-.unete-wrap{max-width:760px;margin:0 auto;}
-.unete-wrap h2{font-weight:800;font-size:clamp(28px,4vw,38px);margin:0 0 8px;text-align:center;}
-.unete-wrap>p{text-align:center;font-size:15px;margin:0 0 36px;}
-.field{width:100%;padding:12px 14px;border-radius:8px;border:none;background:var(--cream);font-size:14px;font-weight:500;color:var(--deep);font-family:'Inter',sans-serif;}
-.field-card{background:#9AB791;border-radius:20px;padding:24px;margin-bottom:20px;}
-.field-card h3{font-weight:800;margin:0 0 18px;font-size:16px;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.tipbtn{border:none;cursor:pointer;border-radius:8px;padding:12px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;background:var(--cream);color:var(--deep);}
-.tipbtn.sel{background:var(--sage-dark);color:var(--white);}
-#unete-form-success{display:none;text-align:center;padding:60px 24px;}
-#unete-form-success .mark{font-size:44px;margin-bottom:18px;}
 
 .como-funciona{background:var(--cream);padding:0 5vw 80px;}
 .como-funciona h2{font-weight:800;font-size:clamp(30px,4.5vw,42px);margin:0 0 32px;max-width:1200px;margin-left:auto;margin-right:auto;}
@@ -157,14 +144,14 @@ footer{background:var(--poppy);}
       <div class="of-card-img"><img src="images/b2b-1.webp" alt="Comisión por evento confirmado" loading="lazy" decoding="async"><span data-edit="colaboradores.ofrecemos.card1-tag">COMISIÓN POR EVENTO CONFIRMADO</span></div>
       <div class="of-card-body">
         <p data-edit="colaboradores.ofrecemos.card1-p">Tú recomiendas el servicio. Nosotros nos encargamos del resto y tú ganas una comisión por cada evento.</p>
-        <a href="#unete-form" data-edit="colaboradores.ofrecemos.card1-cta">ÚNETE→</a>
+        <a href="contacto.html" data-edit="colaboradores.ofrecemos.card1-cta">ÚNETE→</a>
       </div>
     </div>
     <div class="of-card">
       <div class="of-card-img"><img src="images/b2b-2.webp" alt="Servicio exclusivo que diferencia tu negocio" loading="lazy" decoding="async"><span data-edit="colaboradores.ofrecemos.card2-tag">SERVICIO EXCLUSIVO QUE DIFERENCIA TU NEGOCIO</span></div>
       <div class="of-card-body">
         <p data-edit="colaboradores.ofrecemos.card2-p">Amplía tus servicios, sorprende a tus clientes y genera ingresos sin asumir más trabajo.</p>
-        <a href="#unete-form" data-edit="colaboradores.ofrecemos.card2-cta">QUIERO SER COLABORADOR→</a>
+        <a href="contacto.html" data-edit="colaboradores.ofrecemos.card2-cta">QUIERO SER COLABORADOR→</a>
       </div>
     </div>
     <div class="of-card">
@@ -177,139 +164,7 @@ footer{background:var(--poppy);}
   </div>
 </section>
 
-<section class="unete-section" id="unete-form">
-  <div class="unete-wrap">
 
-    <div id="unete-form-success">
-      <div class="mark">✦</div>
-      <h2 data-edit="colaboradores.unete.success-h2">¡Solicitud enviada!</h2>
-      <p style="font-size:15px;line-height:1.6;margin:0;" data-edit="colaboradores.unete.success-p">Revisaremos tu solicitud y te contactaremos pronto. Gracias por querer formar parte de Bendito Lab.</p>
-    </div>
-
-    <div id="unete-form-visible">
-      <h2 data-edit="colaboradores.unete.title">Únete como colaborador</h2>
-      <p data-edit="colaboradores.unete.p">Trabaja con nosotros y gana comisión recomendando Dilo Bonito a tus clientes.</p>
-
-      <form id="unete-form-el" style="display:flex;flex-direction:column;gap:20px;">
-
-        <div class="field-card">
-          <h3>1 · Datos del colaborador</h3>
-          <div class="grid2">
-            <input class="field" name="nombre" placeholder="Nombre y apellidos" required>
-            <input class="field" name="espacio" placeholder="Espacio o empresa" required>
-            <input class="field" name="email" type="email" placeholder="Email" required>
-            <input class="field" name="telefono" type="tel" placeholder="Teléfono" required>
-            <input class="field" name="instagram" placeholder="Instagram (opcional)">
-            <input class="field" name="web" placeholder="Web (opcional, ej: benditolab.com)">
-          </div>
-        </div>
-
-        <div class="field-card">
-          <h3>2 · Tipo de colaborador</h3>
-          <div class="grid3" id="tipos-grid">
-            <button type="button" class="tipbtn" data-tipo="Finca">Finca</button>
-            <button type="button" class="tipbtn" data-tipo="Restaurante">Restaurante</button>
-            <button type="button" class="tipbtn" data-tipo="Hotel">Hotel</button>
-            <button type="button" class="tipbtn" data-tipo="Espacio de eventos">Espacio de eventos</button>
-            <button type="button" class="tipbtn" data-tipo="Wedding Planner">Wedding Planner</button>
-            <button type="button" class="tipbtn" data-tipo="Otro">Otro</button>
-          </div>
-        </div>
-
-        <div class="field-card" id="datos-fisico" style="display:none;">
-          <h3>3 · Datos técnicos del espacio</h3>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <input class="field" name="direccion" placeholder="Dirección (calle, municipio, provincia)">
-            <div class="grid2">
-              <select class="field" name="aforo">
-                <option value="" disabled selected>Aforo habitual</option>
-                <option>Menos de 50 personas</option>
-                <option>50–100 personas</option>
-                <option>100–200 personas</option>
-                <option>Más de 200 personas</option>
-              </select>
-              <select class="field" name="zona_stand">
-                <option value="" disabled selected>¿Dónde iría el stand?</option>
-                <option>Interior</option>
-                <option>Exterior</option>
-                <option>Ambas</option>
-                <option>Depende del evento</option>
-              </select>
-            </div>
-            <input class="field" name="medidas" placeholder="Medidas disponibles (opcional)">
-            <div class="grid3">
-              <select class="field" name="corriente">
-                <option value="" disabled selected>Corriente cerca</option>
-                <option>Sí, siempre</option>
-                <option>Depende del espacio</option>
-                <option>No</option>
-              </select>
-              <select class="field" name="acceso">
-                <option value="" disabled selected>Acceso carga/descarga</option>
-                <option>Sí, sin restricciones</option>
-                <option>Sí, con horario</option>
-                <option>Limitado</option>
-                <option>No</option>
-              </select>
-              <select class="field" name="aparcamiento">
-                <option value="" disabled selected>Aparcamiento</option>
-                <option>Propio amplio</option>
-                <option>Propio limitado</option>
-                <option>Público cercano</option>
-                <option>Sin aparcamiento</option>
-              </select>
-            </div>
-            <textarea class="field" name="obs_espacio" rows="3" placeholder="Observaciones (opcional)"></textarea>
-          </div>
-        </div>
-
-        <div class="field-card" id="datos-servicio" style="display:none;">
-          <h3>3 · Sobre tu actividad</h3>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div class="grid2">
-              <select class="field" name="eventos_anio">
-                <option value="" disabled selected>Eventos al año</option>
-                <option>Menos de 10</option>
-                <option>10–30</option>
-                <option>30–60</option>
-                <option>Más de 60</option>
-              </select>
-              <input class="field" name="zona_trabajo" placeholder="Zona donde trabajas">
-            </div>
-            <input class="field" name="portfolio" placeholder="Web o portfolio (opcional, ej: instagram.com/tuperfil)">
-            <div class="grid2">
-              <select class="field" name="forma_recomendacion">
-                <option value="" disabled selected>¿Cómo recomiendas servicios?</option>
-                <option>Lista de proveedores directa</option>
-                <option>Recomendación verbal</option>
-                <option>Catálogo en la web</option>
-                <option>Redes sociales</option>
-                <option>Otro</option>
-              </select>
-              <select class="field" name="lista_proveedores">
-                <option value="" disabled selected>Lista de proveedores</option>
-                <option>Cerrada (proveedores fijos)</option>
-                <option>Abierta (cualquier proveedor)</option>
-                <option>No tengo lista definida</option>
-              </select>
-            </div>
-            <textarea class="field" name="obs_servicios" rows="3" placeholder="Cuéntanos más sobre tu forma de trabajar (opcional)"></textarea>
-          </div>
-        </div>
-
-        <div class="field-card">
-          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
-            <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;">
-            <span style="font-size:14px;">Acepto que Bendito Lab guarde mis datos para gestionar esta solicitud de colaboración. Consulta nuestra <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
-          </label>
-          <button type="submit" style="margin-top:20px;width:100%;background:var(--sage-dark);color:var(--white);font-weight:700;font-size:14px;padding:16px;border-radius:999px;border:none;cursor:pointer;">ENVIAR SOLICITUD→</button>
-          <p style="margin:14px 0 0;text-align:center;font-size:13px;">¿Prefieres hablar primero? <a href="mailto:colaboradores@benditolab.com" style="text-decoration:underline;">colaboradores@benditolab.com</a> · 647 444 308</p>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</section>
 
 <section class="como-funciona">
   <h2 data-edit="colaboradores.comofunciona.title">Cómo funciona</h2>
