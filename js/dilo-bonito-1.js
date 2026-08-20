@@ -69,13 +69,24 @@ window.addEventListener('DOMContentLoaded', function(){
   if (!consent) { var b=document.getElementById('cookie-banner'); if(b) b.style.display='flex'; }
   if (consent==='accepted') activarAnalytics();
   
-  // Hacer clickeable la sección de Personalización en directo → catálogo
+  // Sección Personalización en directo → catálogo
   var personalizacionSection = document.querySelector('#personalizacion .db-two-col');
   if(personalizacionSection){
     personalizacionSection.addEventListener('click', function(){
       window.location.href = 'catalogo.html';
     });
   }
+  
+  // Otras secciones (Seating, Expendedora, Gancho, Merch) → contacto
+  var contactoSections = ['#seating', '#expendedora', '#gancho', '#merchcorner'];
+  contactoSections.forEach(function(selector){
+    var section = document.querySelector(selector);
+    if(section){
+      section.addEventListener('click', function(){
+        window.location.href = 'contacto.html';
+      });
+    }
+  });
   
   // Hacer clickeables otras fotos de sv-card → contacto
   var svCardImages = document.querySelectorAll('.sv-card img');
