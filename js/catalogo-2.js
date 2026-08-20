@@ -119,8 +119,19 @@ function renderCategorias(articulos) {
 }
 
 function pintarGrid() {
+  // Si hay una "necesidad" activa (ver más abajo), el criterio de orden
+  // debe aplicarse sobre esos resultados, no sobre el catálogo completo —
+  // antes, cambiar el desplegable "Ordenar por" con una necesidad activa
+  // repintaba el catálogo entero sin avisar, aunque el banner siguiera
+  // diciendo "Mostrando artículos para X".
+  if (necesidadActiva) {
+    var criterioNecesidad = leerOrdenActiva ? leerOrdenActiva() : 'nombre';
+    renderGridEn('catalogo-grid', ordenarArticulos(ARTICULOS_NECESIDAD_ACTIVA, criterioNecesidad), MSG_VACIO_NECESIDAD);
+    return;
+  }
+
   var lista = TODOS_LOS_ARTICULOS;
-  
+
   // Filtro especial para Packs
   if (categoriaActiva === '__packs__') {
     lista = lista.filter(function(a){
@@ -194,6 +205,11 @@ function abrirArticuloDesdeUrl() {
 // muestra y el catálogo funciona igual que antes (por categoría).
 var NECESIDADES_API = 'https://app.benditolab.com';
 var necesidadActiva = null;
+// Resultados de la necesidad activa, para que pintarGrid() pueda
+// reordenarlos sin tener que volver a llamar a la API cada vez que
+// cambia el criterio de "Ordenar por".
+var ARTICULOS_NECESIDAD_ACTIVA = [];
+var MSG_VACIO_NECESIDAD = 'Todavía no tenemos artículos destacados para esta necesidad. Escríbenos y te ayudamos a elegir.';
 
 async function cargarNecesidades() {
   try {
@@ -249,8 +265,8 @@ async function aplicarFiltroNecesidad(slug, nombre) {
     var r = await fetch(NECESIDADES_API + '/api/public/necesidades/recomendaciones?necesidad=' + encodeURIComponent(slug));
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Error');
-    var articulos = (d.articulos || []).map(function(x){ return x.catalogo_articulos; }).filter(Boolean);
-    renderGridEn('catalogo-grid', articulos, 'Todavía no tenemos artículos destacados para esta necesidad. Escríbenos y te ayudamos a elegir.');
+    ARTICULOS_NECESIDAD_ACTIVA = (d.articulos || []).map(function(x){ return x.catalogo_articulos; }).filter(Boolean);
+    pintarGrid();
   } catch (e) {
     cont.innerHTML = '<p class="catalogo-vacio">No se han podido cargar los resultados. Prueba de nuevo o escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>.</p>';
   }
@@ -258,6 +274,7 @@ async function aplicarFiltroNecesidad(slug, nombre) {
 
 function quitarFiltroNecesidad() {
   necesidadActiva = null;
+  ARTICULOS_NECESIDAD_ACTIVA = [];
   document.querySelectorAll('.nec-btn').forEach(function(b){ b.classList.remove('activo'); });
   document.getElementById('necesidad-banner').style.display = 'none';
   if (TODOS_LOS_ARTICULOS.length) renderCategorias(TODOS_LOS_ARTICULOS);

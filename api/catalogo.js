@@ -80,9 +80,20 @@ function redondearPsicologico(precio) {
   return conDecimal >= precio ? conDecimal : entero + 1 + 0.95;
 }
 
+// Los tramos de un grupo (catalogo_grupos_tramos.tramos, JSONB en Supabase)
+// no tienen garantizada ninguna posición concreta — si se guardaron o se
+// reserializaron fuera de orden, recorrerlos tal cual llegan aplicaría el
+// margen equivocado (esta función y tramoActual en infoTramos asumen
+// cantidadMin ascendente). Se ordena aquí, una sola vez, en vez de confiar
+// en que cada llamador ya lo haga (el override B2C sí lo hacía, esto no).
+function tramosOrdenados(tramos) {
+  return [...tramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
+}
+
 function margenPorTramo(cantidad, tramos) {
-  let margen = tramos[0].margen;
-  for (const t of tramos) {
+  const ordenados = tramosOrdenados(tramos);
+  let margen = ordenados[0].margen;
+  for (const t of ordenados) {
     if (cantidad >= t.cantidadMin) margen = t.margen;
   }
   return Math.max(margen, MARGEN_MINIMO);
@@ -126,8 +137,8 @@ function infoTramos(articulo, cantidad, contexto) {
     return { tiene_tramos: false, tabla: [] };
   }
   const tramos = tieneOverride
-    ? [...contexto.overrideB2c].sort((a, b) => a.cantidadMin - b.cantidadMin)
-    : (contexto.tramos || TRAMOS_MARGEN_DEFECTO);
+    ? tramosOrdenados(contexto.overrideB2c)
+    : tramosOrdenados(contexto.tramos || TRAMOS_MARGEN_DEFECTO);
   const tabla = tramos.map((t) => ({
     cantidad_min: t.cantidadMin,
     precio_unitario: precioUnitarioProducto(articulo, t.cantidadMin, contexto),
