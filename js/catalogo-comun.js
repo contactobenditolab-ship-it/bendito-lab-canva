@@ -311,10 +311,12 @@ document.getElementById('modal-presupuesto').addEventListener('click', function(
 // el segundo en seco nada más entrar.
 var enviandoPresupuesto = false;
 
-// Lee un <input type="file"> como data: URL (base64) para subirlo a
-// /api/upload-logo-presupuesto — igual que resizeImageToDataUrl en
+// Lee un <input type="file"> como data: URL (base64) para subirlo vía
+// /api/contact (type "upload-logo") — igual que resizeImageToDataUrl en
 // admin.html, pero sin redimensionar: el logo es solo referencia para el
-// mockup, no una imagen del catálogo.
+// mockup, no una imagen del catálogo. Reutiliza /api/contact en vez de su
+// propio endpoint porque el plan Hobby de Vercel tope a 12 Serverless
+// Functions por deployment y ya estaba al límite.
 function leerArchivoComoDataUrl(file) {
   return new Promise(function(resolve, reject){
     var reader = new FileReader();
@@ -326,10 +328,10 @@ function leerArchivoComoDataUrl(file) {
 
 async function subirLogoPresupuesto(file) {
   var dataUrl = await leerArchivoComoDataUrl(file);
-  var r = await fetch('/api/upload-logo-presupuesto', {
+  var r = await fetch('/api/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ dataUrl: dataUrl }),
+    body: JSON.stringify({ type: 'upload-logo', dataUrl: dataUrl }),
   });
   var d = await r.json();
   if (!d.ok) throw new Error(d.error || 'No se pudo subir el logo');
