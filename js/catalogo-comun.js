@@ -520,11 +520,22 @@ function renderFichaProducto(a) {
 
   var tecnicasChips = (a.tecnicas_personalizacion || []).map(function(t){ return '<span class="chip tecnica">' + escapeHtml(t) + '</span>'; }).join('');
   var zonasChips = (a.areas_marcaje || []).map(function(z){ return '<span class="chip">' + escapeHtml(z) + '</span>'; }).join('');
+  // Tamaño máximo que admite este artículo para personalizar — para que el
+  // cliente no pida un diseño más grande de lo que cabe. Prioriza el par
+  // ancho/alto (cm) si está, si no cae al texto libre (p.ej. "10x15 cm").
+  var medidaMaxima = (a.personalizacion_ancho_max_cm && a.personalizacion_alto_max_cm)
+    ? a.personalizacion_ancho_max_cm + ' × ' + a.personalizacion_alto_max_cm + ' cm'
+    : (a.superficie_max_personalizacion || null);
+  var medidaMaximaHtml = medidaMaxima
+    ? '<div><div class="prod-field-label">Medida máxima de personalización</div>' +
+      '<p style="margin:0;font-size:14px;color:var(--deep);opacity:.8;">' + escapeHtml(medidaMaxima) + '</p></div>'
+    : '';
   var personalizacionHtml =
     (tecnicasChips ? '<div><div class="prod-field-label">Técnicas disponibles</div><div class="chip-list">' + tecnicasChips + '</div></div>' : '') +
-    (zonasChips ? '<div><div class="prod-field-label">Zona de marcaje</div><div class="chip-list">' + zonasChips + '</div></div>' : '');
+    (zonasChips ? '<div><div class="prod-field-label">Zona de marcaje</div><div class="chip-list">' + zonasChips + '</div></div>' : '') +
+    medidaMaximaHtml;
 
-  var hayPersonalizacion = !!(tecnicasChips || zonasChips);
+  var hayPersonalizacion = !!(tecnicasChips || zonasChips || medidaMaxima);
   var hayDetalles = !!atributosDetalle.length;
   // Personalización empieza activa (más relevante para elegir técnica que
   // las medidas/material) — Detalles se muestra si se pulsa su pestaña.
