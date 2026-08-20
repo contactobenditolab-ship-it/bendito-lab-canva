@@ -123,6 +123,9 @@ input::placeholder,textarea::placeholder{color:#8A9099;}
 .mp-box form{display:flex;flex-direction:column;gap:12px;}
 .field{padding:12px 16px;border-radius:8px;border:1px solid #D9D3C0;background:#fff;font-size:14px;color:var(--deep);width:100%;}
 textarea.field{resize:vertical;}
+.mp-fila{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mp-field-label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
+.mp-precio-aprox{font-size:11px;color:var(--baby);line-height:1.4;margin:8px 0 0;}
 
 .md-box{background:#fff;max-width:760px;margin:0 auto;border-radius:12px;padding:32px;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:28px;}
 .md-box .btn-cerrar{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;z-index:1;}
@@ -253,7 +256,21 @@ footer{background:var(--rose);}
       <input class="field" name="nombre" type="text" placeholder="Nombre" required>
       <input class="field" name="email" type="email" placeholder="Email" required>
       <input class="field" name="telefono" type="tel" placeholder="Teléfono" required>
-      <textarea class="field" name="mensaje" rows="3" placeholder="Cantidad, personalización u otros detalles (opcional)"></textarea>
+      <div class="mp-fila">
+        <input class="field" name="cantidad" type="number" min="1" placeholder="Cantidad">
+        <input class="field" name="color" type="text" placeholder="Color">
+      </div>
+      <select class="field" name="zona_marcaje" id="mp-zona-marcaje" style="display:none;">
+        <option value="">Zona de marcaje</option>
+      </select>
+      <select class="field" name="tecnica" id="mp-tecnica" style="display:none;">
+        <option value="">Técnica de personalización</option>
+      </select>
+      <label>
+        <span class="mp-field-label">Logo para el mockup (opcional)</span>
+        <input class="field" name="logo" id="mp-logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+      </label>
+      <textarea class="field" name="otros_datos" rows="3" placeholder="Otros datos: más artículos, fecha del pedido, detalles adicionales... (opcional)"></textarea>
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;">
         <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
         <span>Acepto que Bendito Lab guarde mis datos para gestionar esta solicitud. Consulta la <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
@@ -263,8 +280,8 @@ footer{background:var(--rose);}
     </form>
     <div id="presupuesto-success" style="display:none;text-align:center;padding:20px 0;">
       <div style="font-size:34px;margin-bottom:10px;">✓</div>
-      <h3 style="margin:0 0 6px;">¡Solicitud enviada!</h3>
-      <p style="font-size:13px;">Te contactaremos pronto con tu presupuesto.</p>
+      <h3 style="margin:0 0 6px;">Hemos recibido tu mensaje</h3>
+      <p style="font-size:13px;">En breve te haremos llegar tu presupuesto, esperamos que te encante. Si tienes cualquier duda o quieres incluir algo más no dudes en contactarnos.</p>
     </div>
   </div>
 </div>

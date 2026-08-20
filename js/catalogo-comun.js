@@ -244,16 +244,51 @@ function montarOrdenSelect(containerId, onCambio) {
 // ── Modal de presupuesto ──────────────────────────────────
 var articuloSeleccionado = null;
 
-function abrirModalPresupuesto(articuloId, detallesPrefill) {
+// Rellena un <select> del modal de presupuesto con las opciones dadas
+// (p.ej. áreas de marcaje o técnicas del artículo) y lo oculta si no hay
+// ninguna — no tiene sentido mostrar un desplegable vacío.
+function poblarSelectPresupuesto(selectId, opciones, valorPreseleccionado) {
+  var select = document.getElementById(selectId);
+  if (!select) return;
+  var placeholder = select.options[0];
+  select.innerHTML = '';
+  select.appendChild(placeholder);
+  (opciones || []).forEach(function(op){
+    var option = document.createElement('option');
+    option.value = op;
+    option.textContent = op;
+    select.appendChild(option);
+  });
+  select.style.display = opciones && opciones.length ? '' : 'none';
+  select.value = valorPreseleccionado && opciones && opciones.indexOf(valorPreseleccionado) !== -1 ? valorPreseleccionado : '';
+}
+
+function abrirModalPresupuesto(articuloId, prefill) {
   articuloSeleccionado = ARTICULOS_MOSTRADOS.find(function(a){ return a.id === articuloId; }) || null;
   document.getElementById('mp-producto-nombre').textContent = articuloSeleccionado ? articuloSeleccionado.nombre : '';
   document.getElementById('presupuesto-form').style.display = 'flex';
   document.getElementById('presupuesto-success').style.display = 'none';
   document.getElementById('presupuesto-form').reset();
-  if (detallesPrefill) {
-    var mensajeEl = document.querySelector('#presupuesto-form [name="mensaje"]');
-    if (mensajeEl) mensajeEl.value = detallesPrefill;
-  }
+
+  var form = document.getElementById('presupuesto-form');
+  prefill = prefill || {};
+
+  var cantidadEl = document.getElementById('calc-cantidad');
+  if (cantidadEl && cantidadEl.value) form.elements.namedItem('cantidad').value = cantidadEl.value;
+  if (prefill.color) form.elements.namedItem('color').value = prefill.color;
+
+  poblarSelectPresupuesto('mp-zona-marcaje', articuloSeleccionado ? articuloSeleccionado.areas_marcaje : null);
+
+  var tecnicaEl = document.getElementById('calc-tecnica');
+  poblarSelectPresupuesto(
+    'mp-tecnica',
+    articuloSeleccionado ? articuloSeleccionado.tecnicas_personalizacion : null,
+    tecnicaEl ? tecnicaEl.value : null
+  );
+
+  var otrosDatosEl = form.elements.namedItem('otros_datos');
+  if (otrosDatosEl && prefill.talla) otrosDatosEl.value = 'Talla: ' + prefill.talla;
+
   document.getElementById('presupuesto-error').style.display = 'none';
   document.getElementById('modal-presupuesto').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -276,6 +311,31 @@ document.getElementById('modal-presupuesto').addEventListener('click', function(
 // el segundo en seco nada más entrar.
 var enviandoPresupuesto = false;
 
+// Lee un <input type="file"> como data: URL (base64) para subirlo a
+// /api/upload-logo-presupuesto — igual que resizeImageToDataUrl en
+// admin.html, pero sin redimensionar: el logo es solo referencia para el
+// mockup, no una imagen del catálogo.
+function leerArchivoComoDataUrl(file) {
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(){ resolve(reader.result); };
+    reader.onerror = function(){ reject(new Error('No se pudo leer el archivo')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function subirLogoPresupuesto(file) {
+  var dataUrl = await leerArchivoComoDataUrl(file);
+  var r = await fetch('/api/upload-logo-presupuesto', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dataUrl: dataUrl }),
+  });
+  var d = await r.json();
+  if (!d.ok) throw new Error(d.error || 'No se pudo subir el logo');
+  return d.url;
+}
+
 document.getElementById('presupuesto-form').addEventListener('submit', async function(e){
   e.preventDefault();
   if (enviandoPresupuesto) return;
@@ -288,17 +348,32 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
   var btn = form.querySelector('.btn-presupuesto');
   btn.disabled = true; btn.textContent = 'Enviando...';
 
-  var nombreProducto = articuloSeleccionado ? articuloSeleccionado.nombre : 'artículo del catálogo';
-  var mensajeExtra = f.get('mensaje');
-  var mensaje = 'Interesad@ en: ' + nombreProducto + (mensajeExtra ? ' · ' + mensajeExtra : '');
-
   try {
+    var logoUrl = null;
+    var logoFile = form.elements.namedItem('logo').files[0];
+    if (logoFile) {
+      btn.textContent = 'Subiendo logo...';
+      logoUrl = await subirLogoPresupuesto(logoFile);
+      btn.textContent = 'Enviando...';
+    }
+
+    var nombreProducto = articuloSeleccionado ? articuloSeleccionado.nombre : 'artículo del catálogo';
+    var detalles = [
+      'Artículo: ' + nombreProducto,
+      f.get('cantidad') ? 'Cantidad: ' + f.get('cantidad') : null,
+      f.get('color') ? 'Color: ' + f.get('color') : null,
+      f.get('zona_marcaje') ? 'Zona de marcaje: ' + f.get('zona_marcaje') : null,
+      f.get('tecnica') ? 'Técnica: ' + f.get('tecnica') : null,
+      f.get('otros_datos') ? 'Otros datos: ' + f.get('otros_datos') : null,
+      logoUrl ? 'Logo: ' + logoUrl : null,
+    ].filter(Boolean).join(' · ');
+
     var r = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'cotizacion',
-        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), servicio: 'Bendito Lab', mensaje: mensaje }
+        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), servicio: 'Bendito Lab', mensaje: detalles }
       })
     });
     var d = await r.json();
@@ -444,6 +519,7 @@ function renderFichaProducto(a) {
       atributosHtml +
       '<div class="md-calc" id="md-calc"></div>' +
       '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
+      '<p class="mp-precio-aprox">Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.</p>' +
     '</div>';
 
   document.getElementById('btn-cerrar-detalle').addEventListener('click', cerrarModalDetalle);
@@ -458,9 +534,7 @@ function renderFichaProducto(a) {
   }
   document.getElementById('btn-presupuesto-desde-detalle').addEventListener('click', function(){
     cerrarModalDetalle();
-    var detalles = [COLOR_SELECCIONADO ? 'Color: ' + COLOR_SELECCIONADO : null, TALLA_SELECCIONADA ? 'Talla: ' + TALLA_SELECCIONADA : null]
-      .filter(Boolean).join(' · ');
-    abrirModalPresupuesto(a.id, detalles);
+    abrirModalPresupuesto(a.id, { color: COLOR_SELECCIONADO, talla: TALLA_SELECCIONADA });
   });
 
   renderCalculadora(a);
