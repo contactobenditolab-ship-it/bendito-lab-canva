@@ -52,12 +52,18 @@ const TRAMOS_MARGEN_DEFECTO = [
  * Elimina duplicación de calcularCosteReal + redondearPsicologico + tramos.
  */
 async function calcularPrecioDesdeAPI(articulo_id, cantidad, canal = 'b2c') {
+  // El fetch nativo de Node (a diferencia de node-fetch) no soporta la opción
+  // `timeout` — se ignoraba en silencio, así que un bendito-os colgado dejaba
+  // esta llamada esperando hasta el límite de la función de Vercel en vez de
+  // los 5s previstos. AbortController sí funciona con fetch nativo.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await fetch(PRICING_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ articulo_id, cantidad, canal }),
-      timeout: 5000, // Fallback rápido si API no responde
+      signal: controller.signal,
     });
 
     if (!response.ok) {
@@ -72,9 +78,12 @@ async function calcularPrecioDesdeAPI(articulo_id, cantidad, canal = 'b2c') {
     // Retornar solo lo que necesitamos: precioUnitario ya redondeado
     return result.data;
   } catch (error) {
-    console.error('[calcularPrecioDesdeAPI]', error.message);
+    const motivo = error.name === 'AbortError' ? 'timeout (5s)' : error.message;
+    console.error('[calcularPrecioDesdeAPI]', motivo);
     // Si falla, lanzar para que el handler maneje el error
-    throw new Error(`No se pudo calcular precio desde API: ${error.message}`);
+    throw new Error(`No se pudo calcular precio desde API: ${motivo}`);
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
