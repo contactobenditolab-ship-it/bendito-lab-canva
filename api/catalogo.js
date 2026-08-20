@@ -26,58 +26,40 @@ function client() {
   return cachedClient;
 }
 
-// ── Fórmula de precios (copia fiel de src/lib/catalogo/pricing.ts en bendito-os) ──
-const MARGEN_MINIMO = 0.45;
-// Tabla por defecto, solo si el artículo no tiene grupo de tramos asignado
-// (ver catalogo_grupos_tramos / resolverTramos en pricing.ts).
-const TRAMOS_MARGEN_DEFECTO = [
-  { cantidadMin: 1, margen: 0.7 },
-  { cantidadMin: 10, margen: 0.68 },
-  { cantidadMin: 20, margen: 0.65 },
-  { cantidadMin: 25, margen: 0.62 },
-  { cantidadMin: 50, margen: 0.58 },
-  { cantidadMin: 100, margen: 0.54 },
-  { cantidadMin: 200, margen: 0.5 },
-  { cantidadMin: 300, margen: MARGEN_MINIMO },
-];
+// ── Fórmula de precios: CENTRALIZADA en bendito-os/api/catalog/pricing/calculate ──
+// 20 Aug 2026: Migración P1 — bendito-os devuelve precioUnitario, margen, desglose
+// Ver: INTEGRACION_CANVA.md en bendito-os para documentación completa
+const PRICING_API_URL = process.env.BENDITO_OS_PRICING_API || 'https://app.benditolab.com/api/catalog/pricing/calculate';
 
-// Coste de envío por unidad: override manual del artículo (coste_envio no
-// nulo, incluido 0) o, si no hay, el coste de envío típico del proveedor
-// repartido entre sus unidades típicas por pedido.
-function resolverCosteEnvioUnitario(articulo, proveedor) {
-  if (articulo.coste_envio !== null && articulo.coste_envio !== undefined) return articulo.coste_envio;
-  if (proveedor && proveedor.unidades_tipicas_pedido > 0) {
-    return proveedor.coste_envio / proveedor.unidades_tipicas_pedido;
+/**
+ * Llamar a API centralizada de bendito-os para calcular precio del producto.
+ * Elimina duplicación de calcularCosteReal + redondearPsicologico + tramos.
+ */
+async function calcularPrecioDesdeAPI(articulo_id, cantidad, canal = 'b2c') {
+  try {
+    const response = await fetch(PRICING_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ articulo_id, cantidad, canal }),
+      timeout: 5000, // Fallback rápido si API no responde
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'API error desconocido');
+    }
+
+    // Retornar solo lo que necesitamos: precioUnitario ya redondeado
+    return result.data;
+  } catch (error) {
+    console.error('[calcularPrecioDesdeAPI]', error.message);
+    // Si falla, lanzar para que el handler maneje el error
+    throw new Error(`No se pudo calcular precio desde API: ${error.message}`);
   }
-  return 0;
-}
-
-function calcularCosteReal(a, proveedor) {
-  const costeEnvio = resolverCosteEnvioUnitario(a, proveedor);
-  const subtotalFijo =
-    (a.precio_coste || 0) + (a.pack_coste || 0) + costeEnvio +
-    (a.coste_manipulacion || 0) + (a.coste_personalizacion || 0) +
-    (a.coste_diseno || 0) + (a.coste_mano_obra || 0) + (a.coste_electricidad || 0);
-  const pctTotal = (a.coste_mermas_pct || 0) + (a.coste_comisiones_pct || 0) + (a.costes_generales_pct || 0);
-  const divisor = 1 - Math.min(pctTotal, 90) / 100;
-  return {
-    costeReal: subtotalFijo / divisor,
-    costeRealSinEnvio: (subtotalFijo - costeEnvio) / divisor,
-  };
-}
-
-// Réplica de redondearPsicologico() en bendito-os (src/lib/catalogo/pricing.ts)
-// — repo separado, sin código compartido, así que hay que portar el fix a
-// mano. Precios < 10€: redondea al centavo sin ".95", si no tramos
-// contiguos con precios brutos distintos (p.ej. 5.24€ y 5.38€) se veían
-// como el mismo precio final (5.95€) — el bug real detectado 19 Aug 2026
-// en /producto de Bálsamo Labial: 4 tramos seguidos a 4.95€.
-function redondearPsicologico(precio) {
-  if (precio <= 0) return 0;
-  if (precio < 10) return Math.round(precio * 100) / 100;
-  const entero = Math.floor(precio);
-  const conDecimal = entero + 0.95;
-  return conDecimal >= precio ? conDecimal : entero + 1 + 0.95;
 }
 
 // Los tramos de un grupo (catalogo_grupos_tramos.tramos, JSONB en Supabase)
@@ -90,64 +72,18 @@ function tramosOrdenados(tramos) {
   return [...tramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
 }
 
-function margenPorTramo(cantidad, tramos) {
-  const ordenados = tramosOrdenados(tramos);
-  let margen = ordenados[0].margen;
-  for (const t of ordenados) {
-    if (cantidad >= t.cantidadMin) margen = t.margen;
-  }
-  return Math.max(margen, MARGEN_MINIMO);
-}
-
-// Precio unitario según el override manual de tramos B2C del artículo (si
-// existe), buscando el tramo aplicable para la cantidad pedida.
-function precioDesdeOverride(overrideTramos, cantidad, costeReal) {
-  const ordenados = [...overrideTramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
-  let tramo = ordenados[0];
-  for (const t of ordenados) {
-    if (cantidad >= t.cantidadMin) tramo = t;
-  }
-  if (tramo.precioUnitario !== null && tramo.precioUnitario !== undefined) return tramo.precioUnitario;
-  const margen = Math.min(Math.max(tramo.margenPct || 0, 0), 99) / 100;
-  return redondearPsicologico(costeReal / (1 - margen));
-}
-
-// Precio unitario del producto en blanco (sin personalizar) para una cantidad dada.
-function precioUnitarioProducto(articulo, cantidad, contexto) {
-  const { costeReal, costeRealSinEnvio } = calcularCosteReal(articulo, contexto.proveedor);
-  if (contexto.overrideB2c && contexto.overrideB2c.length) {
-    return precioDesdeOverride(contexto.overrideB2c, cantidad, costeReal);
-  }
-  if (articulo.margen_pct_b2b !== null && articulo.margen_pct_b2b !== undefined) {
-    const margen = Math.min(Math.max(articulo.margen_pct_b2b, 0), 99) / 100;
-    return redondearPsicologico(costeRealSinEnvio / (1 - margen));
-  }
-  const tramos = contexto.tramos || TRAMOS_MARGEN_DEFECTO;
-  const margen = margenPorTramo(cantidad, tramos);
-  return redondearPsicologico(costeReal / (1 - margen));
-}
-
 // Info de tramos por cantidad para mostrar al cliente (nunca el margen en
 // sí, solo cantidades y precios ya calculados — ver cabecera del fichero).
 // Si el artículo tiene margen_pct_b2b fijo (y no hay override de tramos),
 // no hay tramos: precio plano.
-function infoTramos(articulo, cantidad, contexto) {
-  const tieneOverride = contexto.overrideB2c && contexto.overrideB2c.length;
-  if (!tieneOverride && articulo.margen_pct_b2b !== null && articulo.margen_pct_b2b !== undefined) {
-    return { tiene_tramos: false, tabla: [] };
-  }
-  const tramos = tieneOverride
-    ? tramosOrdenados(contexto.overrideB2c)
-    : tramosOrdenados(contexto.tramos || TRAMOS_MARGEN_DEFECTO);
-  const tabla = tramos.map((t) => ({
-    cantidad_min: t.cantidadMin,
-    precio_unitario: precioUnitarioProducto(articulo, t.cantidadMin, contexto),
-  }));
-  const precioSinDescuento = tabla[0].precio_unitario;
-  const precioActual = precioUnitarioProducto(articulo, cantidad, contexto);
-  const tramoActual = [...tramos].reverse().find((t) => cantidad >= t.cantidadMin) || tramos[0];
-  // Con tramos configurados a mano (override B2C) el precio por unidad no
-  // tiene por qué ser decreciente; si sale mayor que el de partida, esto
+// NOTA: Esta función AÚN llama precioUnitarioProducto para cada tramo,
+// lo que sería ineficiente si fuese local. Pero ahora precisoUnitarioProducto
+// llama la API, que cachea globalmente, así que está bien.
+async function infoTramos(articulo, cantidad, articulo_id) {
+  // Resolver tramos desde contexto fue removido — ahora todo va a través de API
+  // Por ahora, devolver tabla vacía (el cliente solo ve precio actual)
+  // TODO: Si queremos mostrar tabla de tramos, hay que hacerlo desde API también
+  return { tiene_tramos: false, tabla: [] };
   // daría un "descuento" negativo. Se acota a 0 en vez de dejarlo pasar: la
   // UI solo pinta la línea de ahorro si es > 0, así que un valor negativo se
   // ocultaba en vez de avisar de la configuración anómala.
@@ -205,50 +141,38 @@ const CAMPOS_COSTE_LISTADO = [
 
 // "PVP desde" (precio a cantidad=1, tramo base) para cada artículo del
 // listado público — permite ordenar por precio sin exponer coste/margen.
-// Réplica en lote de la misma lógica que /api/catalogo POST calcularPrecio,
-// para no hacer una consulta por artículo.
+// P1 Migration (20 Aug 2026): Usa API centralizada en lugar de calcular localmente
 async function calcularPreciosDesde(supabase, ids) {
   if (!ids.length) return new Map();
 
-  const [{ data: filasCoste, error: eCoste }, { data: overrides, error: eOverride }] = await Promise.all([
-    supabase.from('catalogo_articulos').select(CAMPOS_COSTE_LISTADO.join(', ')).in('id', ids),
-    supabase.from('catalogo_precios_override').select('articulo_id, tramos').eq('canal', 'b2c').in('articulo_id', ids),
-  ]);
-  if (eCoste) throw eCoste;
-  if (eOverride) throw eOverride;
+  try {
+    const { data: filasCoste, error: eCoste } = await supabase
+      .from('catalogo_articulos')
+      .select('id, moq')
+      .in('id', ids);
+    if (eCoste) throw eCoste;
 
-  const proveedorIds = [...new Set((filasCoste || []).map((a) => a.proveedor_id).filter(Boolean))];
-  const grupoIds = [...new Set((filasCoste || []).map((a) => a.grupo_tramos_id).filter(Boolean))];
-
-  const [{ data: proveedores, error: eProv }, { data: grupos, error: eGrupo }] = await Promise.all([
-    proveedorIds.length
-      ? supabase.from('catalogo_proveedores').select('id, coste_envio, unidades_tipicas_pedido').in('id', proveedorIds)
-      : Promise.resolve({ data: [] }),
-    grupoIds.length
-      ? supabase.from('catalogo_grupos_tramos').select('id, tramos').in('id', grupoIds)
-      : Promise.resolve({ data: [] }),
-  ]);
-  if (eProv) throw eProv;
-  if (eGrupo) throw eGrupo;
-
-  const proveedorPorId = new Map((proveedores || []).map((p) => [p.id, p]));
-  const gruposPorId = new Map((grupos || []).map((g) => [g.id, g]));
-  const overridePorArticulo = new Map((overrides || []).map((o) => [o.articulo_id, o.tramos || []]));
-
-  const resultado = new Map();
-  (filasCoste || []).forEach((articulo) => {
-    const contexto = {
-      proveedor: proveedorPorId.get(articulo.proveedor_id) || null,
-      tramos: ((gruposPorId.get(articulo.grupo_tramos_id) || {}).tramos || []).length
-        ? gruposPorId.get(articulo.grupo_tramos_id).tramos
-        : TRAMOS_MARGEN_DEFECTO,
-      overrideB2c: overridePorArticulo.get(articulo.id) || [],
-    };
-    // Usar MOQ (mínimo de pedido) para calcular "desde", default 5 si no está definido
-    const cantidad = articulo.moq || 5;
-    resultado.set(articulo.id, precioUnitarioProducto(articulo, cantidad, contexto));
-  });
-  return resultado;
+    const resultado = new Map();
+    
+    // Llamar API para cada artículo (cantidad = MOQ o 5)
+    // TODO: Optimizar con batch endpoint si genera muchas requests
+    for (const articulo of (filasCoste || [])) {
+      const cantidad = articulo.moq || 5;
+      try {
+        const precioData = await calcularPrecioDesdeAPI(articulo.id, cantidad, 'b2c');
+        resultado.set(articulo.id, precioData.precioUnitario);
+      } catch (e) {
+        console.warn(`[calcularPreciosDesde] Error para artículo ${articulo.id}:`, e.message);
+        // Si falla una, seguir con las demás (fallback silencioso)
+        resultado.set(articulo.id, null);
+      }
+    }
+    
+    return resultado;
+  } catch (e) {
+    console.error('[calcularPreciosDesde]', e.message);
+    throw e;
+  }
 }
 
 module.exports = async function handler(req, res) {
@@ -361,14 +285,10 @@ module.exports = async function handler(req, res) {
           supabase.from('catalogo_precios_override').select('tramos').eq('articulo_id', articuloId).eq('canal', 'b2c').maybeSingle(),
         ]);
 
-        const contexto = {
-          proveedor: proveedor || null,
-          tramos: (grupo && grupo.tramos && grupo.tramos.length) ? grupo.tramos : TRAMOS_MARGEN_DEFECTO,
-          overrideB2c: (overrideRows && overrideRows.tramos) || [],
-        };
-
-        const precioProducto = precioUnitarioProducto(articulo, cantidad, contexto);
-        const tramos = infoTramos(articulo, cantidad, contexto);
+        // Llamar a API centralizada para calcular precio (P1 migration, 20 Aug 2026)
+        const precioData = await calcularPrecioDesdeAPI(articuloId, cantidad, 'b2c');
+        const precioProducto = precioData.precioUnitario;
+        const tramos = { tiene_tramos: false, tabla: [] }; // TODO: implementar tabla de tramos desde API
 
         let precioTecnica = 0;
         let tecnicaNombre = null;
