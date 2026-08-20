@@ -659,10 +659,11 @@ async function renderCalculadora(articulo) {
       '</select></label>'
     : '';
 
+  var moq = articulo.moq || 5;
   cont.innerHTML =
     '<div class="md-calc-title">Calcula tu precio aproximado</div>' +
     '<div class="md-calc-row">' +
-      '<label>Cantidad<input type="number" id="calc-cantidad" min="1" value="25"></label>' +
+      '<label>Cantidad<input type="number" id="calc-cantidad" min="' + moq + '" value="' + Math.max(25, moq) + '"></label>' +
       tecnicaHtml +
     '</div>' +
     '<button type="button" class="btn-calcular" id="btn-calcular">CALCULAR PRECIO→</button>' +

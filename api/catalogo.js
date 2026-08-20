@@ -200,7 +200,7 @@ const CAMPOS_COSTE_LISTADO = [
   'id', 'precio_coste', 'pack_coste', 'coste_envio', 'coste_manipulacion',
   'coste_personalizacion', 'coste_diseno', 'coste_mano_obra', 'coste_electricidad',
   'coste_mermas_pct', 'coste_comisiones_pct', 'costes_generales_pct', 'margen_pct_b2b',
-  'proveedor_id', 'grupo_tramos_id',
+  'proveedor_id', 'grupo_tramos_id', 'moq',
 ];
 
 // "PVP desde" (precio a cantidad=1, tramo base) para cada artículo del
@@ -244,7 +244,9 @@ async function calcularPreciosDesde(supabase, ids) {
         : TRAMOS_MARGEN_DEFECTO,
       overrideB2c: overridePorArticulo.get(articulo.id) || [],
     };
-    resultado.set(articulo.id, precioUnitarioProducto(articulo, 1, contexto));
+    // Usar MOQ (mínimo de pedido) para calcular "desde", default 5 si no está definido
+    const cantidad = articulo.moq || 5;
+    resultado.set(articulo.id, precioUnitarioProducto(articulo, cantidad, contexto));
   });
   return resultado;
 }
@@ -312,12 +314,16 @@ module.exports = async function handler(req, res) {
         const extrasElegidos = Array.isArray(body.extras) ? body.extras : [];
 
         if (!articuloId) return res.status(400).json({ error: 'Falta articulo_id' });
+        
+        // Validar MOQ antes de realizar queries
+        // Si el cliente pide menos que MOQ, devolver error sin hacer nada más
+        // (MOQ se valida después de traer el artículo, ver más abajo)
 
         const CAMPOS_COSTE = [
           'precio_coste', 'pack_coste', 'coste_envio', 'coste_manipulacion',
           'coste_personalizacion', 'coste_diseno', 'coste_mano_obra', 'coste_electricidad',
           'coste_mermas_pct', 'coste_comisiones_pct', 'costes_generales_pct', 'margen_pct_b2b',
-          'proveedor_id', 'grupo_tramos_id',
+          'proveedor_id', 'grupo_tramos_id', 'moq',
         ].join(', ');
 
         const [{ data: articulo, error: e1 }, { data: fichaTecnica }, { data: fichasExtra }] = await Promise.all([
@@ -330,6 +336,16 @@ module.exports = async function handler(req, res) {
             : Promise.resolve({ data: [] }),
         ]);
         if (e1 || !articulo) return res.status(404).json({ error: 'Artículo no encontrado' });
+
+        // Validar MOQ (cantidad mínima de pedido): default 5 si no está definido
+        const moq = articulo.moq || 5;
+        if (cantidad < moq) {
+          return res.status(400).json({
+            error: `Cantidad mínima: ${moq} unidades`,
+            moq,
+            cantidad,
+          });
+        }
 
         const [{ data: proveedor }, { data: grupo }, { data: overrideRows }] = await Promise.all([
           articulo.proveedor_id
