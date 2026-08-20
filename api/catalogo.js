@@ -251,10 +251,14 @@ module.exports = async function handler(req, res) {
 
       const articulosEnriquecidos = await enriquecerArticulos(supabase, data || []);
       const preciosDesde = await calcularPreciosDesde(supabase, articulosEnriquecidos.map((a) => a.id));
-      const articulos = articulosEnriquecidos.map((a) => ({
-        ...a,
-        precio_desde: preciosDesde.has(a.id) ? Math.round(preciosDesde.get(a.id) * 100) / 100 : null,
-      }));
+      const articulos = articulosEnriquecidos.map((a) => {
+        const precio = preciosDesde.get(a.id);
+        // precio puede ser `null` (fallo al calcular ese artículo, ver
+        // calcularPreciosDesde) — sin este chequeo, `Math.round(null * 100)`
+        // coacciona `null` a 0 y la tarjeta mostraba "Desde 0.00€" en vez de
+        // ocultar el precio como hace renderGridEn cuando es null.
+        return { ...a, precio_desde: precio != null ? Math.round(precio * 100) / 100 : null };
+      });
 
       res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
       return res.status(200).json({ articulos });
