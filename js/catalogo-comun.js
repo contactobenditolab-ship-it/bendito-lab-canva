@@ -694,6 +694,20 @@ async function ejecutarCalculo(articuloId) {
       body: JSON.stringify({ accion: 'calcularPrecio', articulo_id: articuloId, cantidad: cantidad, tecnica: tecnica, extras: extras })
     });
     var d = await r.json();
+    
+    // Manejar cantidad menor a MOQ: no es error, es invitación a contactar
+    if (d.moq_no_alcanzado) {
+      resEl.innerHTML =
+        '<div style="padding: 12px; border-left: 3px solid #E2704A; background: #FBF4E9;">' +
+        '<div style="font-weight: bold; font-size: 0.95rem; margin-bottom: 8px; color: #17233F;">' + escapeHtml(d.mensaje) + '</div>' +
+        '<div style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">Cantidad solicitada: ' + d.cantidad + ' uds</div>' +
+        '<a href="/contacto" style="display: inline-block; padding: 10px 14px; background: #E2704A; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9rem;">CONTACTAR→</a>' +
+        '</div>';
+      resEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'CALCULAR PRECIO→';
+      return;
+    }
+    
     if (!d.ok) throw new Error(d.error || 'Error al calcular');
 
     var extrasLinea = d.extras && d.extras.length

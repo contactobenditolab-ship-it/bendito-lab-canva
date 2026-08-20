@@ -340,10 +340,12 @@ module.exports = async function handler(req, res) {
         // Validar MOQ (cantidad mínima de pedido): default 5 si no está definido
         const moq = articulo.moq || 5;
         if (cantidad < moq) {
-          return res.status(400).json({
-            error: `Cantidad mínima: ${moq} unidades`,
+          return res.status(200).json({
+            ok: false,
+            moq_no_alcanzado: true,
             moq,
             cantidad,
+            mensaje: `Para pedidos menores de ${moq} unidades, por favor contacta con nosotros.`,
           });
         }
 
