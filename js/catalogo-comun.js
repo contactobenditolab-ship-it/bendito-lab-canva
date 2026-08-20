@@ -215,6 +215,37 @@ function renderGridEn(containerId, lista, mensajeVacio) {
   }).join('');
 }
 
+// Imagen genérica para los servicios de eventos (Dilo Bonito): no tienen
+// ficha propia como los artículos del catálogo, así que todos comparten
+// la misma foto representativa de "Personalización en directo".
+var IMAGEN_SERVICIOS_EVENTOS = '/images/db-personalizacion.webp';
+
+function renderGridServiciosEn(containerId, servicios) {
+  var cont = document.getElementById(containerId);
+  if (!servicios.length) {
+    cont.innerHTML = '<p class="catalogo-vacio">No hay servicios de eventos disponibles ahora mismo.</p>';
+    return;
+  }
+
+  cont.innerHTML = servicios.map(function(s, i){
+    return (
+      '<button type="button" class="card" data-servicio-idx="' + i + '" style="text-align:left;">' +
+        '<div class="card-img"><img src="' + escapeHtml(IMAGEN_SERVICIOS_EVENTOS) + '" alt="' + escapeHtml(s.servicio) + '" loading="lazy"></div>' +
+        '<div class="card-body">' +
+          '<div class="card-nombre">' + escapeHtml(s.nombre) + '</div>' +
+          '<div class="card-precio">' + s.precio.toFixed(2) + '€</div>' +
+        '</div>' +
+      '</button>'
+    );
+  }).join('');
+
+  cont.querySelectorAll('[data-servicio-idx]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      abrirModalPresupuestoServicio(servicios[Number(btn.dataset.servicioIdx)]);
+    });
+  });
+}
+
 // ── Ordenación del listado (nombre A-Z, precio asc/desc) ──────────────────
 function ordenarArticulos(lista, criterio) {
   var copia = lista.slice();
@@ -257,6 +288,13 @@ function montarOrdenSelect(containerId, onCambio) {
 
 // ── Modal de presupuesto ──────────────────────────────────
 var articuloSeleccionado = null;
+// Distinto de articuloSeleccionado: se usa cuando se pide presupuesto de
+// un servicio de eventos (Dilo Bonito, ver renderGridServiciosEn) en vez
+// de un artículo del catálogo — no tiene ficha propia, así que solo
+// guarda nombre/precio/servicio para el mensaje y para clasificar el
+// lead como "eventos" en Bendito OS (tipoCliente() detecta "dilo bonito"
+// en el campo servicio).
+var SERVICIO_SELECCIONADO = null;
 
 // Rellena un <select> del modal de presupuesto con las opciones dadas
 // (p.ej. áreas de marcaje o técnicas del artículo) y lo oculta si no hay
@@ -279,6 +317,7 @@ function poblarSelectPresupuesto(selectId, opciones, valorPreseleccionado) {
 
 function abrirModalPresupuesto(articuloId, prefill) {
   articuloSeleccionado = ARTICULOS_MOSTRADOS.find(function(a){ return a.id === articuloId; }) || null;
+  SERVICIO_SELECCIONADO = null;
   document.getElementById('mp-producto-nombre').textContent = articuloSeleccionado ? articuloSeleccionado.nombre : '';
   document.getElementById('presupuesto-form').style.display = 'flex';
   document.getElementById('presupuesto-success').style.display = 'none';
@@ -302,6 +341,28 @@ function abrirModalPresupuesto(articuloId, prefill) {
 
   var otrosDatosEl = form.elements.namedItem('otros_datos');
   if (otrosDatosEl && prefill.talla) otrosDatosEl.value = 'Talla: ' + prefill.talla;
+
+  document.getElementById('presupuesto-error').style.display = 'none';
+  document.getElementById('modal-presupuesto').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+// Pedir presupuesto de un servicio de eventos (Dilo Bonito) en vez de un
+// artículo del catálogo: no hay ficha de producto ni técnica/zona que
+// elegir, así que se ocultan esos campos y se prefija directamente el
+// nombre del pack en "Otros datos".
+function abrirModalPresupuestoServicio(servicio) {
+  articuloSeleccionado = null;
+  SERVICIO_SELECCIONADO = servicio;
+  document.getElementById('mp-producto-nombre').textContent = servicio.nombre + ' · ' + servicio.servicio;
+  document.getElementById('presupuesto-form').style.display = 'flex';
+  document.getElementById('presupuesto-success').style.display = 'none';
+  document.getElementById('presupuesto-form').reset();
+
+  var form = document.getElementById('presupuesto-form');
+  poblarSelectPresupuesto('mp-zona-marcaje', null);
+  poblarSelectPresupuesto('mp-tecnica', null);
+  form.elements.namedItem('otros_datos').value = 'Pack: ' + servicio.nombre + ' (' + servicio.precio.toFixed(2) + '€)';
 
   document.getElementById('presupuesto-error').style.display = 'none';
   document.getElementById('modal-presupuesto').style.display = 'block';
@@ -373,7 +434,9 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
       btn.textContent = 'Enviando...';
     }
 
-    var nombreProducto = articuloSeleccionado ? articuloSeleccionado.nombre : 'artículo del catálogo';
+    var nombreProducto = articuloSeleccionado
+      ? articuloSeleccionado.nombre
+      : (SERVICIO_SELECCIONADO ? SERVICIO_SELECCIONADO.nombre + ' (' + SERVICIO_SELECCIONADO.servicio + ')' : 'artículo del catálogo');
     var detalles = [
       'Artículo: ' + nombreProducto,
       f.get('cantidad') ? 'Cantidad: ' + f.get('cantidad') : null,
@@ -389,7 +452,11 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'cotizacion',
-        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), servicio: 'Bendito Lab', mensaje: detalles }
+        data: {
+          nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'),
+          servicio: SERVICIO_SELECCIONADO ? 'Dilo Bonito' : 'Bendito Lab',
+          mensaje: detalles,
+        }
       })
     });
     var d = await r.json();

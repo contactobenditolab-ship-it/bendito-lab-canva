@@ -5,6 +5,7 @@
 // con coleccion.html).
 
 var TODOS_LOS_ARTICULOS = [];
+var SERVICIOS_EVENTOS = [];
 var categoriaActiva = '';
 var subcategoriaActiva = '';
 var leerOrdenActiva = null;
@@ -61,11 +62,17 @@ function renderCategorias(articulos) {
 
   var railHtml = chip('', 'Todos', fotoParaCategoria(articulos, ''));
   railHtml += cats.map(function(c){ return chip(c, c, fotoParaCategoria(articulos, c)); }).join('');
+  // Servicios de Dilo Bonito (personalización en directo en eventos): no
+  // son artículos del catálogo (fichas_costes tipo "servicio", sin
+  // imagen propia), así que van al final del carril con foto genérica.
+  if (SERVICIOS_EVENTOS.length) {
+    railHtml += chip('__eventos__', 'Servicios para eventos', IMAGEN_SERVICIOS_EVENTOS);
+  }
   rail.innerHTML = railHtml;
   rail.style.display = 'flex';
 
   var extraHtml = '';
-  if (categoriaActiva && categoriaActiva !== '__packs__') {
+  if (categoriaActiva && categoriaActiva !== '__packs__' && categoriaActiva !== '__eventos__') {
     var subs = obtenerSubcategoriasDeCategoria(articulos, categoriaActiva);
     if (subs.length) {
       extraHtml += '<div class="subcategorias">' +
@@ -119,8 +126,13 @@ function renderCategorias(articulos) {
 }
 
 function pintarGrid() {
+  if (categoriaActiva === '__eventos__') {
+    renderGridServiciosEn('catalogo-grid', SERVICIOS_EVENTOS);
+    return;
+  }
+
   var lista = TODOS_LOS_ARTICULOS;
-  
+
   // Filtro especial para Packs
   if (categoriaActiva === '__packs__') {
     lista = lista.filter(function(a){
@@ -147,6 +159,7 @@ async function cargarCatalogo() {
     var d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Error al cargar el catálogo');
     TODOS_LOS_ARTICULOS = d.articulos || [];
+    SERVICIOS_EVENTOS = d.servicios_eventos || [];
     leerOrdenActiva = montarOrdenSelect('catalogo-grid', pintarGrid);
     renderCategorias(TODOS_LOS_ARTICULOS);
     pintarGrid();

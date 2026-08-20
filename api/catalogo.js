@@ -265,13 +265,17 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('catalogo_articulos')
-        .select(CAMPOS_PUBLICOS)
-        .eq('visible_web', true)
-        .order('categoria', { ascending: true, nullsFirst: false })
-        .order('nombre', { ascending: true });
+      const [{ data, error }, { data: serviciosData, error: eServicios }] = await Promise.all([
+        supabase
+          .from('catalogo_articulos')
+          .select(CAMPOS_PUBLICOS)
+          .eq('visible_web', true)
+          .order('categoria', { ascending: true, nullsFirst: false })
+          .order('nombre', { ascending: true }),
+        supabase.from('fichas_costes').select('categoria, costes_fijos').eq('tipo', 'servicio').order('orden'),
+      ]);
       if (error) throw error;
+      if (eServicios) throw eServicios;
 
       const articulosEnriquecidos = await enriquecerArticulos(supabase, data || []);
       const preciosDesde = await calcularPreciosDesde(supabase, articulosEnriquecidos.map((a) => a.id));
@@ -280,8 +284,19 @@ module.exports = async function handler(req, res) {
         precio_desde: preciosDesde.has(a.id) ? Math.round(preciosDesde.get(a.id) * 100) / 100 : null,
       }));
 
+      // Servicios de Dilo Bonito (personalización en directo en eventos):
+      // fichas_costes tipo "servicio", una ficha por servicio, cada "coste
+      // fijo" es un pack con su precio — no son catalogo_articulos (sin
+      // imagen/ficha propia), así que el catálogo público los lista aparte
+      // como una categoría más ("Servicios para eventos").
+      const serviciosEventos = (serviciosData || []).flatMap((f) =>
+        (f.costes_fijos || [])
+          .filter((c) => c.concepto && c.importe != null)
+          .map((c) => ({ nombre: c.concepto, precio: c.importe, servicio: f.categoria }))
+      );
+
       res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
-      return res.status(200).json({ articulos });
+      return res.status(200).json({ articulos, servicios_eventos: serviciosEventos });
     } catch (e) {
       console.error('Error listando catálogo público:', e.message);
       return res.status(500).json({ error: 'No se pudo cargar el catálogo' });
