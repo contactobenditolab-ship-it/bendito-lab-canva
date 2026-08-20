@@ -274,7 +274,18 @@ function poblarSelectPresupuesto(selectId, opciones, valorPreseleccionado) {
     select.appendChild(option);
   });
   select.style.display = opciones && opciones.length ? '' : 'none';
-  select.value = valorPreseleccionado && opciones && opciones.indexOf(valorPreseleccionado) !== -1 ? valorPreseleccionado : '';
+
+  // Comparación insensible a mayúsculas/espacios: la técnica preseleccionada
+  // viene del desplegable de la calculadora (nombres de fichas_costes),
+  // mientras que las opciones de este select vienen de
+  // articulo.tecnicas_personalizacion — son dos campos mantenidos por
+  // separado, así que un desajuste de mayúsculas/espacios entre ambos no
+  // debe dejar la preselección en blanco silenciosamente.
+  var normalizar = function(v){ return String(v || '').trim().toLowerCase(); };
+  var coincidencia = valorPreseleccionado && opciones
+    ? opciones.find(function(op){ return normalizar(op) === normalizar(valorPreseleccionado); })
+    : null;
+  select.value = coincidencia || '';
 }
 
 function abrirModalPresupuesto(articuloId, prefill) {
