@@ -649,13 +649,26 @@ function esArticuloEventos(articulo) {
   return articulo.categoria === 'Servicios para eventos';
 }
 
+// Mismas 3 opciones que ArticuloEvento/COSTES_ARTICULO en calculator.ts
+// (bendito-os) — el nombre visible es solo de presentación, el value es
+// la clave real que espera calcularPrecioEvento.
+var ARTICULOS_EVENTOS = [
+  { value: 'neceser', etiqueta: 'Neceser' },
+  { value: 'tote', etiqueta: 'Tote bag' },
+  { value: 'camiseta', etiqueta: 'Camiseta' },
+];
+
 function renderCalculadoraEventos(articulo) {
   var cont = document.getElementById('md-calc');
   if (!cont) return;
+  var opcionesArticulo = ARTICULOS_EVENTOS.map(function(a){
+    return '<option value="' + escapeHtml(a.value) + '">' + escapeHtml(a.etiqueta) + '</option>';
+  }).join('');
   cont.innerHTML =
     '<div class="md-calc-title">Calcula tu pack orientativo</div>' +
     '<div class="md-calc-row">' +
       '<label>Número de invitados<input type="number" id="calc-invitados" min="1" value="50"></label>' +
+      '<label>Artículo a personalizar<select id="calc-articulo-evento">' + opcionesArticulo + '</select></label>' +
     '</div>' +
     '<button type="button" class="btn-calcular" id="btn-calcular">CALCULAR PRECIO→</button>' +
     '<div class="md-calc-resultado" id="calc-resultado" style="display:none;"></div>';
@@ -668,6 +681,8 @@ async function ejecutarCalculoEvento(articuloId) {
   var btn = document.getElementById('btn-calcular');
   var resEl = document.getElementById('calc-resultado');
   var invitados = parseInt(document.getElementById('calc-invitados').value, 10) || 1;
+  var articuloEl = document.getElementById('calc-articulo-evento');
+  var articuloElegido = articuloEl ? articuloEl.value : null;
 
   btn.disabled = true; btn.textContent = 'Calculando...';
   resEl.style.display = 'none';
@@ -676,13 +691,14 @@ async function ejecutarCalculoEvento(articuloId) {
     var r = await fetch('/api/catalogo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accion: 'calcularPrecioEvento', articulo_id: articuloId, invitados: invitados }),
+      body: JSON.stringify({ accion: 'calcularPrecioEvento', articulo_id: articuloId, invitados: invitados, articulo: articuloElegido }),
     });
     var d = await r.json();
     if (!d.ok) throw new Error(d.error || 'Error al calcular');
 
+    var etiquetaArticulo = ARTICULOS_EVENTOS.filter(function(a){ return a.value === d.articulo; }).map(function(a){ return a.etiqueta; })[0];
     resEl.innerHTML =
-      '<div class="md-calc-total">Pack ' + escapeHtml(d.pack.nombre) + ': ' + d.precio.toFixed(2) + '€ <span>(' + d.invitados + ' invitados)</span></div>' +
+      '<div class="md-calc-total">Pack ' + escapeHtml(d.pack.nombre) + ': ' + d.precio.toFixed(2) + '€ <span>(' + d.invitados + ' invitados' + (etiquetaArticulo ? ' · ' + escapeHtml(etiquetaArticulo) : '') + ')</span></div>' +
       '<div class="md-calc-aviso">' + escapeHtml(d.aviso) + '</div>';
     resEl.style.display = 'block';
   } catch (e) {

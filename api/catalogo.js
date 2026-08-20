@@ -107,6 +107,30 @@ function getPackEvento(invitados) {
   return PACKS_EVENTOS.find((p) => invitados >= p.min && invitados <= p.max) || PACKS_EVENTOS[PACKS_EVENTOS.length - 1];
 }
 
+// Resto de la réplica de calcularPresupuestoEvento() en calculator.ts —
+// cuando el cliente elige qué artículo personalizar, el precio del pack
+// puede quedarse corto para esa cantidad de invitados (más coste de
+// material cuanto más caro el artículo), así que se recalcula el mínimo
+// igual que hace el motor interno y se aplica el que sea mayor de los dos.
+// Sin comisión de colaborador (comPct=0) ni extras (horas/diseño/km/niños):
+// eso son datos internos del presupuesto, no de esta calculadora pública.
+const OCUPACION_EVENTOS = 0.8; // % de invitados que realmente recogen producto
+const MARGEN_CONSUMIBLES_EVENTOS = 0.5; // 50% margen mínimo sobre consumibles
+const COSTES_ARTICULO_EVENTOS = { neceser: 1.15, tote: 1.92, camiseta: 4.6 };
+function getBeneficioMinimoEvento(invitados) {
+  if (invitados <= 50) return 200;
+  const tramos = Math.floor((invitados - 50) / 50);
+  return 200 + tramos * 50;
+}
+function precioEventoConArticulo(pack, invitados, articulo) {
+  const invitadosReales = Math.round(invitados * OCUPACION_EVENTOS);
+  const coste = invitadosReales * COSTES_ARTICULO_EVENTOS[articulo];
+  const precioMinPorMargen = Math.ceil(coste / (1 - MARGEN_CONSUMIBLES_EVENTOS));
+  const precioMinPorBeneficio = Math.ceil(coste + getBeneficioMinimoEvento(invitados));
+  const precioMinMaterial = Math.max(precioMinPorMargen, precioMinPorBeneficio);
+  return Math.max(pack.precio, precioMinMaterial);
+}
+
 function margenPorTramo(cantidad, tramos) {
   const ordenados = tramosOrdenados(tramos);
   let margen = ordenados[0].margen;
@@ -323,14 +347,17 @@ module.exports = async function handler(req, res) {
     }
     if (body && body.accion === 'calcularPrecioEvento') {
       const invitados = Math.max(parseInt(body.invitados, 10) || 0, 0);
+      const articulo = Object.prototype.hasOwnProperty.call(COSTES_ARTICULO_EVENTOS, body.articulo) ? body.articulo : null;
       const pack = getPackEvento(invitados);
+      const precio = articulo ? precioEventoConArticulo(pack, invitados, articulo) : pack.precio;
       res.setHeader('Cache-Control', 'no-store');
       return res.status(200).json({
         ok: true,
         invitados,
+        articulo,
         pack: { nombre: pack.nombre, min: pack.min, max: pack.max },
-        precio: pack.precio,
-        aviso: 'Precio orientativo del pack según nº de invitados. El presupuesto final puede variar según extras (horas, diseño, desplazamiento) y detalles del evento.',
+        precio,
+        aviso: 'Precio orientativo según nº de invitados y artículo elegido. El presupuesto final puede variar según extras (horas, diseño, desplazamiento) y detalles del evento.',
       });
     }
     if (body && body.accion === 'calcularPrecio') {
