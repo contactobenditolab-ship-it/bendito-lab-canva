@@ -69,11 +69,11 @@ window.addEventListener('DOMContentLoaded', function(){
   if (!consent) { var b=document.getElementById('cookie-banner'); if(b) b.style.display='flex'; }
   if (consent==='accepted') activarAnalytics();
   
-  // Sección Personalización en directo → catálogo
+  // Sección Personalización en directo → página de producto específica
   var personalizacionSection = document.querySelector('#personalizacion .db-two-col');
   if(personalizacionSection){
     personalizacionSection.addEventListener('click', function(){
-      window.location.href = 'catalogo.html';
+      window.location.href = 'https://www.benditolab.com/producto/personalizacion-para-eventos-f83a849d-0f21-41a5-b22e-2aa8141dce1f';
     });
   }
   
