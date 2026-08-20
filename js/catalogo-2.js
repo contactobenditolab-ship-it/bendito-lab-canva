@@ -160,6 +160,7 @@ async function cargarCatalogo() {
     TODOS_LOS_ARTICULOS = d.articulos || [];
     leerOrdenActiva = montarOrdenSelect('catalogo-grid', pintarGrid);
     renderCategorias(TODOS_LOS_ARTICULOS);
+    abrirCategoriaDesdeUrl();
     pintarGrid();
     abrirArticuloDesdeUrl();
   } catch (e) {
@@ -167,6 +168,19 @@ async function cargarCatalogo() {
   }
 }
 cargarCatalogo();
+
+// Deep-link: /catalogo?categoria=<nombre> selecciona esa categoría al cargar
+function abrirCategoriaDesdeUrl() {
+  var categParam = new URLSearchParams(location.search).get('categoria');
+  if (categParam) {
+    var categDecode = decodeURIComponent(categParam);
+    var existe = TODOS_LOS_ARTICULOS.some(function(a){ return a.categoria === categDecode; });
+    if (existe) {
+      categoriaActiva = categDecode;
+      renderCategorias(TODOS_LOS_ARTICULOS);
+    }
+  }
+}
 
 // Deep-link: /catalogo?articulo=<id> abre directamente la ficha de ese
 // artículo (usado por el botón "Ver en la web" de Bendito OS).
