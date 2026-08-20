@@ -31,6 +31,22 @@ function client() {
 // Ver: INTEGRACION_CANVA.md en bendito-os para documentación completa
 const PRICING_API_URL = process.env.BENDITO_OS_PRICING_API || 'https://app.benditolab.com/api/catalog/pricing/calculate';
 
+// El precio del producto en sí ya viene de la API (arriba). Pero el precio de
+// la TÉCNICA de personalización (DTF, láser, etc. — ver precioTecnicaDesdeFicha
+// más abajo) nunca se migró a la API porque no es por artículo, así que sigue
+// necesitando esta tabla de márgenes por defecto localmente.
+const MARGEN_MINIMO = 0.45;
+const TRAMOS_MARGEN_DEFECTO = [
+  { cantidadMin: 1, margen: 0.7 },
+  { cantidadMin: 10, margen: 0.68 },
+  { cantidadMin: 20, margen: 0.65 },
+  { cantidadMin: 25, margen: 0.62 },
+  { cantidadMin: 50, margen: 0.58 },
+  { cantidadMin: 100, margen: 0.54 },
+  { cantidadMin: 200, margen: 0.5 },
+  { cantidadMin: 300, margen: MARGEN_MINIMO },
+];
+
 /**
  * Llamar a API centralizada de bendito-os para calcular precio del producto.
  * Elimina duplicación de calcularCosteReal + redondearPsicologico + tramos.
@@ -70,6 +86,15 @@ async function calcularPrecioDesdeAPI(articulo_id, cantidad, canal = 'b2c') {
 // en que cada llamador ya lo haga (el override B2C sí lo hacía, esto no).
 function tramosOrdenados(tramos) {
   return [...tramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
+}
+
+function margenPorTramo(cantidad, tramos) {
+  const ordenados = tramosOrdenados(tramos);
+  let margen = ordenados[0].margen;
+  for (const t of ordenados) {
+    if (cantidad >= t.cantidadMin) margen = t.margen;
+  }
+  return Math.max(margen, MARGEN_MINIMO);
 }
 
 // Info de tramos por cantidad para mostrar al cliente (nunca el margen en
@@ -153,21 +178,26 @@ async function calcularPreciosDesde(supabase, ids) {
     if (eCoste) throw eCoste;
 
     const resultado = new Map();
-    
-    // Llamar API para cada artículo (cantidad = MOQ o 5)
-    // TODO: Optimizar con batch endpoint si genera muchas requests
-    for (const articulo of (filasCoste || [])) {
-      const cantidad = articulo.moq || 5;
-      try {
-        const precioData = await calcularPrecioDesdeAPI(articulo.id, cantidad, 'b2c');
-        resultado.set(articulo.id, precioData.precioUnitario);
-      } catch (e) {
-        console.warn(`[calcularPreciosDesde] Error para artículo ${articulo.id}:`, e.message);
-        // Si falla una, seguir con las demás (fallback silencioso)
-        resultado.set(articulo.id, null);
-      }
-    }
-    
+
+    // Llamar API para cada artículo (cantidad = MOQ o 5), todas en paralelo:
+    // en secuencia (await dentro de un for) esto tardaba ~1-2s × nº de
+    // artículos (llamada HTTP por artículo a bendito-os) — con 30-40
+    // artículos el catálogo tardaba más de un minuto en cargar.
+    // TODO: Optimizar con batch endpoint si el catálogo crece mucho más
+    await Promise.all(
+      (filasCoste || []).map(async (articulo) => {
+        const cantidad = articulo.moq || 5;
+        try {
+          const precioData = await calcularPrecioDesdeAPI(articulo.id, cantidad, 'b2c');
+          resultado.set(articulo.id, precioData.precioUnitario);
+        } catch (e) {
+          console.warn(`[calcularPreciosDesde] Error para artículo ${articulo.id}:`, e.message);
+          // Si falla una, seguir con las demás (fallback silencioso)
+          resultado.set(articulo.id, null);
+        }
+      })
+    );
+
     return resultado;
   } catch (e) {
     console.error('[calcularPreciosDesde]', e.message);
@@ -292,7 +322,7 @@ module.exports = async function handler(req, res) {
 
         let precioTecnica = 0;
         let tecnicaNombre = null;
-        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad, contexto.tramos); tecnicaNombre = fichaTecnica.categoria; }
+        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad, TRAMOS_MARGEN_DEFECTO); tecnicaNombre = fichaTecnica.categoria; }
 
         const extrasDisponibles = fichasExtra || [];
         let extrasTotal = 0;
