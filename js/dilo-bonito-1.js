@@ -68,4 +68,19 @@ window.addEventListener('DOMContentLoaded', function(){
   var consent = localStorage.getItem('bl_cookie_consent');
   if (!consent) { var b=document.getElementById('cookie-banner'); if(b) b.style.display='flex'; }
   if (consent==='accepted') activarAnalytics();
+  
+  // Hacer clickeables las fotos de artículos en Dilo Bonito
+  var svCardImages = document.querySelectorAll('.sv-card img');
+  svCardImages.forEach(function(img, index){
+    img.style.cursor = 'pointer';
+    img.addEventListener('click', function(){
+      if(index === 0){
+        // Primer item: Personalización en directo → ir a catálogo
+        window.location.href = 'catalogo.html';
+      } else {
+        // Otros items → ir a contacto
+        window.location.href = 'contacto.html';
+      }
+    });
+  });
 });
