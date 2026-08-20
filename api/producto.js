@@ -392,6 +392,12 @@ module.exports = async function handler(req, res) {
           ? a.tecnicas_personalizacion.join(', ')
           : null,
       ],
+      [
+        'Medida máxima de personalización',
+        a.personalizacion_ancho_max_cm && a.personalizacion_alto_max_cm
+          ? `${a.personalizacion_ancho_max_cm} × ${a.personalizacion_alto_max_cm} cm`
+          : a.superficie_max_personalizacion || null,
+      ],
     ].filter(([, valor]) => !!valor);
 
     const guiaEsImagen = /^https?:\/\/.+\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(a.guia_tallas || '');
