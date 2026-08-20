@@ -30,6 +30,10 @@ function client() {
 // 20 Aug 2026: Migración P1 — bendito-os devuelve precioUnitario, margen, desglose
 // Ver: INTEGRACION_CANVA.md en bendito-os para documentación completa
 const PRICING_API_URL = process.env.BENDITO_OS_PRICING_API || 'https://app.benditolab.com/api/catalog/pricing/calculate';
+// Versión en lote (un artículo por fila) del mismo endpoint, para el "precio
+// desde" del listado — evita una llamada HTTP + 1-3 queries a Supabase por
+// cada artículo visible (ver calcularPreciosDesde más abajo).
+const PRICING_API_BATCH_URL = PRICING_API_URL.replace(/\/calculate$/, '/calculate-batch');
 
 // El precio del producto en sí ya viene de la API (arriba). Pero el precio de
 // la TÉCNICA de personalización (DTF, láser, etc. — ver precioTecnicaDesdeFicha
@@ -82,6 +86,49 @@ async function calcularPrecioDesdeAPI(articulo_id, cantidad, canal = 'b2c') {
     console.error('[calcularPrecioDesdeAPI]', motivo);
     // Si falla, lanzar para que el handler maneje el error
     throw new Error(`No se pudo calcular precio desde API: ${motivo}`);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Igual que calcularPrecioDesdeAPI pero para varios artículos en una sola
+ * llamada — usa /calculate-batch en bendito-os. Devuelve un Map(articulo_id
+ * -> precioUnitario), con `null` para los que no se pudieron calcular (no
+ * lanza por artículo individual: solo lanza si la llamada entera falla).
+ */
+async function calcularPreciosDesdeAPIBatch(items) {
+  if (!items.length) return new Map();
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(PRICING_API_BATCH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'API error desconocido');
+    }
+    const resultado = new Map();
+    for (const item of result.data) {
+      if (item.success) resultado.set(item.articulo_id, item.precioUnitario);
+      else {
+        console.warn(`[calcularPreciosDesdeAPIBatch] Error para artículo ${item.articulo_id}:`, item.error);
+        resultado.set(item.articulo_id, null);
+      }
+    }
+    return resultado;
+  } catch (error) {
+    const motivo = error.name === 'AbortError' ? 'timeout (8s)' : error.message;
+    console.error('[calcularPreciosDesdeAPIBatch]', motivo);
+    throw new Error(`No se pudo calcular precios en lote: ${motivo}`);
   } finally {
     clearTimeout(timeoutId);
   }
@@ -176,6 +223,12 @@ const CAMPOS_COSTE_LISTADO = [
 // "PVP desde" (precio a cantidad=1, tramo base) para cada artículo del
 // listado público — permite ordenar por precio sin exponer coste/margen.
 // P1 Migration (20 Aug 2026): Usa API centralizada en lugar de calcular localmente
+// P2 (20 Aug 2026): Una sola llamada a /calculate-batch en vez de N llamadas
+// en paralelo a /calculate — con 47 artículos, 47 peticiones HTTP a otro
+// proyecto de Vercel (cada una con sus propias 1-3 queries a Supabase)
+// saturaban las funciones serverless de bendito-os de golpe en cada carga
+// del catálogo. Si el lote entero falla (bendito-os caído), se cae a la
+// versión artículo-por-artículo como red de seguridad.
 async function calcularPreciosDesde(supabase, ids) {
   if (!ids.length) return new Map();
 
@@ -186,23 +239,27 @@ async function calcularPreciosDesde(supabase, ids) {
       .in('id', ids);
     if (eCoste) throw eCoste;
 
-    const resultado = new Map();
+    const items = (filasCoste || []).map((articulo) => ({
+      articulo_id: articulo.id,
+      cantidad: articulo.moq || 5,
+      canal: 'b2c',
+    }));
 
-    // Llamar API para cada artículo (cantidad = MOQ o 5), todas en paralelo:
-    // en secuencia (await dentro de un for) esto tardaba ~1-2s × nº de
-    // artículos (llamada HTTP por artículo a bendito-os) — con 30-40
-    // artículos el catálogo tardaba más de un minuto en cargar.
-    // TODO: Optimizar con batch endpoint si el catálogo crece mucho más
+    try {
+      return await calcularPreciosDesdeAPIBatch(items);
+    } catch (e) {
+      console.warn('[calcularPreciosDesde] Lote falló, cayendo a llamadas individuales:', e.message);
+    }
+
+    const resultado = new Map();
     await Promise.all(
-      (filasCoste || []).map(async (articulo) => {
-        const cantidad = articulo.moq || 5;
+      items.map(async (item) => {
         try {
-          const precioData = await calcularPrecioDesdeAPI(articulo.id, cantidad, 'b2c');
-          resultado.set(articulo.id, precioData.precioUnitario);
+          const precioData = await calcularPrecioDesdeAPI(item.articulo_id, item.cantidad, item.canal);
+          resultado.set(item.articulo_id, precioData.precioUnitario);
         } catch (e) {
-          console.warn(`[calcularPreciosDesde] Error para artículo ${articulo.id}:`, e.message);
-          // Si falla una, seguir con las demás (fallback silencioso)
-          resultado.set(articulo.id, null);
+          console.warn(`[calcularPreciosDesde] Error para artículo ${item.articulo_id}:`, e.message);
+          resultado.set(item.articulo_id, null);
         }
       })
     );
