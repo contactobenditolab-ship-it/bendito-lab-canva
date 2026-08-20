@@ -90,6 +90,23 @@ function tramosOrdenados(tramos) {
   return [...tramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
 }
 
+// Réplica de PACKS/getPack() en bendito-os (src/lib/eventos/calculator.ts)
+// — repo separado, sin código compartido. Es la única fuente de precio
+// para "Personalización para eventos" (Dilo Bonito) en el catálogo
+// público: no pasa por precioUnitarioProducto (coste/margen de artículo
+// físico, no aplica aquí), solo por el número de invitados, igual que la
+// calculadora de presupuestos interna.
+const PACKS_EVENTOS = [
+  { nombre: 'MINI', min: 0, max: 30, precio: 250 },
+  { nombre: 'ESENCIAL', min: 31, max: 50, precio: 300 },
+  { nombre: 'CLÁSICO', min: 51, max: 100, precio: 400 },
+  { nombre: 'COMPLETO', min: 101, max: 150, precio: 500 },
+  { nombre: 'A MEDIDA', min: 151, max: 9999, precio: 750 },
+];
+function getPackEvento(invitados) {
+  return PACKS_EVENTOS.find((p) => invitados >= p.min && invitados <= p.max) || PACKS_EVENTOS[PACKS_EVENTOS.length - 1];
+}
+
 function margenPorTramo(cantidad, tramos) {
   const ordenados = tramosOrdenados(tramos);
   let margen = ordenados[0].margen;
@@ -303,6 +320,18 @@ module.exports = async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    if (body && body.accion === 'calcularPrecioEvento') {
+      const invitados = Math.max(parseInt(body.invitados, 10) || 0, 0);
+      const pack = getPackEvento(invitados);
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).json({
+        ok: true,
+        invitados,
+        pack: { nombre: pack.nombre, min: pack.min, max: pack.max },
+        precio: pack.precio,
+        aviso: 'Precio orientativo del pack según nº de invitados. El presupuesto final puede variar según extras (horas, diseño, desplazamiento) y detalles del evento.',
+      });
     }
     if (body && body.accion === 'calcularPrecio') {
       try {

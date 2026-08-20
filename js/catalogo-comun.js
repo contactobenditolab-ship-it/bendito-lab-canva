@@ -302,6 +302,17 @@ function abrirModalPresupuesto(articuloId, prefill) {
   if (cantidadEl && cantidadEl.value) form.elements.namedItem('cantidad').value = cantidadEl.value;
   if (prefill.color) form.elements.namedItem('color').value = prefill.color;
 
+  // "Personalización para eventos" no tiene cantidad ni técnica que elegir
+  // en el sentido habitual — el número de invitados (y el pack que haya
+  // salido en la calculadora) se prefija en "Otros datos" en su lugar.
+  var invitadosEl = document.getElementById('calc-invitados');
+  if (invitadosEl && invitadosEl.value) {
+    var resultadoEventoEl = document.getElementById('calc-resultado');
+    var totalEventoEl = resultadoEventoEl ? resultadoEventoEl.querySelector('.md-calc-total') : null;
+    var packTexto = (resultadoEventoEl && resultadoEventoEl.style.display !== 'none' && totalEventoEl) ? totalEventoEl.textContent : null;
+    form.elements.namedItem('otros_datos').value = 'Invitados: ' + invitadosEl.value + (packTexto ? ' · ' + packTexto : '');
+  }
+
   poblarSelectPresupuesto('mp-zona-marcaje', articuloSeleccionado ? articuloSeleccionado.areas_marcaje : null);
 
   var tecnicaEl = document.getElementById('calc-tecnica');
@@ -395,12 +406,13 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
       logoUrl ? 'Logo: ' + logoUrl : null,
     ].filter(Boolean).join(' · ');
 
+    var esEventos = articuloSeleccionado && esArticuloEventos(articuloSeleccionado);
     var r = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'cotizacion',
-        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), servicio: 'Bendito Lab', mensaje: detalles }
+        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), servicio: esEventos ? 'Dilo Bonito' : 'Bendito Lab', mensaje: detalles }
       })
     });
     var d = await r.json();
@@ -629,9 +641,62 @@ function cargarMetaPersonalizacion() {
   return METAP_CACHE;
 }
 
+// "Personalización para eventos" (Dilo Bonito) no es un artículo físico:
+// no tiene técnica/área que calcular, su precio depende del nº de
+// invitados (packs) — usa una calculadora propia en vez de la de
+// cantidad+técnica del resto del catálogo.
+function esArticuloEventos(articulo) {
+  return articulo.categoria === 'Servicios para eventos';
+}
+
+function renderCalculadoraEventos(articulo) {
+  var cont = document.getElementById('md-calc');
+  if (!cont) return;
+  cont.innerHTML =
+    '<div class="md-calc-title">Calcula tu pack orientativo</div>' +
+    '<div class="md-calc-row">' +
+      '<label>Número de invitados<input type="number" id="calc-invitados" min="1" value="50"></label>' +
+    '</div>' +
+    '<button type="button" class="btn-calcular" id="btn-calcular">CALCULAR PRECIO→</button>' +
+    '<div class="md-calc-resultado" id="calc-resultado" style="display:none;"></div>';
+
+  document.getElementById('btn-calcular').addEventListener('click', function(){ ejecutarCalculoEvento(articulo.id); });
+  ejecutarCalculoEvento(articulo.id);
+}
+
+async function ejecutarCalculoEvento(articuloId) {
+  var btn = document.getElementById('btn-calcular');
+  var resEl = document.getElementById('calc-resultado');
+  var invitados = parseInt(document.getElementById('calc-invitados').value, 10) || 1;
+
+  btn.disabled = true; btn.textContent = 'Calculando...';
+  resEl.style.display = 'none';
+
+  try {
+    var r = await fetch('/api/catalogo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accion: 'calcularPrecioEvento', articulo_id: articuloId, invitados: invitados }),
+    });
+    var d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Error al calcular');
+
+    resEl.innerHTML =
+      '<div class="md-calc-total">Pack ' + escapeHtml(d.pack.nombre) + ': ' + d.precio.toFixed(2) + '€ <span>(' + d.invitados + ' invitados)</span></div>' +
+      '<div class="md-calc-aviso">' + escapeHtml(d.aviso) + '</div>';
+    resEl.style.display = 'block';
+  } catch (e) {
+    resEl.innerHTML = '<div class="md-calc-error">' + escapeHtml(e.message) + '</div>';
+    resEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'CALCULAR PRECIO→';
+  }
+}
+
 async function renderCalculadora(articulo) {
   var cont = document.getElementById('md-calc');
   if (!cont) return;
+  if (esArticuloEventos(articulo)) { renderCalculadoraEventos(articulo); return; }
   cont.innerHTML = '<p class="md-calc-loading">Cargando calculadora…</p>';
 
   var meta = await cargarMetaPersonalizacion();
