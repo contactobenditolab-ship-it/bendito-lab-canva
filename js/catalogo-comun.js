@@ -298,8 +298,10 @@ function abrirModalPresupuesto(articuloId, prefill) {
   var form = document.getElementById('presupuesto-form');
   prefill = prefill || {};
 
-  var cantidadEl = document.getElementById('calc-cantidad');
-  if (cantidadEl && cantidadEl.value) form.elements.namedItem('cantidad').value = cantidadEl.value;
+  var cantidadEl = document.getElementById('calc-cantidad') || document.getElementById('calc-invitados');
+  var cantidadFormEl = form.elements.namedItem('cantidad');
+  cantidadFormEl.placeholder = (articuloSeleccionado && esArticuloEventos(articuloSeleccionado)) ? 'Nº invitados' : 'Cantidad';
+  if (cantidadEl && cantidadEl.value) cantidadFormEl.value = cantidadEl.value;
   if (prefill.color) form.elements.namedItem('color').value = prefill.color;
 
   poblarSelectPresupuesto('mp-zona-marcaje', articuloSeleccionado ? articuloSeleccionado.areas_marcaje : null);
@@ -385,9 +387,11 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
     }
 
     var nombreProducto = articuloSeleccionado ? articuloSeleccionado.nombre : 'artículo del catálogo';
+    var esEvento = articuloSeleccionado && esArticuloEventos(articuloSeleccionado);
+    var etiquetaCantidad = esEvento ? 'Nº invitados' : 'Cantidad';
     var detalles = [
       'Artículo: ' + nombreProducto,
-      f.get('cantidad') ? 'Cantidad: ' + f.get('cantidad') : null,
+      f.get('cantidad') ? etiquetaCantidad + ': ' + f.get('cantidad') : null,
       f.get('color') ? 'Color: ' + f.get('color') : null,
       f.get('zona_marcaje') ? 'Zona de marcaje: ' + f.get('zona_marcaje') : null,
       f.get('tecnica') ? 'Técnica: ' + f.get('tecnica') : null,
@@ -609,7 +613,11 @@ function renderFichaProducto(a) {
     abrirModalPresupuesto(a.id, { color: COLOR_SELECCIONADO, talla: TALLA_SELECCIONADA });
   });
 
-  renderCalculadora(a);
+  if (esArticuloEventos(a)) {
+    renderCalculadoraEventos(a);
+  } else {
+    renderCalculadora(a);
+  }
 }
 
 function abrirModalDetalle(articuloId) {
@@ -619,6 +627,50 @@ function abrirModalDetalle(articuloId) {
   renderFichaProducto(a);
   document.getElementById('modal-detalle').style.display = 'block';
   document.body.style.overflow = 'hidden';
+}
+
+// ── Packs de eventos (Dilo Bonito) — tramos por nº de invitados ────────────
+// Espejo público de PACKS en bendito-os/src/lib/eventos/calculator.ts.
+// Precio "desde": el presupuesto final depende de artículos, personalización
+// y extras (horas, diseño, transporte…) que se acuerdan con el cliente.
+var PACKS_EVENTOS = [
+  { nombre: 'MINI', min: 0, max: 30, precio: 250 },
+  { nombre: 'ESENCIAL', min: 31, max: 50, precio: 300 },
+  { nombre: 'CLÁSICO', min: 51, max: 100, precio: 400 },
+  { nombre: 'COMPLETO', min: 101, max: 150, precio: 500 },
+  { nombre: 'A MEDIDA', min: 151, max: Infinity, precio: 750 },
+];
+function esArticuloEventos(a) {
+  return String(a.categoria || '').toLowerCase() === 'servicios para eventos';
+}
+function getPackEvento(invitados) {
+  return PACKS_EVENTOS.find(function(p){ return invitados >= p.min && invitados <= p.max; }) || PACKS_EVENTOS[PACKS_EVENTOS.length - 1];
+}
+function renderCalculadoraEventos(articulo) {
+  var cont = document.getElementById('md-calc');
+  if (!cont) return;
+  cont.innerHTML =
+    '<div class="md-calc-title">Calcula tu pack por nº de invitados</div>' +
+    '<div class="md-calc-row">' +
+      '<label>Número de invitados<input type="number" id="calc-invitados" min="1" value="50"></label>' +
+    '</div>' +
+    '<button type="button" class="btn-calcular" id="btn-calcular-evento">CALCULAR PACK→</button>' +
+    '<div class="md-calc-resultado" id="calc-resultado" style="display:none;"></div>';
+
+  document.getElementById('btn-calcular-evento').addEventListener('click', ejecutarCalculoEvento);
+  ejecutarCalculoEvento();
+}
+function ejecutarCalculoEvento() {
+  var resEl = document.getElementById('calc-resultado');
+  var invitadosEl = document.getElementById('calc-invitados');
+  var invitados = Math.max(parseInt(invitadosEl.value, 10) || 1, 1);
+  var pack = getPackEvento(invitados);
+
+  resEl.innerHTML =
+    '<div class="md-calc-total">Pack ' + escapeHtml(pack.nombre) + ' — desde ' + pack.precio.toFixed(2) + '€</div>' +
+    '<div class="md-calc-linea">Para ' + invitados + ' invitados' + (pack.max !== Infinity ? ' (hasta ' + pack.max + ')' : ' (151 o más)') + '</div>' +
+    '<div class="md-calc-aviso">Precio desde. El presupuesto final puede variar según los artículos, personalizaciones y extras (horas, diseño, transporte…) que necesitéis para el evento.</div>';
+  resEl.style.display = 'block';
 }
 
 // ── Calculadora de precio aproximado (producto + técnica + extras) ────────
