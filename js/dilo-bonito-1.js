@@ -69,18 +69,19 @@ window.addEventListener('DOMContentLoaded', function(){
   if (!consent) { var b=document.getElementById('cookie-banner'); if(b) b.style.display='flex'; }
   if (consent==='accepted') activarAnalytics();
   
-  // Hacer clickeables las fotos de artículos en Dilo Bonito
+  // Hacer clickeable la sección de Personalización en directo → catálogo
+  var personalizacionSection = document.querySelector('#personalizacion .db-two-col');
+  if(personalizacionSection){
+    personalizacionSection.addEventListener('click', function(){
+      window.location.href = 'catalogo.html';
+    });
+  }
+  
+  // Hacer clickeables otras fotos de sv-card → contacto
   var svCardImages = document.querySelectorAll('.sv-card img');
-  svCardImages.forEach(function(img, index){
-    img.style.cursor = 'pointer';
+  svCardImages.forEach(function(img){
     img.addEventListener('click', function(){
-      if(index === 0){
-        // Primer item: Personalización en directo → ir a catálogo
-        window.location.href = 'catalogo.html';
-      } else {
-        // Otros items → ir a contacto
-        window.location.href = 'contacto.html';
-      }
+      window.location.href = 'contacto.html';
     });
   });
 });
