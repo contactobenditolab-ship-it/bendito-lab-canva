@@ -144,6 +144,47 @@ function tramosOrdenados(tramos) {
   return [...tramos].sort((a, b) => a.cantidadMin - b.cantidadMin);
 }
 
+// Réplica de PACKS/getPack() en bendito-os (src/lib/eventos/calculator.ts)
+// — repo separado, sin código compartido. Es la única fuente de precio
+// para "Personalización para eventos" (Dilo Bonito) en el catálogo
+// público: no pasa por precioUnitarioProducto (coste/margen de artículo
+// físico, no aplica aquí), solo por el número de invitados, igual que la
+// calculadora de presupuestos interna.
+const PACKS_EVENTOS = [
+  { nombre: 'MINI', min: 0, max: 30, precio: 250 },
+  { nombre: 'ESENCIAL', min: 31, max: 50, precio: 300 },
+  { nombre: 'CLÁSICO', min: 51, max: 100, precio: 400 },
+  { nombre: 'COMPLETO', min: 101, max: 150, precio: 500 },
+  { nombre: 'A MEDIDA', min: 151, max: 9999, precio: 750 },
+];
+function getPackEvento(invitados) {
+  return PACKS_EVENTOS.find((p) => invitados >= p.min && invitados <= p.max) || PACKS_EVENTOS[PACKS_EVENTOS.length - 1];
+}
+
+// Resto de la réplica de calcularPresupuestoEvento() en calculator.ts —
+// cuando el cliente elige qué artículo personalizar, el precio del pack
+// puede quedarse corto para esa cantidad de invitados (más coste de
+// material cuanto más caro el artículo), así que se recalcula el mínimo
+// igual que hace el motor interno y se aplica el que sea mayor de los dos.
+// Sin comisión de colaborador (comPct=0) ni extras (horas/diseño/km/niños):
+// eso son datos internos del presupuesto, no de esta calculadora pública.
+const OCUPACION_EVENTOS = 0.8; // % de invitados que realmente recogen producto
+const MARGEN_CONSUMIBLES_EVENTOS = 0.5; // 50% margen mínimo sobre consumibles
+const COSTES_ARTICULO_EVENTOS = { neceser: 1.15, tote: 1.92, camiseta: 4.6 };
+function getBeneficioMinimoEvento(invitados) {
+  if (invitados <= 50) return 200;
+  const tramos = Math.floor((invitados - 50) / 50);
+  return 200 + tramos * 50;
+}
+function precioEventoConArticulo(pack, invitados, articulo) {
+  const invitadosReales = Math.round(invitados * OCUPACION_EVENTOS);
+  const coste = invitadosReales * COSTES_ARTICULO_EVENTOS[articulo];
+  const precioMinPorMargen = Math.ceil(coste / (1 - MARGEN_CONSUMIBLES_EVENTOS));
+  const precioMinPorBeneficio = Math.ceil(coste + getBeneficioMinimoEvento(invitados));
+  const precioMinMaterial = Math.max(precioMinPorMargen, precioMinPorBeneficio);
+  return Math.max(pack.precio, precioMinMaterial);
+}
+
 function margenPorTramo(cantidad, tramos) {
   const ordenados = tramosOrdenados(tramos);
   let margen = ordenados[0].margen;
@@ -329,6 +370,21 @@ module.exports = async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    if (body && body.accion === 'calcularPrecioEvento') {
+      const invitados = Math.max(parseInt(body.invitados, 10) || 0, 0);
+      const articulo = Object.prototype.hasOwnProperty.call(COSTES_ARTICULO_EVENTOS, body.articulo) ? body.articulo : null;
+      const pack = getPackEvento(invitados);
+      const precio = articulo ? precioEventoConArticulo(pack, invitados, articulo) : pack.precio;
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).json({
+        ok: true,
+        invitados,
+        articulo,
+        pack: { nombre: pack.nombre, min: pack.min, max: pack.max },
+        precio,
+        aviso: 'Precio orientativo según nº de invitados y artículo elegido. El presupuesto final puede variar según extras (horas, diseño, desplazamiento) y detalles del evento.',
+      });
     }
     if (body && body.accion === 'calcularPrecio') {
       try {
