@@ -724,9 +724,14 @@ async function renderCalculadora(articulo) {
     : todasTecnicas;
   if (!tecnicasAplicables.length) tecnicasAplicables = todasTecnicas;
 
-  // El precio base del artículo (sin personalizar) siempre se puede calcular
-  // con solo la cantidad — la técnica es opcional. Antes, si no había
-  // fichas de coste de tipo "tecnica" en el catálogo interno
+  // El precio "desde" del listado (sin personalizar) se calcula aparte, en
+  // /api/catalogo (precio_desde) — pero todo presupuesto real que se haga
+  // desde esta calculadora debe incluir ya la personalización: la técnica
+  // ya no es opcional por defecto, se preselecciona la primera aplicable al
+  // artículo. Solo los artículos marcados en el ERP con
+  // permite_sin_personalizar (los que también se venden en blanco) ofrecen
+  // "Sin personalizar" como opción — para el resto no existe. Antes, si no
+  // había fichas de coste de tipo "tecnica" en el catálogo interno
   // (fichas_costes), aquí se vaciaba el contenedor entero y la calculadora
   // desaparecía sin más, aunque el precio base sí se pudiera calcular.
   //
@@ -734,8 +739,9 @@ async function renderCalculadora(articulo) {
   // Bonito (eventos) — no se muestran aquí, esto es el catálogo B2B/B2C de
   // producto: mostrar "Extras de eventos" en todos los artículos (un
   // bálsamo labial, p.ej.) no tiene sentido para el cliente.
+  var opcionSinPersonalizar = articulo.permite_sin_personalizar ? '<option value="">Sin personalizar</option>' : '';
   var tecnicaHtml = tecnicasAplicables.length
-    ? '<label>Técnica (opcional)<select id="calc-tecnica"><option value="">Sin personalizar</option>' +
+    ? '<label>Técnica<select id="calc-tecnica">' + opcionSinPersonalizar +
         tecnicasAplicables.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('') +
       '</select></label>'
     : '';
