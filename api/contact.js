@@ -8,8 +8,45 @@
 //   email a colaboradores@benditolab.com. Así la solicitud queda guardada
 //   en su apartado dentro de OS, no solo como un email suelto. Además se
 //   envía una confirmación al colaborador con la newsletter de colaboradores.
+// - "upload-logo": sube a Vercel Blob el logo que un cliente adjunta al
+//   pedir presupuesto (para mandarle un mockup). Vive aquí, no en su
+//   propio archivo /api, porque el plan Hobby de Vercel tiene un límite
+//   de 12 Serverless Functions por deployment y ya estaba al límite —
+//   ver "Vercel" en CLAUDE.md.
 // Público (sin auth): lo llaman formularios de visitantes, no el admin.
+const { put } = require('@vercel/blob');
 const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
+
+const LOGO_MAX_BYTES = 4 * 1024 * 1024; // 4MB tras decodificar, igual que /api/upload-image
+const LOGO_EXT_POR_MIME = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+  'image/svg+xml': 'svg',
+};
+
+async function subirLogoPresupuesto(dataUrl) {
+  if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
+    throw new Error('Falta dataUrl');
+  }
+  const match = /^data:([^;,]+);base64,(.+)$/.exec(dataUrl);
+  if (!match) throw new Error('dataUrl inválida');
+  const mime = match[1];
+  const ext = LOGO_EXT_POR_MIME[mime];
+  if (!ext) throw new Error('Tipo de imagen no soportado: ' + mime);
+
+  const buf = Buffer.from(match[2], 'base64');
+  if (!buf.length) throw new Error('Imagen vacía');
+  if (buf.length > LOGO_MAX_BYTES) throw new Error('Imagen demasiado grande (máx 4MB)');
+
+  const blobPath = 'logos-presupuesto/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+  const result = await put(blobPath, buf, {
+    access: 'public',
+    contentType: mime,
+    addRandomSuffix: false,
+  });
+  return result.url;
+}
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const OS_COLABORADOR_URL = 'https://portal.benditolab.com/api/public/colaborador-solicitud';
@@ -209,6 +246,18 @@ module.exports = async function handler(req, res) {
   }
   const type = body && body.type;
   const data = (body && body.data) || {};
+
+  // "upload-logo" no es un lead: no lleva nombre/email/data, solo el
+  // dataUrl del logo a subir — se resuelve aparte del resto de tipos.
+  if (type === 'upload-logo') {
+    try {
+      const url = await subirLogoPresupuesto(body && body.dataUrl);
+      return res.status(200).json({ ok: true, url });
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+  }
+
   // Honeypot anti-spam: el campo "website" debe llegar vacío desde un humano.
   if (typeof body?.website === 'string' && body.website.trim()) {
     return res.status(200).json({ ok: true });

@@ -32,46 +32,62 @@ function existenPacks(articulos) {
   });
 }
 
-// Árbol de categorías: todas las categorías se muestran siempre; al
-// pulsar una, sus subcategorías (si tiene) se despliegan justo debajo,
-// sin ocultar el resto del menú.
+// Foto representativa de una categoría para su círculo en el carril: la
+// del primer artículo con imagen dentro de esa categoría (categoria=""
+// para "Todos" usa el primer artículo con imagen del catálogo entero). Si
+// no hay ninguna, cae al logo del sitio en vez de dejar el círculo vacío.
+function fotoParaCategoria(articulos, categoria) {
+  var art = articulos.find(function(a){
+    return (!categoria || a.categoria === categoria) && a.imagen_principal_url;
+  });
+  return art ? art.imagen_principal_url : 'images/eye-logo.svg';
+}
+
+// Árbol de categorías: el carril horizontal (círculos con foto) muestra
+// siempre las categorías de primer nivel; al pulsar una, sus
+// subcategorías (si tiene) y la sección de Packs se despliegan debajo en
+// #categorias-extra, sin ocultar el carril.
 function renderCategorias(articulos) {
   var cats = obtenerCategoriasUnicas(articulos);
-  var cont = document.getElementById('categorias');
-  if (!cats.length) { cont.style.display = 'none'; return; }
+  var rail = document.getElementById('categorias');
+  var extra = document.getElementById('categorias-extra');
+  if (!cats.length) { rail.style.display = 'none'; extra.innerHTML = ''; return; }
 
-  var html = '<button type="button" class="cat-btn' + (!categoriaActiva ? ' activo' : '') + '" data-cat="">Todos</button>';
+  function chip(valor, etiqueta, foto) {
+    return '<button type="button" class="cat-chip' + (categoriaActiva === valor ? ' activo' : '') + '" data-cat="' + escapeHtml(valor) + '">' +
+      '<span class="cat-chip-photo"><img src="' + escapeHtml(foto) + '" alt="" loading="lazy"></span>' +
+      '<span class="cat-chip-label">' + escapeHtml(etiqueta) + '</span></button>';
+  }
 
-  html += cats.map(function(c){
-    var esActiva = categoriaActiva === c;
-    var bloque = '<button type="button" class="cat-btn' + (esActiva ? ' activo' : '') + '" data-cat="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
-    if (esActiva) {
-      var subs = obtenerSubcategoriasDeCategoria(articulos, c);
-      if (subs.length) {
-        bloque += '<div class="subcategorias">' +
-          '<button type="button" class="cat-btn' + (!subcategoriaActiva ? ' activo' : '') + '" data-subcat="" data-cat-padre="' + escapeHtml(c) + '">Ver todos</button>' +
-          subs.map(function(s){
-            return '<button type="button" class="cat-btn' + (subcategoriaActiva === s ? ' activo' : '') + '" data-subcat="' + escapeHtml(s) + '" data-cat-padre="' + escapeHtml(c) + '">' + escapeHtml(s) + '</button>';
-          }).join('') +
-          '</div>';
-      }
+  var railHtml = chip('', 'Todos', fotoParaCategoria(articulos, ''));
+  railHtml += cats.map(function(c){ return chip(c, c, fotoParaCategoria(articulos, c)); }).join('');
+  rail.innerHTML = railHtml;
+  rail.style.display = 'flex';
+
+  var extraHtml = '';
+  if (categoriaActiva && categoriaActiva !== '__packs__') {
+    var subs = obtenerSubcategoriasDeCategoria(articulos, categoriaActiva);
+    if (subs.length) {
+      extraHtml += '<div class="subcategorias">' +
+        '<button type="button" class="cat-btn' + (!subcategoriaActiva ? ' activo' : '') + '" data-subcat="">Ver todos</button>' +
+        subs.map(function(s){
+          return '<button type="button" class="cat-btn' + (subcategoriaActiva === s ? ' activo' : '') + '" data-subcat="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>';
+        }).join('') +
+        '</div>';
     }
-    return bloque;
-  }).join('');
+  }
 
-  // Sección de Packs, también expandible en el árbol
+  // Sección de Packs, siempre visible debajo del carril si hay alguno
   if (existenPacks(articulos)) {
     var packActiva = categoriaActiva === '__packs__';
-    html += '<div class="pack-section">' +
+    extraHtml += '<div class="pack-section">' +
       '<span class="pack-title">📦 PACKS</span>' +
       '<button type="button" class="cat-btn' + (packActiva ? ' activo' : '') + '" data-cat="__packs__">Ver packs</button>' +
       '</div>';
   }
+  extra.innerHTML = extraHtml;
 
-  cont.innerHTML = html;
-  cont.style.display = 'flex';
-
-  cont.querySelectorAll('[data-cat]').forEach(function(btn){
+  rail.querySelectorAll('[data-cat]').forEach(function(btn){
     btn.addEventListener('click', function(){
       var nuevaCat = btn.dataset.cat || '';
       // Pulsar la categoría ya activa la contrae de nuevo
@@ -82,7 +98,17 @@ function renderCategorias(articulos) {
     });
   });
 
-  cont.querySelectorAll('[data-subcat]').forEach(function(btn){
+  extra.querySelectorAll('[data-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var nuevaCat = btn.dataset.cat || '';
+      categoriaActiva = (categoriaActiva === nuevaCat) ? '' : nuevaCat;
+      subcategoriaActiva = '';
+      renderCategorias(articulos);
+      pintarGrid();
+    });
+  });
+
+  extra.querySelectorAll('[data-subcat]').forEach(function(btn){
     btn.addEventListener('click', function(e){
       e.stopPropagation();
       subcategoriaActiva = btn.dataset.subcat || '';
@@ -209,6 +235,7 @@ async function aplicarFiltroNecesidad(slug, nombre) {
 
   var catCont = document.getElementById('categorias');
   catCont.style.display = 'none';
+  document.getElementById('categorias-extra').innerHTML = '';
 
   var banner = document.getElementById('necesidad-banner');
   banner.style.display = 'block';
