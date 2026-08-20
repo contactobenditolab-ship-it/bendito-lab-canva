@@ -40,14 +40,14 @@ function escapeHtml(value) {
 (function injectCatalogoComunStyles(){
   var s = document.createElement('style');
   s.textContent =
-    '.color-swatch{position:relative;}' +
-    '.color-swatch::after{content:attr(data-color-nombre);position:absolute;bottom:calc(100% + 7px);left:50%;' +
+    '.swatch-btn{position:relative;}' +
+    '.swatch-btn::after{content:attr(data-color-nombre);position:absolute;bottom:calc(100% + 7px);left:50%;' +
     'transform:translateX(-50%);background:#17233F;color:#FBF4E9;font-size:11px;font-weight:600;' +
     'padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;' +
     'transition:opacity .12s;z-index:10;}' +
-    '.color-swatch::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);' +
+    '.swatch-btn::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);' +
     'border:4px solid transparent;border-top-color:#17233F;opacity:0;pointer-events:none;transition:opacity .12s;z-index:10;}' +
-    '.color-swatch:hover::after,.color-swatch:hover::before{opacity:1;}' +
+    '.swatch-btn:hover::after,.swatch-btn:hover::before{opacity:1;}' +
     '.btn-guia-tallas{display:inline-block;background:none;border:1px solid var(--baby,#8FA3C2);' +
     'color:var(--baby,#8FA3C2);font-size:12px;font-weight:700;letter-spacing:.3px;padding:8px 14px;' +
     'border-radius:20px;cursor:pointer;margin:0 0 18px;}' +
@@ -167,6 +167,25 @@ function cerrarModalTallas() {
 // busca ahí por id cuando se hace clic en una tarjeta.
 var ARTICULOS_MOSTRADOS = [];
 
+// Círculos de color en miniatura para la tarjeta del grid (no
+// interactivos, a diferencia de renderColoresSwatches en la ficha de
+// producto) — como mucho 3 + un contador "+N" del resto.
+function renderSwatchesTarjeta(coloresResueltos) {
+  if (!coloresResueltos || !coloresResueltos.length) return '';
+  var visibles = coloresResueltos.slice(0, 3);
+  var swatches = visibles.map(function(c){
+    var segmentos = c.segmentos || [];
+    var sinMatch = segmentos.some(function(s){ return !s.hex; });
+    if (sinMatch) return '<span class="swatch" style="background:repeating-linear-gradient(45deg,#e0ddd6,#e0ddd6 2px,#f2f0ea 2px,#f2f0ea 4px);" title="' + escapeHtml(c.nombre) + '"></span>';
+    var fondo = segmentos.length === 2
+      ? 'linear-gradient(135deg,' + segmentos[0].hex + ' 0 50%,' + segmentos[1].hex + ' 50% 100%)'
+      : segmentos[0].hex;
+    return '<span class="swatch" style="background:' + fondo + ';" title="' + escapeHtml(c.nombre) + '"></span>';
+  }).join('');
+  var resto = coloresResueltos.length - visibles.length;
+  return '<div class="card-swatches">' + swatches + (resto > 0 ? '<span class="swatch-more">+' + resto + '</span>' : '') + '</div>';
+}
+
 function renderGridEn(containerId, lista, mensajeVacio) {
   ARTICULOS_MOSTRADOS = lista;
   var cont = document.getElementById(containerId);
@@ -181,22 +200,17 @@ function renderGridEn(containerId, lista, mensajeVacio) {
       ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" loading="lazy" ' +
         'onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'Sin imagen\'}));">'
       : '<span>Sin imagen</span>';
-    var desc = a.descripcion_corta || a.descripcion || '';
     var href = urlProducto(a);
-    var precio = (a.precio_desde != null) ? '<p class="prod-precio">Desde ' + a.precio_desde.toFixed(2) + '€</p>' : '';
+    var precio = (a.precio_desde != null) ? '<div class="card-precio">Desde <b>' + a.precio_desde.toFixed(2) + '€</b></div>' : '';
     return (
-      '<div class="prod-card">' +
-        '<a class="prod-clicable" href="' + escapeHtml(href) + '" data-detalle-id="' + escapeHtml(a.id) + '">' +
-          '<div class="prod-card-img">' + img + '</div>' +
-        '</a>' +
-        '<div class="prod-card-body">' +
-          (a.categoria ? '<p class="prod-cat">' + escapeHtml(a.categoria) + '</p>' : '') +
-          '<a class="prod-nombre prod-clicable" href="' + escapeHtml(href) + '" data-detalle-id="' + escapeHtml(a.id) + '">' + escapeHtml(a.nombre) + '</a>' +
-          (desc ? '<p class="prod-desc">' + escapeHtml(desc) + '</p>' : '') +
+      '<a class="card" href="' + escapeHtml(href) + '">' +
+        '<div class="card-img">' + img + '</div>' +
+        '<div class="card-body">' +
+          renderSwatchesTarjeta(a.colores_resueltos) +
+          '<div class="card-nombre">' + escapeHtml(a.nombre) + '</div>' +
           precio +
-          '<a class="btn-presupuesto" href="' + escapeHtml(href) + '">Pedir presupuesto</a>' +
         '</div>' +
-      '</div>'
+      '</a>'
     );
   }).join('');
 }
@@ -391,13 +405,13 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
   }
 });
 
-// ── Cuadrados de color (en vez del nombre en texto) ────────
+// ── Círculos de color (en vez del nombre en texto) ────────
 // colores_resueltos viene ya calculado por /api/catalogo: cada color es
 // { nombre, segmentos: [{hex, esEstampado}, ...] } — 2 segmentos para
 // bicolores tipo "Celeste/Blanco" (se pintan partidos en diagonal), 1 para
 // el resto. hex null (estampados o nombres sin match en la carta de
-// colores) cae en el estilo .color-swatch--sin-match.
-// Los cuadrados de color funcionan como el "desplegable" de color: son
+// colores) cae en el estilo .swatch-btn--sin-match.
+// Los círculos de color funcionan como el "desplegable" de color: son
 // seleccionables (rol de radio) y la selección se guarda en
 // COLOR_SELECCIONADO para prefijar el mensaje al pedir presupuesto.
 var COLOR_SELECCIONADO = null;
@@ -406,7 +420,7 @@ var TALLA_SELECCIONADA = null;
 function renderColoresSwatches(coloresResueltos) {
   if (!coloresResueltos || !coloresResueltos.length) return '';
 
-  var swatches = coloresResueltos.map(function(c, i) {
+  var swatches = coloresResueltos.map(function(c) {
     var segmentos = c.segmentos || [];
     var sinMatch = segmentos.some(function(s){ return !s.hex; });
     var estampado = segmentos.some(function(s){ return s.esEstampado; });
@@ -420,37 +434,44 @@ function renderColoresSwatches(coloresResueltos) {
       }
     }
 
-    var clase = 'color-swatch' + (sinMatch ? ' color-swatch--sin-match' : '') + (estampado ? ' color-swatch--estampado' : '');
-    return '<span class="' + clase + '" style="' + estiloExtra + '" title="' + escapeHtml(c.nombre) + '"' +
-      ' role="radio" aria-checked="false" tabindex="0" aria-label="' + escapeHtml(c.nombre) + '" data-color-nombre="' + escapeHtml(c.nombre) + '"></span>';
+    var clase = 'swatch-btn' + (sinMatch ? ' swatch-btn--sin-match' : '') + (estampado ? ' swatch-btn--estampado' : '');
+    return '<button type="button" class="' + clase + '" style="' + estiloExtra + '" title="' + escapeHtml(c.nombre) + '"' +
+      ' role="radio" aria-checked="false" aria-label="' + escapeHtml(c.nombre) + '" data-color-nombre="' + escapeHtml(c.nombre) + '"></button>';
   }).join('');
 
-  return '<div class="md-colores"><span class="md-colores-label">Color</span><div class="md-colores-lista" id="md-colores-lista">' + swatches + '</div></div>';
+  return '<div>' +
+    '<div class="prod-field-label">Color</div>' +
+    '<div class="swatch-row" id="md-colores-lista">' + swatches + '</div>' +
+    '<p class="color-actual" id="color-actual" style="display:none;">Color: <b></b></p>' +
+  '</div>';
 }
 
 function activarSelectorColores(articulo) {
   var lista = document.getElementById('md-colores-lista');
   if (!lista) return;
-  var imgEl = document.querySelector('#md-contenido .md-img img');
+  var imgEl = document.getElementById('img-principal');
   var imgPorDefecto = imgEl ? imgEl.src : null;
   var imagenesPorColor = (articulo && articulo.imagenes_por_color) || {};
+  var actual = document.getElementById('color-actual');
 
   lista.addEventListener('click', function(e){
     var swatch = e.target.closest('[data-color-nombre]');
     if (!swatch) return;
-    var yaActivo = swatch.classList.contains('color-swatch--activo');
-    Array.prototype.forEach.call(lista.querySelectorAll('.color-swatch'), function(s){
-      s.classList.remove('color-swatch--activo');
+    var yaActivo = swatch.classList.contains('swatch-btn--activo');
+    Array.prototype.forEach.call(lista.querySelectorAll('.swatch-btn'), function(s){
+      s.classList.remove('swatch-btn--activo');
       s.setAttribute('aria-checked', 'false');
     });
     if (yaActivo) {
       COLOR_SELECCIONADO = null;
       if (imgEl && imgPorDefecto) imgEl.src = imgPorDefecto;
+      if (actual) actual.style.display = 'none';
     } else {
-      swatch.classList.add('color-swatch--activo');
+      swatch.classList.add('swatch-btn--activo');
       swatch.setAttribute('aria-checked', 'true');
       COLOR_SELECCIONADO = swatch.dataset.colorNombre;
       if (imgEl && imagenesPorColor[COLOR_SELECCIONADO]) imgEl.src = imagenesPorColor[COLOR_SELECCIONADO];
+      if (actual) { actual.querySelector('b').textContent = COLOR_SELECCIONADO; actual.style.display = 'block'; }
     }
   });
 }
@@ -459,7 +480,7 @@ function renderTallaSelect(tallas) {
   if (!tallas || !tallas.length) return '';
   var options = '<option value="">Selecciona talla</option>' +
     tallas.map(function(t){ return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('');
-  return '<div class="md-talla"><label class="md-colores-label" for="md-talla-select">Talla</label>' +
+  return '<div class="md-talla"><label class="prod-field-label" for="md-talla-select">Talla</label>' +
     '<select id="md-talla-select">' + options + '</select></div>';
 }
 
@@ -480,23 +501,40 @@ function actualizarUrlArticulo(articuloId) {
 // #md-contenido directamente en la página en vez de dentro de un modal.
 function renderFichaProducto(a) {
   var img = a.imagen_principal_url
-    ? '<img src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" ' +
+    ? '<img id="img-principal" src="' + escapeHtml(a.imagen_principal_url) + '" alt="' + escapeHtml(a.nombre) + '" ' +
       'onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:\'Sin imagen\'}));">'
     : '<span>Sin imagen</span>';
 
-  var atributos = [
+  var atributosDetalle = [
     ['Material', a.material],
     ['Medidas', a.medidas],
     ['Capacidad', a.capacidad],
     ['Formato', a.formato],
     ['Acabados', a.acabados],
-    ['Personalización', a.tecnicas_personalizacion && a.tecnicas_personalizacion.length ? a.tecnicas_personalizacion.join(', ') : null],
   ].filter(function(par){ return !!par[1]; });
 
-  var atributosHtml = atributos.length
-    ? '<dl class="md-atributos">' + atributos.map(function(par){
-        return '<div><dt>' + escapeHtml(par[0]) + '</dt><dd>' + escapeHtml(par[1]) + '</dd></div>';
-      }).join('') + '</dl>'
+  var detallesHtml = atributosDetalle.map(function(par){
+    return '<div><div class="prod-field-label">' + escapeHtml(par[0]) + '</div>' +
+      '<p style="margin:0;font-size:14px;color:var(--deep);opacity:.8;">' + escapeHtml(par[1]) + '</p></div>';
+  }).join('');
+
+  var tecnicasChips = (a.tecnicas_personalizacion || []).map(function(t){ return '<span class="chip tecnica">' + escapeHtml(t) + '</span>'; }).join('');
+  var zonasChips = (a.areas_marcaje || []).map(function(z){ return '<span class="chip">' + escapeHtml(z) + '</span>'; }).join('');
+  var personalizacionHtml =
+    (tecnicasChips ? '<div><div class="prod-field-label">Técnicas disponibles</div><div class="chip-list">' + tecnicasChips + '</div></div>' : '') +
+    (zonasChips ? '<div><div class="prod-field-label">Zona de marcaje</div><div class="chip-list">' + zonasChips + '</div></div>' : '');
+
+  var hayPersonalizacion = !!(tecnicasChips || zonasChips);
+  var hayDetalles = !!atributosDetalle.length;
+  // Personalización empieza activa (más relevante para elegir técnica que
+  // las medidas/material) — Detalles se muestra si se pulsa su pestaña.
+  var tabsHtml = (hayDetalles || hayPersonalizacion)
+    ? '<div class="prod-tabs" role="tablist">' +
+        (hayDetalles ? '<button type="button" class="prod-tab" data-tab="detalles" aria-selected="false">Detalles</button>' : '') +
+        (hayPersonalizacion ? '<button type="button" class="prod-tab" data-tab="personalizacion" aria-selected="true">Personalización</button>' : '') +
+      '</div>' +
+      (hayDetalles ? '<div class="prod-panel" data-panel="detalles" hidden>' + detallesHtml + '</div>' : '') +
+      (hayPersonalizacion ? '<div class="prod-panel" data-panel="personalizacion">' + personalizacionHtml + '</div>' : '')
     : '';
 
   var coloresHtml = renderColoresSwatches(a.colores_resueltos);
@@ -510,18 +548,22 @@ function renderFichaProducto(a) {
 
   document.getElementById('md-contenido').innerHTML =
     '<button class="btn-cerrar" id="btn-cerrar-detalle">✕</button>' +
-    '<div class="md-img">' + img + '</div>' +
-    '<div>' +
-      (a.categoria ? '<p class="md-cat">' + escapeHtml(a.categoria) + (a.subcategoria ? ' · ' + escapeHtml(a.subcategoria) : '') + '</p>' : '') +
-      '<h3>' + escapeHtml(a.nombre) + '</h3>' +
-      (desc ? '<p class="md-desc">' + escapeHtml(desc) + '</p>' : '') +
-      coloresHtml +
-      tallaHtml +
-      guiaTallasHtml +
-      atributosHtml +
-      '<div class="md-calc" id="md-calc"></div>' +
-      '<button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
-      '<p class="mp-precio-aprox">Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.</p>' +
+    '<div class="prod-wrap">' +
+      '<div class="prod-gallery"><div class="prod-img">' + img + '</div></div>' +
+      '<div class="prod-info">' +
+        (a.categoria ? '<div class="prod-eyebrow"><span>' + escapeHtml(a.categoria) + '</span>' + (a.subcategoria ? '<span class="dot"></span><span>' + escapeHtml(a.subcategoria) + '</span>' : '') + '</div>' : '') +
+        '<h1 class="prod-titulo">' + escapeHtml(a.nombre) + '</h1>' +
+        (desc ? '<p class="prod-desc">' + escapeHtml(desc) + '</p>' : '') +
+        tabsHtml +
+        coloresHtml +
+        tallaHtml +
+        guiaTallasHtml +
+        '<div class="md-calc" id="md-calc"></div>' +
+        '<div class="prod-ctas">' +
+          '<button type="button" class="btn btn-primary" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>' +
+        '</div>' +
+        '<p class="mp-precio-aprox">Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.</p>' +
+      '</div>' +
     '</div>';
 
   document.getElementById('btn-cerrar-detalle').addEventListener('click', cerrarModalDetalle);
@@ -534,6 +576,12 @@ function renderFichaProducto(a) {
   if (tallaSelect) {
     tallaSelect.addEventListener('change', function(){ TALLA_SELECCIONADA = tallaSelect.value || null; });
   }
+  document.querySelectorAll('#md-contenido .prod-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('#md-contenido .prod-tab').forEach(function(t){ t.setAttribute('aria-selected', t === tab ? 'true' : 'false'); });
+      document.querySelectorAll('#md-contenido .prod-panel').forEach(function(p){ p.hidden = p.dataset.panel !== tab.dataset.tab; });
+    });
+  });
   document.getElementById('btn-presupuesto-desde-detalle').addEventListener('click', function(){
     cerrarModalDetalle();
     abrirModalPresupuesto(a.id, { color: COLOR_SELECCIONADO, talla: TALLA_SELECCIONADA });

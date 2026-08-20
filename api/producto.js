@@ -91,9 +91,9 @@ function renderTablaTallasHtml(tabla) {
   );
 }
 
-// CSS propio de la ficha de producto: mismas variables/clases .md-* y
-// .mt-tabla que catalogo.html, para que se vea igual que el modal de
-// detalle del catálogo. Las de .color-swatch (tooltip, hover) y
+// CSS propio de la ficha de producto: mismas variables/clases .prod-*/.md-*
+// y .mt-tabla que catalogo.html, para que se vea igual que el modal de
+// detalle del catálogo. Las de .swatch-btn (tooltip, hover) y
 // .mt-caja/#modal-tallas las inyecta catalogo-comun.js por JS al cargar,
 // así que no hace falta repetirlas aquí.
 const ESTILOS = `
@@ -130,27 +130,42 @@ textarea.field{resize:vertical;}
 .mp-field-label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
 .mp-precio-aprox{font-size:11px;color:var(--baby);line-height:1.4;margin:8px 0 0;}
 
-.md-box{background:#fff;max-width:1100px;margin:0 auto;border-radius:12px;padding:32px;position:relative;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;}
+.md-box{background:#fff;max-width:1180px;margin:0 auto;border-radius:12px;position:relative;overflow:hidden;}
 .md-box .btn-cerrar{display:none;}
-.md-img{aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--baby);display:flex;align-items:center;justify-content:center;}
-.md-img img{width:100%;height:100%;object-fit:cover;display:block;}
-.md-img span{color:var(--white);font-size:13px;font-weight:700;}
-.md-cat{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 6px;}
-.md-box h1,.md-box h3{font-size:22px;margin:0 0 14px;}
-.md-desc{font-size:14px;line-height:1.6;color:var(--deep);opacity:.85;margin:0 0 18px;}
-.md-atributos{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:0 0 22px;font-size:13px;}
-.md-atributos dt{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0;}
-.md-atributos dd{margin:2px 0 0;}
-.md-colores{margin:0 0 18px;}
-.md-colores-label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 8px;}
-.md-colores-lista{display:flex;flex-wrap:wrap;gap:8px;}
-.color-swatch{width:22px;height:22px;border-radius:5px;border:1px solid rgba(0,0,0,.15);cursor:pointer;flex-shrink:0;transition:box-shadow .15s;}
-.color-swatch--sin-match{background:repeating-linear-gradient(45deg,#e0ddd6,#e0ddd6 4px,#f2f0ea 4px,#f2f0ea 8px);border-style:dashed;}
-.color-swatch--estampado{background:repeating-linear-gradient(45deg,#cfcac0,#cfcac0 3px,#efece5 3px,#efece5 6px);}
-.color-swatch:hover{box-shadow:0 0 0 2px rgba(0,0,0,.1);}
-.color-swatch--activo{box-shadow:0 0 0 2px var(--gold,#E8C24A);border-color:transparent;}
-.md-talla{margin:0 0 18px;}
+
+.prod-wrap{max-width:1180px;margin:0 auto;padding:40px 5vw;display:grid;grid-template-columns:1.05fr 1fr;gap:48px;}
+.prod-gallery{position:sticky;top:16px;align-self:start;}
+.prod-img{aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:var(--baby);display:flex;align-items:center;justify-content:center;}
+.prod-img img{width:100%;height:100%;object-fit:contain;display:block;}
+.prod-img span{color:var(--white);font-size:13px;font-weight:700;}
+
+.prod-eyebrow{display:flex;gap:8px;align-items:center;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--baby);margin-bottom:10px;}
+.prod-eyebrow .dot{width:4px;height:4px;border-radius:50%;background:var(--baby);}
+.prod-titulo,h1.prod-titulo{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:0;}
+.prod-desc{margin-top:12px;font-size:14.5px;line-height:1.6;color:var(--deep);opacity:.85;}
+
+.prod-tabs{display:flex;gap:24px;margin-top:24px;border-bottom:1px solid #E4DEC9;}
+.prod-tab{background:none;border:none;cursor:pointer;padding:0 0 12px;font-size:13.5px;font-weight:700;color:var(--baby);border-bottom:2px solid transparent;margin-bottom:-1px;}
+.prod-tab[aria-selected="true"]{color:var(--deep);border-color:var(--poppy);}
+.prod-panel{padding-top:18px;display:flex;flex-direction:column;gap:16px;}
+.prod-field-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--baby);margin:0 0 8px;}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{padding:6px 12px;border-radius:999px;border:1px solid #E4DEC9;font-size:12.5px;font-weight:600;background:#fff;color:var(--deep);}
+.chip.tecnica{background:#F7F5EF;}
+
+.swatch-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.swatch-btn{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1.5px #E4DEC9;position:relative;padding:0;}
+.swatch-btn--sin-match{background:repeating-linear-gradient(45deg,#e0ddd6,#e0ddd6 4px,#f2f0ea 4px,#f2f0ea 8px);}
+.swatch-btn--estampado{background:repeating-linear-gradient(45deg,#cfcac0,#cfcac0 3px,#efece5 3px,#efece5 6px);}
+.swatch-btn--activo{box-shadow:0 0 0 2px var(--deep);}
+.color-actual{font-size:13px;color:var(--deep);opacity:.8;margin:8px 0 0;}
+.color-actual b{opacity:1;font-weight:700;}
+
+.md-talla{margin:18px 0 0;}
 .md-talla select{width:100%;padding:8px 10px;border-radius:6px;border:1px solid #E0DDD6;font-size:13px;}
+.prod-ctas{margin-top:20px;}
+.btn{padding:15px 20px;border-radius:11px;font-size:14.5px;font-weight:700;border:1.5px solid transparent;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;}
+.btn-primary{background:var(--deep);color:var(--white);}
 .mt-tabla-scroll{overflow-x:auto;margin-top:4px;}
 .mt-tabla{width:100%;border-collapse:collapse;font-size:13px;}
 .mt-tabla th,.mt-tabla td{padding:9px 12px;text-align:center;white-space:nowrap;}
@@ -180,7 +195,10 @@ textarea.field{resize:vertical;}
 .md-calc-tramos td{padding:4px 6px;border-bottom:1px solid #EFEDE6;color:var(--deep);}
 .md-calc-tramos tr.tramo-activo td{font-weight:700;background:#EFE9DC;}
 .btn-presupuesto{background:var(--captain);color:var(--white);font-weight:700;font-size:12px;padding:11px 16px;border-radius:20px;border:none;cursor:pointer;text-align:center;}
-@media(max-width:800px){ .md-box{grid-template-columns:1fr;padding:24px;} }
+@media(max-width:860px){
+  .prod-wrap{grid-template-columns:1fr;gap:24px;padding:24px 5vw;}
+  .prod-gallery{position:static;}
+}
 @media(max-width:900px){
   .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
   .site-nav a{font-size:20px;color:var(--white)!important;}
@@ -381,24 +399,29 @@ module.exports = async function handler(req, res) {
     const guiaTallasHtml = !a.guia_tallas
       ? ''
       : guiaEsImagen
-      ? `<div class="md-talla"><span class="md-colores-label">Guía de tallas</span><img src="${escapeHtml(a.guia_tallas)}" alt="Guía de tallas" style="max-width:100%;border-radius:8px;"></div>`
+      ? `<div class="md-talla"><span class="prod-field-label">Guía de tallas</span><img src="${escapeHtml(a.guia_tallas)}" alt="Guía de tallas" style="max-width:100%;border-radius:8px;"></div>`
       : tablaTallas
-      ? `<div class="md-talla"><span class="md-colores-label">Guía de tallas</span>${renderTablaTallasHtml(tablaTallas)}</div>`
-      : `<div class="md-talla"><span class="md-colores-label">Guía de tallas</span><p class="md-desc">${escapeHtml(a.guia_tallas).replace(/\n/g, '<br>')}</p></div>`;
+      ? `<div class="md-talla"><span class="prod-field-label">Guía de tallas</span>${renderTablaTallasHtml(tablaTallas)}</div>`
+      : `<div class="md-talla"><span class="prod-field-label">Guía de tallas</span><p class="prod-desc">${escapeHtml(a.guia_tallas).replace(/\n/g, '<br>')}</p></div>`;
 
+    // Ficha estática básica para buscadores/vistas previas sin JS —
+    // catalogo-producto.js la sustituye por la versión interactiva
+    // (renderFichaProducto, con pestañas y calculadora) en cuanto carga.
     const contenidoFicha = `
-      <div class="md-img"><img src="${escapeHtml(imagen)}" alt="${escapeHtml(a.nombre)}"></div>
-      <div>
-        ${a.categoria ? `<p class="md-cat">${escapeHtml(a.categoria)}${a.subcategoria ? ' · ' + escapeHtml(a.subcategoria) : ''}</p>` : ''}
-        <h1>${escapeHtml(a.nombre)}</h1>
-        ${descripcionBase ? `<p class="md-desc">${escapeHtml(descripcionBase)}</p>` : ''}
-        ${a.colores && a.colores.length ? `<p class="md-desc"><strong>Colores disponibles:</strong> ${escapeHtml(a.colores.join(', '))}</p>` : ''}
-        ${a.tallas && a.tallas.length ? `<p class="md-desc"><strong>Tallas disponibles:</strong> ${escapeHtml(a.tallas.join(', '))}</p>` : ''}
-        ${guiaTallasHtml}
-        ${atributos.length ? `<dl class="md-atributos">${atributos.map(([l, v]) => `<div><dt>${escapeHtml(l)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl>` : ''}
-        <div class="md-calc" id="md-calc"></div>
-        <button type="button" class="btn-presupuesto" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button>
-        <p class="mp-precio-aprox">Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.</p>
+      <div class="prod-wrap">
+        <div class="prod-gallery"><div class="prod-img"><img src="${escapeHtml(imagen)}" alt="${escapeHtml(a.nombre)}"></div></div>
+        <div class="prod-info">
+          ${a.categoria ? `<div class="prod-eyebrow"><span>${escapeHtml(a.categoria)}</span>${a.subcategoria ? `<span class="dot"></span><span>${escapeHtml(a.subcategoria)}</span>` : ''}</div>` : ''}
+          <h1 class="prod-titulo">${escapeHtml(a.nombre)}</h1>
+          ${descripcionBase ? `<p class="prod-desc">${escapeHtml(descripcionBase)}</p>` : ''}
+          ${a.colores && a.colores.length ? `<p class="prod-desc"><strong>Colores disponibles:</strong> ${escapeHtml(a.colores.join(', '))}</p>` : ''}
+          ${a.tallas && a.tallas.length ? `<p class="prod-desc"><strong>Tallas disponibles:</strong> ${escapeHtml(a.tallas.join(', '))}</p>` : ''}
+          ${guiaTallasHtml}
+          ${atributos.length ? atributos.map(([l, v]) => `<div><div class="prod-field-label">${escapeHtml(l)}</div><p style="margin:0;font-size:14px;color:var(--deep);opacity:.8;">${escapeHtml(v)}</p></div>`).join('') : ''}
+          <div class="md-calc" id="md-calc"></div>
+          <div class="prod-ctas"><button type="button" class="btn btn-primary" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button></div>
+          <p class="mp-precio-aprox">Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.</p>
+        </div>
       </div>`;
 
     const html = `<!DOCTYPE html>
