@@ -270,17 +270,17 @@ const CAMPOS_COSTE_LISTADO = [
 // saturaban las funciones serverless de bendito-os de golpe en cada carga
 // del catálogo. Si el lote entero falla (bendito-os caído), se cae a la
 // versión artículo-por-artículo como red de seguridad.
-async function calcularPreciosDesde(supabase, ids) {
-  if (!ids.length) return new Map();
+//
+// Recibe los artículos ya cargados por el listado (necesitan traer `moq`,
+// ver CAMPOS_PUBLICOS) en vez de volver a consultar catalogo_articulos por
+// los mismos ids — era un viaje de ida y vuelta a Supabase entero (en
+// Frankfurt, con las funciones en iad1) solo para releer una columna que
+// ya se tenía.
+async function calcularPreciosDesde(articulosBase) {
+  if (!articulosBase.length) return new Map();
 
   try {
-    const { data: filasCoste, error: eCoste } = await supabase
-      .from('catalogo_articulos')
-      .select('id, moq')
-      .in('id', ids);
-    if (eCoste) throw eCoste;
-
-    const items = (filasCoste || []).map((articulo) => ({
+    const items = articulosBase.map((articulo) => ({
       articulo_id: articulo.id,
       cantidad: articulo.moq || 5,
       canal: 'b2c',
@@ -348,7 +348,7 @@ module.exports = async function handler(req, res) {
       if (error) throw error;
 
       const articulosEnriquecidos = await enriquecerArticulos(supabase, data || []);
-      const preciosDesde = await calcularPreciosDesde(supabase, articulosEnriquecidos.map((a) => a.id));
+      const preciosDesde = await calcularPreciosDesde(articulosEnriquecidos);
       const articulos = articulosEnriquecidos.map((a) => {
         const precio = preciosDesde.get(a.id);
         // precio puede ser `null` (fallo al calcular ese artículo, ver
