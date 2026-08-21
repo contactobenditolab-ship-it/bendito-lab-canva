@@ -574,6 +574,9 @@ function renderFichaProducto(a) {
   var tallaHtml = renderTallaSelect(a.tallas);
   var guiaTallasHtml = a.guia_tallas
     ? '<button type="button" class="btn-guia-tallas" id="btn-guia-tallas">📏 Guía de tallas</button>' : '';
+  var disponibilidadHtml = (coloresHtml || tallaHtml)
+    ? '<p style="margin:4px 0 0;font-size:12px;color:var(--deep);opacity:.65;">Tallas y colores sujetos a disponibilidad.</p>'
+    : '';
   COLOR_SELECCIONADO = null;
   TALLA_SELECCIONADA = null;
 
@@ -590,6 +593,7 @@ function renderFichaProducto(a) {
         tabsHtml +
         coloresHtml +
         tallaHtml +
+        disponibilidadHtml +
         guiaTallasHtml +
         '<div class="md-calc" id="md-calc"></div>' +
         '<div class="prod-ctas">' +
