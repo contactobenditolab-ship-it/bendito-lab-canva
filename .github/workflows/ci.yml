@@ -1,10 +1,15 @@
 name: CI
 
+# Desactivado en automático (21 Aug 2026): se agotaron los minutos gratis de
+# GitHub Actions a nivel de cuenta (mismo problema ya documentado en
+# bendito-os, PR #137) — cada run se bloqueaba antes de arrancar (3s de
+# cómputo, sin logs, ver PR #80). Vercel ya construye y valida cada push/PR,
+# así que no bloquea nada crítico. Sigue disponible para lanzar a mano desde
+# la pestaña Actions → CI → Run workflow. Para reactivarlo en automático:
+# añadir de vuelta `pull_request: {branches: [main]}` y
+# `push: {branches: [main]}` aquí.
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   ci:
