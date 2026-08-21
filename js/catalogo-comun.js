@@ -530,7 +530,6 @@ function renderFichaProducto(a) {
 
   var atributosDetalle = [
     ['Material', a.material],
-    ['Medidas', a.medidas],
     ['Capacidad', a.capacidad],
     ['Formato', a.formato],
     ['Acabados', a.acabados],
