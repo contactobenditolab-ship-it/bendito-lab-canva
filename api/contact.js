@@ -217,6 +217,8 @@ async function enviarCotizacionAOS(data) {
     email: data.email,
     servicio: valorUtil(data.servicio) || undefined,
     mensaje: valorUtil(data.mensaje) || undefined,
+    articulo_id: valorUtil(data.articulo_id) || undefined,
+    cantidad: data.cantidad ? Number(data.cantidad) : undefined,
   };
 
   const r = await fetch(OS_COTIZACION_URL, {
@@ -228,6 +230,9 @@ async function enviarCotizacionAOS(data) {
     const detalle = await r.text().catch(() => '');
     throw new Error('Bendito OS respondió ' + r.status + ': ' + detalle);
   }
+  // { ok, numero, estimacion } — usado por el catálogo para la pantalla de
+  // confirmación (número de referencia + precio estimado).
+  return r.json().catch(() => ({}));
 }
 
 module.exports = async function handler(req, res) {
@@ -272,11 +277,12 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Faltan datos obligatorios' });
   }
 
+  let resultadoCotizacion = null;
   try {
     if (type === 'colaborador') {
       await enviarColaboradorAOS(data);
     } else if (type === 'cotizacion') {
-      await enviarCotizacionAOS(data);
+      resultadoCotizacion = await enviarCotizacionAOS(data);
     } else {
       await enviarContactoEmail(data);
     }
@@ -305,5 +311,9 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ ok: true });
+  return res.status(200).json({
+    ok: true,
+    numero: resultadoCotizacion?.numero || undefined,
+    estimacion: resultadoCotizacion?.estimacion ?? undefined,
+  });
 };
