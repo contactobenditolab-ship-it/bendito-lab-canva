@@ -374,6 +374,36 @@ async function subirLogoPresupuesto(file) {
   return d.url;
 }
 
+// Rellena la pantalla "presupuesto-success" con los datos reales que
+// devuelve /api/contact (numero de presupuesto + estimación con el motor
+// real de precios, ver /api/public/cotizacion en bendito-os). El número y
+// la estimación son opcionales: si no llegan (fallo puntual del cálculo,
+// artículo sin motor de precios...) esas filas simplemente no se muestran,
+// la confirmación de "solicitud recibida" nunca depende de ellos.
+function mostrarConfirmacionPresupuesto(resultado) {
+  var el = document.getElementById('presupuesto-success');
+
+  var numeroEl = el.querySelector('#ps-numero');
+  var filaNumero = el.querySelector('#ps-fila-numero');
+  if (resultado.numero) {
+    numeroEl.textContent = resultado.numero;
+    filaNumero.style.display = 'flex';
+  } else {
+    filaNumero.style.display = 'none';
+  }
+
+  var estimacionEl = el.querySelector('#ps-estimacion');
+  var filaEstimacion = el.querySelector('#ps-fila-estimacion');
+  if (typeof resultado.estimacion === 'number') {
+    estimacionEl.textContent = '€' + resultado.estimacion.toFixed(2);
+    filaEstimacion.style.display = 'flex';
+  } else {
+    filaEstimacion.style.display = 'none';
+  }
+
+  el.style.display = 'block';
+}
+
 document.getElementById('presupuesto-form').addEventListener('submit', async function(e){
   e.preventDefault();
   if (enviandoPresupuesto) return;
@@ -412,13 +442,18 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'cotizacion',
-        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), servicio: esEventos ? 'Dilo Bonito' : 'Bendito Lab', mensaje: detalles }
+        data: {
+          nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'),
+          servicio: esEventos ? 'Dilo Bonito' : 'Bendito Lab', mensaje: detalles,
+          articulo_id: articuloSeleccionado ? articuloSeleccionado.id : undefined,
+          cantidad: f.get('cantidad') || undefined,
+        }
       })
     });
     var d = await r.json();
     if (!d.ok) throw new Error(d.error || 'Error al enviar');
     form.style.display = 'none';
-    document.getElementById('presupuesto-success').style.display = 'block';
+    mostrarConfirmacionPresupuesto(d);
   } catch (err) {
     errEl.textContent = err.message + ' — o escríbenos directamente a contacto@benditolab.com';
     errEl.style.display = 'block';
