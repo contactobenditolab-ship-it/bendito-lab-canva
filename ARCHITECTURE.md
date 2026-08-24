@@ -71,18 +71,27 @@ bendito-lab-canva/
 
 #### Migration Strategy
 
-1. **common.js** (✅ Done): Extraer funciones reutilizables
-2. **catalogo-module.js**: Consolidar 4 archivos catalogo-*
-3. **pages.js**: Consolidar índices (index-1/2/3, portada, dilo-bonito, bendito-lab)
-4. **images.js**: Mantener como está (especializado)
-5. **admin-panel.js**: Renombrar admin-1.js
-6. **helpers.js**: Recopilar inicializaciones minor
+1. **common.js** (✅ Done): Extraer funciones reutilizables (110L)
+2. **catalogo-module.js** (✅ Done): Loader que consolida catalogo-* (será ~1.3k)
+3. **pages-module.js** (✅ Done): Loader que consolida index-1/2/3, portada, etc (será ~600L)
+4. **contact-module.js** (✅ Done): Loader que consolida contacto-1/2 (será ~100L)
+5. **images.js**: Mantener como está (especializado, 1.0k)
+6. **admin-panel.js**: Renombrar admin-1.js después (1.4k)
+7. **analytics.js**: Copiar ga4-config.js (187L)
 
-#### Rollout
-- Crear nuevos módulos primero (sin eliminar antiguos)
-- Actualizar HTML imports: `<script src="js/catalogo-module.js"></script>`
-- Verificar functionality en cada página
-- Eliminar archivos antiguos
+#### Rollout (2 Fases)
+
+**Fase A (Loaders - DONE):**
+- ✅ Crear loaders: common.js, catalogo-module.js, pages-module.js, contact-module.js
+- Loaders documentan dependencias sin cambiar comportamiento
+
+**Fase B (Consolidación - Próxima sesión):**
+- Leer catalogo-comun.js (911L) + catalogo-2.js (298L) + catalogo-producto.js (20L)
+- Eliminar funciones duplicadas (que ya están en common.js)
+- Fusionar en `catalogo-module.js` (~1.3k)
+- Repetir para pages-module.js, contact-module.js
+- Actualizar HTML imports (una página a la vez, verificar)
+- Eliminar archivos antiguos cuando consolidación completa
 
 ---
 
