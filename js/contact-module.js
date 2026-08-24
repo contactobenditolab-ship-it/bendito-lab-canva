@@ -61,7 +61,6 @@ window.addEventListener('DOMContentLoaded', function(){
   if (consent==='accepted') activarAnalytics();
 });
 
-});
 document.getElementById('contacto-form').addEventListener('submit', async function(e){
   e.preventDefault();
   var form = e.target;
