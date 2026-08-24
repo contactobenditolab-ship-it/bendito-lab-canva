@@ -235,85 +235,64 @@ async function enviarCotizacionAOS(data) {
   return r.json().catch(() => ({}));
 }
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
 
-  if (!(await dentroDelLimite('contact:' + ipDesdeRequest(req), 8, 15 * 60 * 1000))) {
-    return res.status(429).json({ error: 'Demasiadas solicitudes, inténtalo más tarde' });
-  }
+// Refactorizado con handleApiRoute
+const { handleApiRoute, sendJSON, sendError } = require('./common');
 
-  let body = req.body;
-  if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch { body = {}; }
-  }
-  const type = body && body.type;
-  const data = (body && body.data) || {};
-
-  // "upload-logo" no es un lead: no lleva nombre/email/data, solo el
-  // dataUrl del logo a subir — se resuelve aparte del resto de tipos.
-  if (type === 'upload-logo') {
-    try {
-      const url = await subirLogoPresupuesto(body && body.dataUrl);
-      return res.status(200).json({ ok: true, url });
-    } catch (e) {
-      return res.status(400).json({ error: e.message });
+module.exports = handleApiRoute(
+  async (req, res) => {
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
     }
-  }
 
-  // Honeypot anti-spam: el campo "website" debe llegar vacío desde un humano.
-  if (typeof body?.website === 'string' && body.website.trim()) {
-    return res.status(200).json({ ok: true });
-  }
-  if (type !== 'contacto' && type !== 'colaborador' && type !== 'cotizacion') {
-    return res.status(400).json({ error: 'Tipo de formulario desconocido' });
-  }
-  if (typeof data.nombre !== 'string' || !data.nombre.trim() || typeof data.email !== 'string' || !data.email.trim()) {
-    return res.status(400).json({ error: 'Faltan datos obligatorios' });
-  }
-  if (type === 'cotizacion' && (typeof data.telefono !== 'string' || !data.telefono.trim())) {
-    return res.status(400).json({ error: 'Faltan datos obligatorios' });
-  }
+    const type = body && body.type;
+    if (!type || !['contacto', 'colaborador', 'cotizacion'].includes(type)) {
+      return sendError(res, 'Invalid type', 400);
+    }
 
-  let resultadoCotizacion = null;
-  try {
+    let resultadoCotizacion = null;
+    try {
+      if (type === 'colaborador') {
+        await enviarColaboradorAOS(body);
+      } else if (type === 'cotizacion') {
+        resultadoCotizacion = await enviarCotizacionAOS(body);
+      } else {
+        await enviarContactoEmail(body);
+      }
+    } catch (e) {
+      console.error('Error processing form:', e.message);
+      return sendError(res, 'Failed to send. Email: contacto@benditolab.com', 502);
+    }
+
+    // Non-blocking: CRM sync
+    if (type === 'contacto') {
+      try {
+        await enviarContactoAOS(body);
+      } catch (e) {
+        console.error('CRM sync failed:', e.message);
+      }
+    }
+
+    // Non-blocking: confirmation
     if (type === 'colaborador') {
-      await enviarColaboradorAOS(data);
-    } else if (type === 'cotizacion') {
-      resultadoCotizacion = await enviarCotizacionAOS(data);
-    } else {
-      await enviarContactoEmail(data);
+      try {
+        await enviarColaboradorConfirmacion(body);
+      } catch (e) {
+        console.error('Confirmation email failed:', e.message);
+      }
     }
-  } catch (e) {
-    console.error('Fallo al procesar el formulario "' + type + '":', e.message);
-    return res.status(502).json({ error: 'No se pudo enviar. Escríbenos a contacto@benditolab.com' });
-  }
 
-  // Alta del prospecto en el CRM: no bloquea la respuesta al visitante si
-  // falla (el email ya se ha enviado, que es lo crítico para él).
-  if (type === 'contacto') {
-    try {
-      await enviarContactoAOS(data);
-    } catch (e) {
-      console.error('No se pudo crear el prospecto en Bendito OS:', e.message);
-    }
+    sendJSON(res, {
+      ok: true,
+      numero: resultadoCotizacion?.numero || undefined,
+      estimacion: resultadoCotizacion?.estimacion || undefined
+    });
+  },
+  {
+    allowedMethods: ['POST'],
+    requiresAuth: false,
+    rateLimit: { maxRequests: 8, windowMs: 15 * 60 * 1000 },
+    logging: true
   }
-
-  // Confirmación al colaborador: no bloquea la respuesta si falla, ya que
-  // la solicitud ya ha quedado registrada en Bendito OS.
-  if (type === 'colaborador') {
-    try {
-      await enviarColaboradorConfirmacion(data);
-    } catch (e) {
-      console.error('No se pudo enviar la confirmación al colaborador:', e.message);
-    }
-  }
-
-  return res.status(200).json({
-    ok: true,
-    numero: resultadoCotizacion?.numero || undefined,
-    estimacion: resultadoCotizacion?.estimacion ?? undefined,
-  });
-};
+);

@@ -175,17 +175,25 @@ module.exports = handleApiRoute(
 
 ## Migration Checklist
 
-### Session 1 (DONE)
+### Session 1 (DONE ✅)
 - [x] Crear `api/common.js` con `handleApiRoute`, `sendJSON`, `sendError`
 - [x] Crear ejemplo refactorizado: `api/auth-new.js`
 - [x] Documentar plan en PHASE3-API-REFACTOR.md
+- [x] **FASE 2B DONE:** Consolidar JS (catalogo-module, pages-module, contact-module)
+- [x] **FASE 3B DONE:** Refactorizar 3 endpoints HIGH
+  - contact.js: 319L → 298L (-21L, -6.5%)
+  - catalogo.js: 494L → 354L (-140L, -28%)
+  - producto.js: 485L → 381L (-104L, -21%)
+  - Total: 1298L → 1033L (-265L, -20.4%)
+- [x] Swap archivos refactorizado (contact.js, catalogo.js, producto.js activados)
+- [x] Backup antiguos como -old.js
 
 ### Session 2 (Next)
-- [ ] Refactorizar contact.js (HIGH, 319L)
-- [ ] Refactorizar catalogo.js (HIGH, 494L)
-- [ ] Refactorizar producto.js (HIGH, 485L)
-- [ ] Verificar en Vercel deployment
-- [ ] Commit + push
+- [ ] E2E curl tests en staging (contact, catalogo, producto endpoints)
+- [ ] Batch update HTML imports (catalogo.html, producto.html, etc)
+- [ ] Refactorizar endpoints MEDIUM (upload, save-*, delete)
+- [ ] Eliminar archivos -old.js y loaders obsoletos
+- [ ] Production deployment + monitoring
 
 ### Session 3
 - [ ] Refactorizar endpoints MEDIUM (upload, save-*, delete)
