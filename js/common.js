@@ -94,3 +94,35 @@ document.addEventListener('click', function(e) {
     cerrarModal();
   }
 });
+
+/** Inicializar Service Worker updater (notificación de nuevas versiones) */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
+    .then(function(reg) {
+      console.log('[SW] Registrado OK');
+      
+      // Escuchar cuando hay una actualización disponible
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'waiting' && navigator.serviceWorker.controller) {
+            // Nueva versión instalada y lista → mostrar banner
+            (function showUpdateBanner() {
+              if (document.getElementById('sw-update-banner')) return;
+              var banner = document.createElement('div');
+              banner.id = 'sw-update-banner';
+              banner.innerHTML = '<div style="position: fixed; bottom: 20px; right: 20px; background: #17233F; color: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 14px; max-width: 300px; z-index: 9999; font-family: system-ui, -apple-system, sans-serif; animation: slideIn 0.3s ease-out;"><p style="margin: 0 0 12px 0; font-weight: 500;">✨ Bendito Lab actualizado</p><p style="margin: 0 0 12px 0; color: #ccc; font-size: 13px;">Nueva versión disponible.</p><div style="display: flex; gap: 8px;"><button id="sw-update-reload" style="flex: 1; background: #FF6B35; border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;">Recargar</button><button id="sw-update-close" style="flex: 1; background: transparent; border: 1px solid #555; color: #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">Ahora no</button></div></div><style>@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }</style>';
+              document.body.appendChild(banner);
+              document.getElementById('sw-update-reload').addEventListener('click', function() { window.location.reload(); });
+              document.getElementById('sw-update-close').addEventListener('click', function() { banner.remove(); });
+              setTimeout(function() { if (banner.parentNode) banner.remove(); }, 10000);
+            })();
+          }
+        });
+      });
+      
+      // Polling: chequear actualizaciones cada hora
+      setInterval(function() { reg.update(); }, 60 * 60 * 1000);
+    })
+    .catch(function(err) { console.error('[SW] Error:', err); });
+}
