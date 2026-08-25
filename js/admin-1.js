@@ -706,20 +706,28 @@ async function uploadImg(input,filePath,uid){
   var st=document.getElementById('st-'+uid);
   var prog=document.getElementById('prog-'+uid);
   var pb=document.getElementById('pb-'+uid);
-  st.style.display='block';st.style.color='#888';st.textContent='Procesando imagen...';
-  prog.style.display='block';pb.style.width='30%';
+  if(st){st.style.display='block';st.style.color='#888';st.textContent='Procesando imagen...';}
+  if(prog)prog.style.display='block';
+  if(pb)pb.style.width='30%';
   try{
-    pb.style.width='60%';st.textContent='Subiendo...';
+    if(pb)pb.style.width='60%';
+    if(st)st.textContent='Subiendo...';
     var url=await subirImagenSlot(filePath,file);
     IMAGE_CONTENT[filePath]=url;
-    pb.style.width='100%';
-    st.style.color='#27AE60';st.textContent='✓ Subida';
+    if(pb)pb.style.width='100%';
+    if(st){st.style.color='#27AE60';st.textContent='✓ Subida';}
     var img=document.querySelector('#prev-'+uid+' img');
+    if(!img){
+      var card=input.closest('.img-card');
+      if(card)img=card.querySelector('img');
+    }
     if(img)img.src=url+'?t='+Date.now();
+    if(!st)showToast('✓ Imagen actualizada');
   }catch(err){
-    st.style.color='#C0392B';st.textContent='✗ Error: '+err.message;
+    if(st){st.style.color='#C0392B';st.textContent='✗ Error: '+err.message;}
+    else showToast('Error: '+err.message);
   }
-  setTimeout(function(){prog.style.display='none';pb.style.width='0%';},3000);
+  if(prog)setTimeout(function(){prog.style.display='none';if(pb)pb.style.width='0%';},3000);
 }
 
 // ══ INIT ═════════════════════════════════════════════════════
