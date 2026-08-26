@@ -116,11 +116,10 @@ var IMG_GROUPS = {
     {key:'b2b-1.webp',      path:'images/b2b-1.webp',      name:'Portada — Banda de imagen (camisetas)'},
   ],
   db_carrusel: [
-    {key:'carrusel-1.webp', path:'images/carrusel-1.webp', name:'Dilo Bonito — Galería Foto 1'},
-    {key:'carrusel-2.webp', path:'images/carrusel-2.webp', name:'Dilo Bonito — Galería Foto 2'},
-    {key:'carrusel-3.webp', path:'images/carrusel-3.webp', name:'Dilo Bonito — Galería Foto 3'},
-    {key:'carrusel-4.webp', path:'images/carrusel-4.webp', name:'Dilo Bonito — Galería Foto 4'},
-    {key:'carrusel-5.webp', path:'images/carrusel-5.webp', name:'Dilo Bonito — Galería Foto 5'},
+    {key:'carrusel-1.webp', path:'images/carrusel-1.webp', name:'Portada — Carrusel principal Foto 1'},
+    {key:'carrusel-2.webp', path:'images/carrusel-2.webp', name:'Portada — Carrusel principal Foto 2'},
+    {key:'carrusel-3.webp', path:'images/carrusel-3.webp', name:'Portada — Carrusel principal Foto 3'},
+    {key:'carrusel-4.webp', path:'images/carrusel-4.webp', name:'Portada — Carrusel principal Foto 4'},
   ],
   dilo_bonito: [
     {key:'db-personalizacion.webp', path:'images/db-personalizacion.webp', name:'Dilo Bonito — Servicio: Personalización en directo'},
@@ -927,44 +926,30 @@ async function publicarCarruselDB() {
   var imgs = IMG_GROUPS['db_carrusel'];
   if (!imgs || imgs.length === 0) { alert('No hay fotos en el carrusel.'); return; }
 
-  // Leer dilo-bonito.html actual
+  // El carrusel principal (hero) vive en portada.html, no en dilo-bonito.html
+  // (dilo-bonito.html no tiene carrusel propio). Los dots (#hero-dots) los
+  // genera js/portada-1.js en tiempo de carga a partir del nº de .hero-slide,
+  // así que ese <div> se deja vacío y no hace falta tocar ningún script.
   showToast('Publicando carrusel...');
   try {
-    var fd = await ghGet('dilo-bonito.html');
+    var fd = await ghGet('portada.html');
     var html = atob(fd.content.replace(/\n/g,''));
 
-    // Generar nuevo HTML del carrusel
     var slidesHtml = imgs.map(function(img, i) {
-      return '    <div class="carousel-slide"><img src="' + img.path + '" alt="Dilo Bonito ' + (i+1) + '" loading="' + (i===0?'eager':'lazy') + '"></div>';
-    }).join('\n');
-    var dotsHtml = imgs.map(function(img, i) {
-      return '    <button' + (i===0?' class="active"':'') + ' data-idx="' + i + '"></button>';
+      return '    <div class="hero-slide' + (i===0?' on':'') + '"><img src="' + img.path + '" alt="' + (img.name || ('Portada ' + (i+1))) + '" loading="' + (i===0?'eager':'lazy') + '"></div>';
     }).join('\n');
 
-    var newCarrusel =
-      '<!-- ── CARRUSEL ── -->' +
-      '<div id="carousel"><div id="carousel-track">' +
-      slidesHtml +
-      '</div>' +
-      '<button class="carousel-arrow prev" onclick="carouselPrev()">&#8592;</button>' +
-      '<button class="carousel-arrow next" onclick="carouselNext()">&#8594;</button>' +
-      '<div id="carousel-dots">' + dotsHtml + '</div></div>';
+    var slidesStart = html.indexOf('<div class="hero-carrusel" id="hero-carrusel">');
+    if (slidesStart === -1) { showToast('Error: no se encontró el carrusel en portada.html'); return; }
+    slidesStart += '<div class="hero-carrusel" id="hero-carrusel">'.length;
+    var dotsMarker = '<div class="hero-dots" id="hero-dots">';
+    var slidesEnd = html.indexOf(dotsMarker, slidesStart);
+    if (slidesEnd === -1) { showToast('Error: no se encontró #hero-dots en portada.html'); return; }
 
-    // Reemplazar el bloque carrusel
-    var carStart = html.indexOf('<!-- ── CARRUSEL ── -->');
-    var carEnd = html.indexOf('</div>', html.indexOf('id="carousel-dots"')) + 6;
-    if (carStart === -1) { showToast('Error: no se encontró el carrusel en dilo-bonito.html'); return; }
-    html = html.substring(0, carStart) + newCarrusel + html.substring(carEnd);
+    html = html.substring(0, slidesStart) + '\n' + slidesHtml + '\n    ' + html.substring(slidesEnd);
 
-    // Actualizar script dots count
-    var newDots = 'var dots = document.querySelectorAll("#carousel-dots button");\n' +
-      '  var slides = document.querySelectorAll(".carousel-slide");\n' +
-      '  var n = ' + imgs.length + ';';
-    html = html.replace(/var dots = document\.querySelectorAll\('[^']+'\);\s*var slides[^;]+;\s*var n = \d+;/, newDots);
-
-    // Subir
     var b64 = btoa(unescape(encodeURIComponent(html)));
-    await ghPut('dilo-bonito.html', b64, 'Admin: actualizar carrusel Dilo Bonito', fd.sha);
+    await ghPut('portada.html', b64, 'Admin: actualizar carrusel de portada', fd.sha);
     showToast('✓ Carrusel publicado. Visible en ~30s');
   } catch(err) {
     showToast('Error: ' + err.message);
