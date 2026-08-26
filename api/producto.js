@@ -337,7 +337,7 @@ ${PIE}
 
 
 // Refactorizado con handleApiRoute
-const { handleApiRoute, sendJSON, sendError } = require('./common');
+const { handleApiRoute, sendJSON, sendError } = require('../lib/common');
 
 module.exports = handleApiRoute(
   async (req, res) => {
