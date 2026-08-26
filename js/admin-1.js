@@ -891,7 +891,7 @@ async function publicarCarruselDB() {
   showToast('Publicando carrusel...');
   try {
     var fd = await ghGet('portada.html');
-    var html = atob(fd.content.replace(/\n/g,''));
+    var html = decodeURIComponent(escape(atob(fd.content.replace(/\n/g,''))));
 
     var slidesHtml = imgs.map(function(img, i) {
       return '    <div class="hero-slide' + (i===0?' on':'') + '"><img src="' + img.path + '" alt="' + (img.name || ('Portada ' + (i+1))) + '" loading="' + (i===0?'eager':'lazy') + '"></div>';
