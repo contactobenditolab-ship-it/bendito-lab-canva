@@ -99,57 +99,15 @@ var productos = [
 ];
 
 // ── IMÁGENES ──────────────────────────────────────────────
+// El resto de fotos (logos, Dilo Bonito, Colaboradores, Bendito Lab, la
+// lista simple de Portada) se editan ahora con el editor visual in-page —
+// solo queda aquí lo que ese editor no cubre: el orden del carrusel.
 var IMG_GROUPS = {
-  logos: [
-    {key:'logo-bendito.png', path:'logo-bendito.png', name:'Logo Bendito Lab (todas las páginas)'},
-    {key:'logo.webp',         path:'logo.webp',         name:'Logo Dilo Bonito (menú)'},
-  ],
-  portada_carrusel: [
-    {key:'carrusel-1.webp', path:'images/carrusel-1.webp', name:'Portada — Carrusel Foto 1'},
-    {key:'carrusel-2.webp', path:'images/carrusel-2.webp', name:'Portada — Carrusel Foto 2'},
-    {key:'carrusel-3.webp', path:'images/carrusel-3.webp', name:'Portada — Carrusel Foto 3'},
-    {key:'carrusel-4.webp', path:'images/carrusel-4.webp', name:'Portada — Carrusel Foto 4'},
-    {key:'hero.webp',       path:'images/hero.webp',       name:'Portada — Retrato (intro)'},
-    {key:'db-personalizacion.webp', path:'images/db-personalizacion.webp', name:'Portada — Qué hacemos: Dilo Bonito'},
-    {key:'img-tote.webp',   path:'images/img-tote.webp',   name:'Portada — Qué hacemos: Bendito Lab'},
-    {key:'colab-hero.webp', path:'images/colab-hero.webp', name:'Portada — Qué hacemos: Colaboradores'},
-    {key:'b2b-1.webp',      path:'images/b2b-1.webp',      name:'Portada — Banda de imagen (camisetas)'},
-  ],
   db_carrusel: [
     {key:'carrusel-1.webp', path:'images/carrusel-1.webp', name:'Portada — Carrusel principal Foto 1'},
     {key:'carrusel-2.webp', path:'images/carrusel-2.webp', name:'Portada — Carrusel principal Foto 2'},
     {key:'carrusel-3.webp', path:'images/carrusel-3.webp', name:'Portada — Carrusel principal Foto 3'},
     {key:'carrusel-4.webp', path:'images/carrusel-4.webp', name:'Portada — Carrusel principal Foto 4'},
-  ],
-  dilo_bonito: [
-    {key:'db-personalizacion.webp', path:'images/db-personalizacion.webp', name:'Dilo Bonito — Servicio: Personalización en directo'},
-    {key:'seating.webp',            path:'images/seating.webp',            name:'Dilo Bonito — Servicio: Seating Plan'},
-    {key:'db-maquinas.webp',        path:'images/db-maquinas.webp',        name:'Dilo Bonito — Servicio: Máquina expendedora'},
-    {key:'maquinas.webp',           path:'images/maquinas.webp',           name:'Dilo Bonito — Servicio: Máquina de gancho'},
-    {key:'db-merch.webp',           path:'images/db-merch.webp',           name:'Dilo Bonito — Servicio: Corner Merch'},
-    {key:'merch.webp',              path:'images/merch.webp',              name:'Dilo Bonito — Servicio: Cuéntanos tu idea'},
-    {key:'personalizacion.webp',    path:'images/personalizacion.webp',    name:'Dilo Bonito — Sección personalización (foto grande)'},
-  ],
-  colaboradores: [
-    {key:'colab-hero.webp', path:'images/colab-hero.webp', name:'Colaboradores — Foto de fondo del hero'},
-    {key:'b2b-1.webp', path:'images/b2b-1.webp', name:'Colaboradores — Comisión por evento confirmado'},
-    {key:'b2b-2.webp', path:'images/b2b-2.webp', name:'Colaboradores — Servicio exclusivo'},
-    {key:'b2b-3.webp', path:'images/b2b-3.webp', name:'Colaboradores — Cero gestión y cero inversión'},
-  ],
-  bendito_lab: [
-    {key:'b2b-1.webp',      path:'images/b2b-1.webp',      name:'Bendito Lab — Producto 1'},
-    {key:'b2b-2.webp',      path:'images/b2b-2.webp',      name:'Bendito Lab — Producto 2'},
-    {key:'b2b-3.webp',      path:'images/b2b-3.webp',      name:'Bendito Lab — Producto 3'},
-    {key:'img-gorra.webp',  path:'images/img-gorra.webp',  name:'Bendito Lab — Ropa laboral e imagen corporativa'},
-    {key:'img-neceser.webp',path:'images/img-neceser.webp',name:'Bendito Lab — Merchandising y regalos'},
-    {key:'personalizacion.webp', path:'images/personalizacion.webp', name:'Bendito Lab — Soluciones personalizadas'},
-    {key:'carrusel-1.webp', path:'images/carrusel-1.webp', name:'Bendito Lab — Carrusel Foto 1'},
-    {key:'carrusel-2.webp', path:'images/carrusel-2.webp', name:'Bendito Lab — Carrusel Foto 2'},
-    {key:'carrusel-3.webp', path:'images/carrusel-3.webp', name:'Bendito Lab — Carrusel Foto 3'},
-    {key:'carrusel-4.webp', path:'images/carrusel-4.webp', name:'Bendito Lab — Carrusel Foto 4'},
-    {key:'carrusel-5.webp', path:'images/carrusel-5.webp', name:'Bendito Lab — Carrusel Foto 5'},
-    {key:'bl-foto-1.webp', path:'images/bl-foto-1.webp', name:'Bendito Lab — Foto camiseta "Rafa"'},
-    {key:'bl-foto-2.webp', path:'images/bl-foto-2.webp', name:'Bendito Lab — Foto taller (workshop)'},
   ],
 };
 
