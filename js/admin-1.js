@@ -848,11 +848,25 @@ function dbcDrop(e, idx) {
   renderCarruselDB();
   showToast('Orden actualizado — pulsa "Publicar" para aplicarlo');
 }
-function dbcEliminar(idx) {
+async function dbcEliminar(idx) {
   if (!confirm('¿Quitar esta foto del carrusel?')) return;
+  var img = IMG_GROUPS['db_carrusel'][idx];
   IMG_GROUPS['db_carrusel'].splice(idx, 1);
   renderCarruselDB();
   showToast('Foto quitada — pulsa "Publicar" para aplicarlo');
+  // Si esta foto se subió desde "+ AÑADIR FOTO AL CARRUSEL" (anadirImgData),
+  // vive en Vercel Blob y hay que borrarla también; si no, quitarla del
+  // array de arriba ya basta (es una de las fotos originales estáticas del repo).
+  if (img && IMAGE_CONTENT[img.path]) {
+    try {
+      await fetch('/api/delete-image', {
+        method: 'POST',
+        headers: BL_API.authHeaders(),
+        body: JSON.stringify({ path: img.path })
+      });
+      delete IMAGE_CONTENT[img.path];
+    } catch (e) {}
+  }
 }
 
 // ── Publicación en GitHub ────────────────────────────────────
