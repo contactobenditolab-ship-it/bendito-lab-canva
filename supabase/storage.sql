@@ -28,3 +28,20 @@ on conflict (id) do nothing;
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('sitio-contenido', 'sitio-contenido', true, 1048576, array['application/json'])
 on conflict (id) do nothing;
+
+-- Mapa de imágenes del sitio: reemplaza el JSON de site-content.json (que
+-- vivía como un único objeto en Storage, con lectura-modificación-escritura
+-- no atómica) por una tabla real. Cada hueco de imagen (slot) es una fila
+-- con clave primaria única, así un upsert por slot es atómico — dos
+-- guardados casi simultáneos en huecos distintos ya no pueden pisarse entre
+-- sí, y una foto nueva no puede terminar asignada al hueco de otra.
+create table if not exists sitio_imagenes (
+  slot text primary key,
+  url text,
+  zoom_s numeric,
+  zoom_x numeric,
+  zoom_y numeric,
+  updated_at timestamptz not null default now()
+);
+
+alter table sitio_imagenes enable row level security;

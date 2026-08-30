@@ -2,8 +2,7 @@
 // objeto asociado en Supabase Storage. La foto original estática (la del
 // repo) vuelve a mostrarse. Body JSON: { path }.
 const { requireAuth } = require('../lib/auth');
-const { updateContent } = require('../lib/content-store');
-const { supabaseStorageDeleteByUrl } = require('../lib/common');
+const { supabaseServiceClient, supabaseStorageDeleteByUrl } = require('../lib/common');
 
 const BUCKET = 'sitio-imagenes';
 
@@ -23,20 +22,17 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Falta path' });
   }
 
-  var url;
-  await updateContent(function (data) {
-    data.images = data.images || {};
-    url = data.images[path];
-    if (url) {
-      delete data.images[path];
-      // La foto sustituida podía tener su propio encuadre/zoom guardado;
-      // si no se borra también aquí, al restaurarse la foto original
-      // estática se le sigue aplicando ese zoom/posición viejo y se ve
-      // recortada o descuadrada (mismo bug que se arregló en
-      // upload-image.js para el caso de reemplazo).
-      if (data.imageView && data.imageView[path]) delete data.imageView[path];
-    }
-  });
+  const supabase = supabaseServiceClient();
+  const { data: existente } = await supabase.from('sitio_imagenes').select('url').eq('slot', path).maybeSingle();
+  const url = existente ? existente.url : null;
+
+  // Se borra la fila entera (no solo la url): la foto sustituida podía tener
+  // su propio encuadre/zoom guardado, y si no se borra también aquí, al
+  // restaurarse la foto original estática se le sigue aplicando ese
+  // zoom/posición viejo y se ve recortada o descuadrada.
+  const { error } = await supabase.from('sitio_imagenes').delete().eq('slot', path);
+  if (error) return res.status(500).json({ error: 'Error borrando el hueco: ' + error.message });
+
   if (url) supabaseStorageDeleteByUrl(BUCKET, url).catch(() => {});
   return res.status(200).json({ ok: true });
 };
