@@ -1,9 +1,11 @@
 // POST /api/delete-image (auth) — quita la sustitución de un slot y borra el
-// blob asociado. La foto original estática (la del repo) vuelve a mostrarse.
-// Body JSON: { path }.
-const { del } = require('@vercel/blob');
+// objeto asociado en Supabase Storage. La foto original estática (la del
+// repo) vuelve a mostrarse. Body JSON: { path }.
 const { requireAuth } = require('../lib/auth');
 const { updateContent } = require('../lib/content-store');
+const { supabaseStorageDeleteByUrl } = require('../lib/common');
+
+const BUCKET = 'sitio-imagenes';
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -35,6 +37,6 @@ module.exports = async function handler(req, res) {
       if (data.imageView && data.imageView[path]) delete data.imageView[path];
     }
   });
-  if (url) del(url).catch(() => {});
+  if (url) supabaseStorageDeleteByUrl(BUCKET, url).catch(() => {});
   return res.status(200).json({ ok: true });
 };

@@ -199,8 +199,7 @@ module.exports = handleApiRoute(
 
 ### External
 
-- **Supabase:** `@supabase/supabase-js` (DB + Auth)
-- **Vercel Blob:** `@vercel/blob` (Image storage)
+- **Supabase:** `@supabase/supabase-js` (DB + Auth + Storage — buckets `sitio-imagenes` y `sitio-contenido`, antes Vercel Blob)
 - **Resend:** `resend@*` (Email API)
 
 ### Internal
