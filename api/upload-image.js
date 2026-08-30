@@ -5,7 +5,6 @@
 // `dataUrl` es un data: URL base64 ya redimensionado en el cliente (ver
 // resizeImageToDataUrl en admin.html).
 const { requireAuth } = require('../lib/auth');
-const { updateContent } = require('../lib/content-store');
 const { supabaseServiceClient, supabaseStorageDeleteByUrl } = require('../lib/common');
 
 const BUCKET = 'sitio-imagenes';
@@ -69,20 +68,27 @@ module.exports = async function handler(req, res) {
   }
   const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(storagePath);
 
-  var prevUrl;
-  await updateContent(function (data) {
-    data.images = data.images || {};
-    prevUrl = data.images[path];
-    data.images[path] = publicUrl;
-    // La foto nueva no tiene por qué encajar con el zoom/posición guardado
-    // para la foto anterior en este mismo hueco, así que se resetea aquí
-    // mismo: si esto se hiciera en una segunda petición a /api/save-image-view
-    // (como antes), su propio readContent()/writeContent() podía leer una
-    // copia todavía no propagada del content.json (el objeto es público y
-    // pasa por CDN) y sobrescribir esta imagen recién subida con la versión
-    // vieja.
-    if (data.imageView && data.imageView[path]) delete data.imageView[path];
+  // Fila única por slot (primary key): el upsert es atómico, así que no hay
+  // ventana de carrera entre leer y volver a escribir como con el JSON de
+  // antes — dos subidas casi simultáneas a huecos distintos ya no pueden
+  // pisarse, y una foto nueva no puede terminar en el hueco de otra.
+  const { data: existente } = await supabase.from('sitio_imagenes').select('url').eq('slot', path).maybeSingle();
+  const prevUrl = existente ? existente.url : null;
+
+  // La foto nueva no tiene por qué encajar con el zoom/posición guardado
+  // para la foto anterior en este mismo hueco, así que el zoom se resetea
+  // en la misma fila.
+  const { error: dbError } = await supabase.from('sitio_imagenes').upsert({
+    slot: path,
+    url: publicUrl,
+    zoom_s: null,
+    zoom_x: null,
+    zoom_y: null,
+    updated_at: new Date().toISOString(),
   });
+  if (dbError) {
+    return res.status(500).json({ error: 'Error guardando el hueco: ' + dbError.message });
+  }
 
   if (prevUrl && prevUrl !== publicUrl) {
     supabaseStorageDeleteByUrl(BUCKET, prevUrl).catch(() => {});

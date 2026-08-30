@@ -1,17 +1,22 @@
-// GET  /api/content            — mapa público { images: { slotPath: blobUrl }, updatedAt }
+// GET  /api/content            — mapa público { images: { slotPath: url }, imageView: {...}, colors, texts, links, updatedAt }
 // POST /api/content (auth)     — { path, url } asigna/quita una entrada suelta (uso interno/manual)
-const { readContent, updateContent } = require('../lib/content-store');
+const { readContent } = require('../lib/content-store');
 const { requireAuth } = require('../lib/auth');
+const { supabaseServiceClient: supabaseClient } = require('../lib/common');
 
-const { createClient } = require('@supabase/supabase-js');
-let cachedSupabase = null;
-function supabaseClient() {
-  if (cachedSupabase) return cachedSupabase;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY no configuradas');
-  cachedSupabase = createClient(url, key, { auth: { persistSession: false } });
-  return cachedSupabase;
+/** Lee la tabla sitio_imagenes y la vuelve a las dos formas {images, imageView} que ya esperan bl-images.js y admin.html. */
+async function leerImagenes() {
+  const { data, error } = await supabaseClient().from('sitio_imagenes').select('slot, url, zoom_s, zoom_x, zoom_y');
+  if (error) throw error;
+  const images = {};
+  const imageView = {};
+  for (const fila of data || []) {
+    if (fila.url) images[fila.slot] = fila.url;
+    if (fila.zoom_s !== null && fila.zoom_x !== null && fila.zoom_y !== null) {
+      imageView[fila.slot] = { s: fila.zoom_s, x: fila.zoom_x, y: fila.zoom_y };
+    }
+  }
+  return { images, imageView };
 }
 
 module.exports = async function handler(req, res) {
@@ -31,9 +36,9 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: 'No se pudo cargar el contenido' });
       }
     }
-    const data = await readContent();
+    const [data, { images, imageView }] = await Promise.all([readContent(), leerImagenes()]);
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-    return res.status(200).json(data);
+    return res.status(200).json(Object.assign({}, data, { images, imageView }));
   }
 
   if (req.method === 'POST') {
@@ -47,13 +52,16 @@ module.exports = async function handler(req, res) {
     if (typeof path !== 'string' || !path) {
       return res.status(400).json({ error: 'Falta path' });
     }
-    var images;
-    await updateContent(function (data) {
-      data.images = data.images || {};
-      if (url) data.images[path] = url;
-      else delete data.images[path];
-      images = data.images;
-    });
+    if (url) {
+      const { error } = await supabaseClient().from('sitio_imagenes').upsert({
+        slot: path, url, zoom_s: null, zoom_x: null, zoom_y: null, updated_at: new Date().toISOString(),
+      });
+      if (error) return res.status(500).json({ error: error.message });
+    } else {
+      const { error } = await supabaseClient().from('sitio_imagenes').delete().eq('slot', path);
+      if (error) return res.status(500).json({ error: error.message });
+    }
+    const { images } = await leerImagenes();
     return res.status(200).json({ ok: true, images: images });
   }
 
