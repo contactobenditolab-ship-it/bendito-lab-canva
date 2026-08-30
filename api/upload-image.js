@@ -1,11 +1,14 @@
-// POST /api/upload-image (auth) — sube una imagen a Vercel Blob y actualiza el
-// mapa de contenido para el slot indicado. Body JSON: { path, dataUrl }.
-// `path` es el id del slot (p.ej. "images/hero.jpg", el mismo valor que ya
-// usa admin.html en IMG_GROUPS). `dataUrl` es un data: URL base64 ya
-// redimensionado en el cliente (ver resizeImageToDataUrl en admin.html).
-const { put, del } = require('@vercel/blob');
+// POST /api/upload-image (auth) — sube una imagen a Supabase Storage (bucket
+// sitio-imagenes) y actualiza el mapa de contenido para el slot indicado.
+// Body JSON: { path, dataUrl }. `path` es el id del slot (p.ej.
+// "images/hero.jpg", el mismo valor que ya usa admin.html en IMG_GROUPS).
+// `dataUrl` es un data: URL base64 ya redimensionado en el cliente (ver
+// resizeImageToDataUrl en admin.html).
 const { requireAuth } = require('../lib/auth');
 const { updateContent } = require('../lib/content-store');
+const { supabaseServiceClient, supabaseStorageDeleteByUrl } = require('../lib/common');
+
+const BUCKET = 'sitio-imagenes';
 
 const MAX_BYTES = 4 * 1024 * 1024; // 4MB tras decodificar — deja margen bajo el límite de 4.5MB de body de Vercel
 const EXT_BY_MIME = {
@@ -53,36 +56,37 @@ module.exports = async function handler(req, res) {
   }
 
   const safeSlot = path.replace(/[^a-zA-Z0-9/_-]/g, '-').replace(/^\/+/, '');
-  const blobPath = 'images/' + safeSlot + '-' + Date.now() + '.' + ext;
+  const storagePath = 'images/' + safeSlot + '-' + Date.now() + '.' + ext;
 
-  let result;
-  try {
-    result = await put(blobPath, buf, {
-      access: 'public',
-      contentType: mime,
-      addRandomSuffix: false,
-    });
-  } catch (e) {
-    return res.status(500).json({ error: 'Error subiendo a Blob: ' + e.message });
+  // El Buffer se envuelve en un Blob: si se manda tal cual, storage-js lo
+  // trata como cuerpo crudo de texto en algunos runtimes serverless y cada
+  // byte >= 0x80 se corrompe (mismo bug ya visto y resuelto en bendito-os).
+  const cuerpo = new Blob([new Uint8Array(buf)], { type: mime });
+  const supabase = supabaseServiceClient();
+  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(storagePath, cuerpo, { contentType: mime, upsert: false });
+  if (uploadError) {
+    return res.status(500).json({ error: 'Error subiendo la imagen: ' + uploadError.message });
   }
+  const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(storagePath);
 
   var prevUrl;
   await updateContent(function (data) {
     data.images = data.images || {};
     prevUrl = data.images[path];
-    data.images[path] = result.url;
+    data.images[path] = publicUrl;
     // La foto nueva no tiene por qué encajar con el zoom/posición guardado
     // para la foto anterior en este mismo hueco, así que se resetea aquí
     // mismo: si esto se hiciera en una segunda petición a /api/save-image-view
     // (como antes), su propio readContent()/writeContent() podía leer una
-    // copia todavía no propagada del content.json (el blob es público y pasa
-    // por CDN) y sobrescribir esta imagen recién subida con la versión vieja.
+    // copia todavía no propagada del content.json (el objeto es público y
+    // pasa por CDN) y sobrescribir esta imagen recién subida con la versión
+    // vieja.
     if (data.imageView && data.imageView[path]) delete data.imageView[path];
   });
 
-  if (prevUrl && prevUrl !== result.url) {
-    del(prevUrl).catch(() => {});
+  if (prevUrl && prevUrl !== publicUrl) {
+    supabaseStorageDeleteByUrl(BUCKET, prevUrl).catch(() => {});
   }
 
-  return res.status(200).json({ ok: true, url: result.url, path });
+  return res.status(200).json({ ok: true, url: publicUrl, path });
 };
