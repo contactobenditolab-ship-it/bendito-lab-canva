@@ -76,9 +76,28 @@ function valorUtil(v) {
 // (type === 'colaborador', ver enviarColaboradorConfirmacion), no desde
 // el formulario general de contacto aunque el visitante marque esa opción.
 const NEWSLETTER_POR_TIPO = {
-  eventos: { url: 'https://www.benditolab.com/newsletter-eventos.html', etiqueta: 'eventos' },
-  b2b: { url: 'https://www.benditolab.com/newsletter-empresas.html', etiqueta: 'empresas' },
+  eventos: { path: '/newsletter-eventos.html', etiqueta: 'eventos' },
+  b2b: { path: '/newsletter-empresas.html', etiqueta: 'empresas' },
 };
+
+const SITE_BASE = 'https://www.benditolab.com';
+
+// Las páginas newsletter-*.html ya están maquetadas como un email HTML
+// completo (tablas, estilos inline, condicionales MSO) — se usan también
+// como página pública en el sitio para poder editarlas visualmente desde
+// el admin. Para mandarlas como CUERPO del email (no solo enlazadas) se
+// trae el HTML publicado y se convierten sus rutas relativas (images/...,
+// articulo-*.html, faq.html) en absolutas, y se quitan los <script> (no
+// funcionan dentro de un email y los clientes de correo los descartan de
+// todas formas).
+async function obtenerNewsletterHtml(pathname) {
+  const r = await fetch(SITE_BASE + pathname);
+  if (!r.ok) throw new Error('No se pudo cargar ' + pathname + ': ' + r.status);
+  let html = await r.text();
+  html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  html = html.replace(/(src|href)="(?!https?:|mailto:|tel:|#)([^"]+)"/gi, (m, attr, val) => `${attr}="${SITE_BASE}/${val}"`);
+  return html;
+}
 
 async function enviarEmailResend(payload) {
   const r = await fetch('https://api.resend.com/emails', {
@@ -124,30 +143,47 @@ async function enviarContactoEmail(data) {
   if (esEmailValido(data.email)) {
     const newsletter = NEWSLETTER_POR_TIPO[data.tipo_contacto];
     if (newsletter) {
-      await enviarEmailResend({
-        from: 'Bendito Lab <no-reply@benditolab.com>',
-        to: data.email,
-        subject: 'Hemos recibido tu mensaje · Bendito Lab',
-        html: `<h2>¡Gracias por escribirnos, ${escapeHtml(data.nombre)}!</h2>
+      const asuntoConfirmacion = 'Hemos recibido tu mensaje · Bendito Lab';
+      try {
+        const html = await obtenerNewsletterHtml(newsletter.path);
+        await enviarEmailResend({ from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, subject: asuntoConfirmacion, html });
+      } catch (e) {
+        // Si falla la carga de la newsletter (sitio caído, etc.), se manda
+        // igualmente un email de confirmación con enlace en vez de dejar al
+        // visitante sin ninguna respuesta.
+        console.error('No se pudo incrustar la newsletter de ' + newsletter.etiqueta + ', se envía con enlace:', e.message);
+        await enviarEmailResend({
+          from: 'Bendito Lab <no-reply@benditolab.com>',
+          to: data.email,
+          subject: asuntoConfirmacion,
+          html: `<h2>¡Gracias por escribirnos, ${escapeHtml(data.nombre)}!</h2>
 <p>Hemos recibido tu consulta y te responderemos en menos de 24 horas.</p>
 <p>Mientras tanto, échale un vistazo a nuestra newsletter de ${escapeHtml(newsletter.etiqueta)}:</p>
-<p><a href="${newsletter.url}">${newsletter.url}</a></p>`,
-      });
+<p><a href="${SITE_BASE}${newsletter.path}">${SITE_BASE}${newsletter.path}</a></p>`,
+        });
+      }
     }
   }
 }
 
 async function enviarColaboradorConfirmacion(data) {
   if (!RESEND_API_KEY || !esEmailValido(data.email)) return;
-  await enviarEmailResend({
-    from: 'Bendito Lab <no-reply@benditolab.com>',
-    to: data.email,
-    subject: '¡Gracias por querer colaborar con nosotros! · Bendito Lab',
-    html: `<h2>¡Gracias por tu solicitud, ${escapeHtml(data.nombre)}!</h2>
+  const asuntoConfirmacion = '¡Gracias por querer colaborar con nosotros! · Bendito Lab';
+  try {
+    const html = await obtenerNewsletterHtml('/newsletter-colaboradores.html');
+    await enviarEmailResend({ from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, subject: asuntoConfirmacion, html });
+  } catch (e) {
+    console.error('No se pudo incrustar la newsletter de colaboradores, se envía con enlace:', e.message);
+    await enviarEmailResend({
+      from: 'Bendito Lab <no-reply@benditolab.com>',
+      to: data.email,
+      subject: asuntoConfirmacion,
+      html: `<h2>¡Gracias por tu solicitud, ${escapeHtml(data.nombre)}!</h2>
 <p>Hemos recibido tu solicitud para unirte al programa de colaboradores de Bendito Lab. Estamos revisando tu perfil y te contactaremos en breve.</p>
 <p>Mientras tanto, aquí te contamos cómo funciona la colaboración:</p>
-<p><a href="https://www.benditolab.com/newsletter-colaboradores.html">https://www.benditolab.com/newsletter-colaboradores.html</a></p>`,
-  });
+<p><a href="${SITE_BASE}/newsletter-colaboradores.html">${SITE_BASE}/newsletter-colaboradores.html</a></p>`,
+    });
+  }
 }
 
 async function enviarColaboradorAOS(data) {
