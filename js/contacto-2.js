@@ -3,6 +3,19 @@ function toggleNav(){ document.body.classList.toggle('nav-open'); }
 document.querySelectorAll('.site-nav a').forEach(function(a){
   a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
 });
+
+// Los botones "Únete como colaborador →" (artículos) y "QUIERO SER
+// COLABORADOR→" (colaboradores.html) traen a esta página con
+// ?tipo=colaboradores para preseleccionar el motivo, en vez de depender
+// de un formulario dedicado que ya no existe (ver colaboradores.html).
+(function preseleccionarTipoContacto() {
+  var tipo = new URLSearchParams(location.search).get('tipo');
+  var select = document.querySelector('[name="tipo_contacto"]');
+  if (tipo && select && [...select.options].some(function(o){ return o.value === tipo; })) {
+    select.value = tipo;
+  }
+})();
+
 document.getElementById('contacto-form').addEventListener('submit', async function(e){
   e.preventDefault();
   var form = e.target;
