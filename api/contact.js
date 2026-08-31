@@ -272,14 +272,24 @@ module.exports = handleApiRoute(
       }
     }
 
+    // Todos los formularios (contacto-2.js/contact-module.js, catalogo-comun.js
+    // /catalogo-module.js) envían los campos del lead anidados en "data",
+    // no sueltos en el body — body.type/website van fuera. Antes se pasaba
+    // "body" entero a enviarContactoEmail/enviarColaboradorAOS/etc., así que
+    // todos los campos (nombre, email, ...) salían undefined: el aviso a
+    // contacto@benditolab.com llegaba como "Nuevo contacto web: undefined",
+    // el email de confirmación al visitante nunca se enviaba (email inválido)
+    // y la sincronización con Bendito OS también recibía datos vacíos.
+    const data = body && body.data && typeof body.data === 'object' ? body.data : body;
+
     let resultadoCotizacion = null;
     try {
       if (type === 'colaborador') {
-        await enviarColaboradorAOS(body);
+        await enviarColaboradorAOS(data);
       } else if (type === 'cotizacion') {
-        resultadoCotizacion = await enviarCotizacionAOS(body);
+        resultadoCotizacion = await enviarCotizacionAOS(data);
       } else {
-        await enviarContactoEmail(body);
+        await enviarContactoEmail(data);
       }
     } catch (e) {
       console.error('Error processing form:', e.message);
@@ -289,7 +299,7 @@ module.exports = handleApiRoute(
     // Non-blocking: CRM sync
     if (type === 'contacto') {
       try {
-        await enviarContactoAOS(body);
+        await enviarContactoAOS(data);
       } catch (e) {
         console.error('CRM sync failed:', e.message);
       }
@@ -298,7 +308,7 @@ module.exports = handleApiRoute(
     // Non-blocking: confirmation
     if (type === 'colaborador') {
       try {
-        await enviarColaboradorConfirmacion(body);
+        await enviarColaboradorConfirmacion(data);
       } catch (e) {
         console.error('Confirmation email failed:', e.message);
       }
