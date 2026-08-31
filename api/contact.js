@@ -71,13 +71,18 @@ function valorUtil(v) {
   return v && v !== '-' ? v : '';
 }
 
-// La newsletter de colaboradores NO va aquí a propósito: solo debe
-// enviarse cuando la solicitud llega desde el formulario "Únete"
-// (type === 'colaborador', ver enviarColaboradorConfirmacion), no desde
-// el formulario general de contacto aunque el visitante marque esa opción.
+// Antes la newsletter de colaboradores se excluía aquí a propósito: debía
+// enviarse solo desde el formulario dedicado "Únete" (type === 'colaborador',
+// ver enviarColaboradorConfirmacion). Pero ese formulario ya no existe en
+// colaboradores.html (se perdió en una restauración anterior del archivo,
+// ver PR #89 — la página no tiene ningún <form>), así que el único sitio
+// real donde un visitante puede marcar "quiero ser colaborador" es el
+// select tipo_contacto de este formulario general. Sin esta entrada, esos
+// visitantes nunca recibían ninguna newsletter.
 const NEWSLETTER_POR_TIPO = {
   eventos: { path: '/newsletter-eventos.html', etiqueta: 'eventos' },
   b2b: { path: '/newsletter-empresas.html', etiqueta: 'empresas' },
+  colaboradores: { path: '/newsletter-colaboradores.html', etiqueta: 'colaboradores' },
 };
 
 const SITE_BASE = 'https://www.benditolab.com';
