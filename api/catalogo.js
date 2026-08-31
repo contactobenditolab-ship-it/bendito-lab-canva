@@ -312,43 +312,183 @@ async function calcularPreciosDesde(articulosBase) {
   }
 }
 
+module.exports = async function handler(req, res) {
+  const supabase = client();
 
-// Refactorizado con handleApiRoute
-const { handleApiRoute, sendJSON, sendError } = require('../lib/common');
-
-module.exports = handleApiRoute(
-  async (req, res) => {
-    try {
-      const { id, tipo, necesidad, search } = req.query;
-      
-      // Build Supabase query
-      const client = client(); // Función client() ya está arriba
-      let query = client.from('catalogo_articulos').select('*');
-      
-      if (id) query = query.eq('id', id);
-      if (tipo) query = query.eq('tipo', tipo);
-      if (necesidad) query = query.eq('necesidad', necesidad);
-      if (search) query = query.ilike('nombre', `%${search}%`);
-      
-      const { data: articulos, error } = await query;
-      if (error) throw error;
-      
-      // Enrich with pricing
-      let resultado = articulos;
-      if (req.query.conPrecios) {
-        resultado = await calcularPreciosDesde(articulos);
+  if (req.method === 'GET') {
+    // Metadatos públicos para la calculadora: nombres de técnicas y extras
+    // con sus precios (estos SÍ son públicos, ya son precios de venta).
+    if (req.query.meta === 'personalizacion') {
+      try {
+        const [{ data: tecnicasData, error: e1 }, { data: extrasData, error: e2 }] = await Promise.all([
+          supabase.from('fichas_costes').select('categoria').eq('tipo', 'tecnica').order('orden'),
+          supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'extra').order('orden'),
+        ]);
+        if (e1) throw e1;
+        if (e2) throw e2;
+        const tecnicas = (tecnicasData || []).map((f) => f.categoria).filter(Boolean);
+        const extras = (extrasData || [])
+          .filter((f) => f.categoria)
+          .map((f) => ({ nombre: f.categoria, precio: Math.round(pvpMedioFicha(f) * 100) / 100 }));
+        res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+        return res.status(200).json({ tecnicas, extras });
+      } catch (e) {
+        console.error('Error /api/catalogo?meta=:', e.message);
+        return res.status(500).json({ error: 'No se pudo cargar la personalización' });
       }
-      
-      sendJSON(res, resultado);
-    } catch (e) {
-      console.error('Catalog error:', e.message);
-      return sendError(res, 'Failed to fetch catalog', 500);
     }
-  },
-  {
-    allowedMethods: ['GET'],
-    requiresAuth: false,
-    rateLimit: { maxRequests: 100, windowMs: 60000 },
-    logging: true
+
+    try {
+      const { data, error } = await supabase
+        .from('catalogo_articulos')
+        .select(CAMPOS_PUBLICOS)
+        .eq('visible_web', true)
+        .order('categoria', { ascending: true, nullsFirst: false })
+        .order('nombre', { ascending: true });
+      if (error) throw error;
+
+      const articulosEnriquecidos = await enriquecerArticulos(supabase, data || []);
+      const preciosDesde = await calcularPreciosDesde(articulosEnriquecidos);
+      const articulos = articulosEnriquecidos.map((a) => {
+        const precio = preciosDesde.get(a.id);
+        // precio puede ser `null` (fallo al calcular ese artículo, ver
+        // calcularPreciosDesde) — sin este chequeo, `Math.round(null * 100)`
+        // coacciona `null` a 0 y la tarjeta mostraba "Desde 0.00€" en vez de
+        // ocultar el precio como hace renderGridEn cuando es null.
+        return { ...a, precio_desde: precio != null ? Math.round(precio * 100) / 100 : null };
+      });
+
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+      return res.status(200).json({ articulos });
+    } catch (e) {
+      console.error('Error listando catálogo público:', e.message);
+      return res.status(500).json({ error: 'No se pudo cargar el catálogo' });
+    }
   }
-);
+
+  if (req.method === 'POST') {
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    if (body && body.accion === 'calcularPrecioEvento') {
+      const invitados = Math.max(parseInt(body.invitados, 10) || 0, 0);
+      const articulo = Object.prototype.hasOwnProperty.call(COSTES_ARTICULO_EVENTOS, body.articulo) ? body.articulo : null;
+      const pack = getPackEvento(invitados);
+      const precio = articulo ? precioEventoConArticulo(pack, invitados, articulo) : pack.precio;
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).json({
+        ok: true,
+        invitados,
+        articulo,
+        pack: { nombre: pack.nombre, min: pack.min, max: pack.max },
+        precio,
+        aviso: 'Precio orientativo según nº de invitados y artículo elegido. El presupuesto final puede variar según extras (horas, diseño, desplazamiento) y detalles del evento.',
+      });
+    }
+    if (body && body.accion === 'calcularPrecio') {
+      try {
+        const articuloId = body.articulo_id;
+        const cantidad = Math.max(parseInt(body.cantidad, 10) || 1, 1);
+        const nombreTecnica = body.tecnica || null;
+        const extrasElegidos = Array.isArray(body.extras) ? body.extras : [];
+
+        if (!articuloId) return res.status(400).json({ error: 'Falta articulo_id' });
+        
+        // Validar MOQ antes de realizar queries
+        // Si el cliente pide menos que MOQ, devolver error sin hacer nada más
+        // (MOQ se valida después de traer el artículo, ver más abajo)
+
+        const CAMPOS_COSTE = [
+          'precio_coste', 'pack_coste', 'coste_envio', 'coste_manipulacion',
+          'coste_personalizacion', 'coste_diseno', 'coste_mano_obra', 'coste_electricidad',
+          'coste_mermas_pct', 'coste_comisiones_pct', 'costes_generales_pct', 'margen_pct_b2b',
+          'proveedor_id', 'grupo_tramos_id', 'moq',
+        ].join(', ');
+
+        const [{ data: articulo, error: e1 }, { data: fichaTecnica }, { data: fichasExtra }] = await Promise.all([
+          supabase.from('catalogo_articulos').select(CAMPOS_COSTE).eq('id', articuloId).eq('visible_web', true).single(),
+          nombreTecnica
+            ? supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'tecnica').eq('categoria', nombreTecnica).maybeSingle()
+            : Promise.resolve({ data: null }),
+          extrasElegidos.length
+            ? supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'extra')
+            : Promise.resolve({ data: [] }),
+        ]);
+        if (e1 || !articulo) return res.status(404).json({ error: 'Artículo no encontrado' });
+
+        // Validar MOQ (cantidad mínima de pedido): default 5 si no está definido
+        const moq = articulo.moq || 5;
+        if (cantidad < moq) {
+          return res.status(200).json({
+            ok: false,
+            moq_no_alcanzado: true,
+            moq,
+            cantidad,
+            mensaje: `Para pedidos menores de ${moq} unidades, por favor contacta con nosotros.`,
+          });
+        }
+
+        const [{ data: proveedor }, { data: grupo }, { data: overrideRows }] = await Promise.all([
+          articulo.proveedor_id
+            ? supabase.from('catalogo_proveedores').select('coste_envio, unidades_tipicas_pedido').eq('id', articulo.proveedor_id).maybeSingle()
+            : Promise.resolve({ data: null }),
+          articulo.grupo_tramos_id
+            ? supabase.from('catalogo_grupos_tramos').select('tramos').eq('id', articulo.grupo_tramos_id).maybeSingle()
+            : Promise.resolve({ data: null }),
+          // El sitio público vende a particulares/empresas como cliente final: se
+          // usa el override del canal B2C (ver catalogo_precios_override).
+          supabase.from('catalogo_precios_override').select('tramos').eq('articulo_id', articuloId).eq('canal', 'b2c').maybeSingle(),
+        ]);
+
+        // Llamar a API centralizada para calcular precio (P1 migration, 20 Aug 2026)
+        const precioData = await calcularPrecioDesdeAPI(articuloId, cantidad, 'b2c');
+        const precioProducto = precioData.precioUnitario;
+        const tramos = { tiene_tramos: false, tabla: [] }; // TODO: implementar tabla de tramos desde API
+
+        let precioTecnica = 0;
+        let tecnicaNombre = null;
+        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad, TRAMOS_MARGEN_DEFECTO); tecnicaNombre = fichaTecnica.categoria; }
+
+        const extrasDisponibles = fichasExtra || [];
+        let extrasTotal = 0;
+        const extrasAplicados = [];
+        extrasElegidos.forEach((nombreExtra) => {
+          const f = extrasDisponibles.find((x) => (x.categoria || '').toLowerCase() === String(nombreExtra).toLowerCase());
+          if (f) {
+            const precio = Math.round(pvpMedioFicha(f) * 100) / 100;
+            extrasTotal += precio;
+            extrasAplicados.push({ nombre: f.categoria, precio });
+          }
+        });
+
+        const precioUnitario = Math.round((precioProducto + precioTecnica) * 100) / 100;
+        const subtotal = Math.round(precioUnitario * cantidad * 100) / 100;
+        const total = Math.round((subtotal + extrasTotal) * 100) / 100;
+
+        res.setHeader('Cache-Control', 'no-store');
+        return res.status(200).json({
+          ok: true,
+          cantidad,
+          precio_producto_unitario: precioProducto,
+          tramos,
+          tecnica: tecnicaNombre,
+          precio_tecnica_unitario: precioTecnica,
+          precio_unitario: precioUnitario,
+          subtotal,
+          extras: extrasAplicados,
+          extras_total: Math.round(extrasTotal * 100) / 100,
+          total,
+          aviso: 'Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.',
+        });
+      } catch (e) {
+        console.error('Error /api/catalogo calcularPrecio:', e.message);
+        return res.status(500).json({ error: 'No se pudo calcular el precio' });
+      }
+    }
+    return res.status(400).json({ error: 'Acción desconocida' });
+  }
+
+  res.setHeader('Allow', 'GET, POST');
+  return res.status(405).json({ error: 'Method not allowed' });
+};
