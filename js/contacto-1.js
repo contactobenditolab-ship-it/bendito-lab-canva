@@ -1,4 +1,6 @@
 
+function toggleNav(){ document.body.classList.toggle('nav-open'); }
+
 var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso Legal</h2>
 <ul>
 <li><strong>Titular:</strong> Silvia G. M. · NIF: 05931103-R</li>

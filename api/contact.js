@@ -239,7 +239,14 @@ async function enviarCotizacionAOS(data) {
 
 
 // Refactorizado con handleApiRoute
-const { handleApiRoute, sendJSON, sendError } = require('../lib/common');
+// NOTA: se responde con res.json({ok,...}) directo en vez de sendJSON/
+// sendError (que envuelven en {success,data}/{success,error}) porque TODOS
+// los clientes de este endpoint (contacto-2.js, contact-module.js,
+// pages-module.js, index-1.js, catalogo-comun.js/catalogo-module.js para
+// upload-logo) leen d.ok/d.error directamente — con sendJSON, d.ok siempre
+// era undefined y el formulario mostraba "Error al enviar" incluso cuando
+// el email se enviaba correctamente.
+const { handleApiRoute } = require('../lib/common');
 
 module.exports = handleApiRoute(
   async (req, res) => {
@@ -250,7 +257,7 @@ module.exports = handleApiRoute(
 
     const type = body && body.type;
     if (!type || !['contacto', 'colaborador', 'cotizacion', 'upload-logo'].includes(type)) {
-      return sendError(res, 'Invalid type', 400);
+      return res.status(400).json({ ok: false, error: 'Invalid type' });
     }
 
     // "upload-logo" no es un lead: responde directo en el formato {ok,url}
@@ -276,7 +283,7 @@ module.exports = handleApiRoute(
       }
     } catch (e) {
       console.error('Error processing form:', e.message);
-      return sendError(res, 'Failed to send. Email: contacto@benditolab.com', 502);
+      return res.status(502).json({ ok: false, error: 'Failed to send. Email: contacto@benditolab.com' });
     }
 
     // Non-blocking: CRM sync
@@ -297,7 +304,7 @@ module.exports = handleApiRoute(
       }
     }
 
-    sendJSON(res, {
+    res.status(200).json({
       ok: true,
       numero: resultadoCotizacion?.numero || undefined,
       estimacion: resultadoCotizacion?.estimacion || undefined
