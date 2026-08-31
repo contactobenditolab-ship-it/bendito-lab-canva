@@ -1,6 +1,14 @@
 
 // ── CARRUSEL ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function(){
+// Se ejecuta síncrono, sin esperar a DOMContentLoaded: #c-track/#c-dots/
+// #carousel ya existen en el HTML por encima de este <script> (line ~393),
+// así que no hace falta esperar. Esperar rompía window.cPrev/cNext: ese
+// listener solo se dispara DESPUÉS de que el parser llegue al final del
+// documento — es decir, después de que index-3.js (cargado más abajo)
+// ya haya intentado enganchar los botones de flecha con
+// cArrowPrev.addEventListener('click', cPrev), lanzando
+// "ReferenceError: cPrev is not defined" y abortando el resto de ese
+// script (incluido el enganche del botón "Solicitar cotización").
 (function(){
   var track = document.getElementById('c-track');
   var dotsEl = document.getElementById('c-dots');
@@ -41,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
   start();
 })();
-}); // end DOMContentLoaded carrusel
 
 // ── NAV MOBILE ────────────────────────────────────────────
 function toggleNav(){

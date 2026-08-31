@@ -335,47 +335,151 @@ ${PIE}
 </html>`;
 }
 
-
-// Refactorizado con handleApiRoute
-const { handleApiRoute, sendJSON, sendError } = require('../lib/common');
-
-module.exports = handleApiRoute(
-  async (req, res) => {
-    try {
-      const { id } = req.query;
-      if (!id) {
-        return sendError(res, 'Missing id parameter', 400);
-      }
-
-      const client = client(); // Función client() ya está arriba
-      const { data: articulo, error } = await client
-        .from('catalogo_articulos')
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (error || !articulo) {
-        return sendError(res, 'Product not found', 404);
-      }
-
-      // Enrich with pricing if requested
-      if (req.query.conPrecios) {
-        const precios = await calcularPreciosDesde([articulo]);
-        if (precios && precios.length > 0) {
-          articulo.precios = precios[0].precios;
-        }
-      }
-
-      sendJSON(res, articulo);
-    } catch (e) {
-      console.error('Product fetch error:', e.message);
-      return sendError(res, 'Failed to fetch product', 500);
-    }
-  },
-  {
-    allowedMethods: ['GET'],
-    requiresAuth: false,
-    rateLimit: { maxRequests: 200, windowMs: 60000 },
-    logging: true
+module.exports = async function handler(req, res) {
+  const idParam = String(req.query.id || '');
+  const match = idParam.match(UUID_RE);
+  if (!match) {
+    res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.end(paginaNoEncontrada());
   }
-);
+  const id = match[0];
+
+  try {
+    const supabase = client();
+    const { data: base, error } = await supabase
+      .from('catalogo_articulos')
+      .select(CAMPOS_PUBLICOS)
+      .eq('id', id)
+      .eq('visible_web', true)
+      .maybeSingle();
+    if (error) throw error;
+
+    if (!base) {
+      res.status(404).setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.end(paginaNoEncontrada());
+    }
+
+    const [a] = await enriquecerArticulos(supabase, [base]);
+
+    const slug = slugificar(a.nombre) || 'producto';
+    const url = `https://www.benditolab.com/producto/${slug}-${a.id}`;
+    const titulo = `${a.nombre} · Bendito Lab`;
+    const descripcionBase =
+      a.descripcion_corta ||
+      a.descripcion ||
+      `${a.nombre}, personalizable para empresas y eventos. Pide presupuesto sin compromiso.`;
+    const descripcion = descripcionBase.length > 160 ? descripcionBase.slice(0, 157) + '...' : descripcionBase;
+    const imagen = a.imagen_principal_url || 'https://www.benditolab.com/logo-bendito.png';
+
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: a.nombre,
+      description: descripcionBase,
+      image: a.imagen_principal_url ? [a.imagen_principal_url] : undefined,
+      category: a.categoria || undefined,
+      brand: a.marca ? { '@type': 'Brand', name: a.marca } : undefined,
+    };
+
+    const atributos = [
+      ['Material', a.material],
+      ['Medidas', a.medidas],
+      ['Capacidad', a.capacidad],
+      ['Formato', a.formato],
+      ['Acabados', a.acabados],
+      [
+        'Personalización',
+        a.tecnicas_personalizacion && a.tecnicas_personalizacion.length
+          ? a.tecnicas_personalizacion.join(', ')
+          : null,
+      ],
+      [
+        'Medida máxima de personalización',
+        a.personalizacion_ancho_max_cm && a.personalizacion_alto_max_cm
+          ? `${a.personalizacion_ancho_max_cm} × ${a.personalizacion_alto_max_cm} cm`
+          : a.superficie_max_personalizacion || null,
+      ],
+    ].filter(([, valor]) => !!valor);
+
+    const guiaEsImagen = /^https?:\/\/.+\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(a.guia_tallas || '');
+    const tablaTallas = !guiaEsImagen ? parseTablaTallas(a.guia_tallas) : null;
+    const guiaTallasHtml = !a.guia_tallas
+      ? ''
+      : guiaEsImagen
+      ? `<div class="md-talla"><span class="prod-field-label">Guía de tallas</span><img src="${escapeHtml(a.guia_tallas)}" alt="Guía de tallas" style="max-width:100%;border-radius:8px;"></div>`
+      : tablaTallas
+      ? `<div class="md-talla"><span class="prod-field-label">Guía de tallas</span>${renderTablaTallasHtml(tablaTallas)}</div>`
+      : `<div class="md-talla"><span class="prod-field-label">Guía de tallas</span><p class="prod-desc">${escapeHtml(a.guia_tallas).replace(/\n/g, '<br>')}</p></div>`;
+
+    // Ficha estática básica para buscadores/vistas previas sin JS —
+    // catalogo-producto.js la sustituye por la versión interactiva
+    // (renderFichaProducto, con pestañas y calculadora) en cuanto carga.
+    const contenidoFicha = `
+      <div class="prod-wrap">
+        <div class="prod-gallery"><div class="prod-img"><img src="${escapeHtml(imagen)}" alt="${escapeHtml(a.nombre)}"></div></div>
+        <div class="prod-info">
+          ${a.categoria ? `<div class="prod-eyebrow"><span>${escapeHtml(a.categoria)}</span>${a.subcategoria ? `<span class="dot"></span><span>${escapeHtml(a.subcategoria)}</span>` : ''}</div>` : ''}
+          <h1 class="prod-titulo">${escapeHtml(a.nombre)}</h1>
+          ${descripcionBase ? `<p class="prod-desc">${escapeHtml(descripcionBase)}</p>` : ''}
+          ${a.colores && a.colores.length ? `<p class="prod-desc"><strong>Colores disponibles:</strong> ${escapeHtml(a.colores.join(', '))}</p>` : ''}
+          ${a.tallas && a.tallas.length ? `<p class="prod-desc"><strong>Tallas disponibles:</strong> ${escapeHtml(a.tallas.join(', '))}</p>` : ''}
+          ${guiaTallasHtml}
+          ${atributos.length ? atributos.map(([l, v]) => `<div><div class="prod-field-label">${escapeHtml(l)}</div><p style="margin:0;font-size:14px;color:var(--deep);opacity:.8;">${escapeHtml(v)}</p></div>`).join('') : ''}
+          <div class="md-calc" id="md-calc"></div>
+          <div class="prod-ctas"><button type="button" class="btn btn-primary" id="btn-presupuesto-desde-detalle">Pedir presupuesto</button></div>
+          <p class="mp-precio-aprox">Precio aproximado. El presupuesto final puede variar según diseño y detalles del pedido.</p>
+        </div>
+      </div>`;
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(titulo)}</title>
+<meta name="description" content="${escapeHtml(descripcion)}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="${url}">
+<meta property="og:title" content="${escapeHtml(titulo)}">
+<meta property="og:description" content="${escapeHtml(descripcion)}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${escapeHtml(imagen)}">
+<meta property="og:type" content="product">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(titulo)}">
+<meta name="twitter:description" content="${escapeHtml(descripcion)}">
+<meta name="twitter:image" content="${escapeHtml(imagen)}">
+<script type="application/ld+json">${jsonParaScript(jsonLd)}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>${ESTILOS}</style>
+<link rel="icon" type="image/svg+xml" href="/images/eye-logo.svg">
+<link rel="apple-touch-icon" href="/icon-web-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-web-32.png">
+<link rel="manifest" href="/manifest.json">
+<script src="/js/bl-api.js" defer></script>
+</head>
+<body>
+${CABECERA}
+<section class="ficha-seccion">
+  <a class="volver" href="/catalogo">← Volver al catálogo</a>
+  <div class="md-box" id="md-contenido">${contenidoFicha}</div>
+</section>
+${PIE}
+<script type="application/json" id="datos-articulo">${jsonParaScript(a)}</script>
+<script src="/js/catalogo-1.js"></script>
+<script src="/js/catalogo-comun.js"></script>
+<script src="/js/catalogo-producto.js"></script>
+</body>
+</html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    return res.status(200).end(html);
+  } catch (e) {
+    console.error('Error generando página de producto:', e.message);
+    res.status(500).setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.end('<!DOCTYPE html><html><body>No se pudo cargar el producto. Inténtalo de nuevo.</body></html>');
+  }
+};
