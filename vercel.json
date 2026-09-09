@@ -44,6 +44,13 @@
       "continue": true
     },
     {
+      "src": "/formulario/.*",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow"
+      },
+      "continue": true
+    },
+    {
       "src": "/articulo-.*",
       "headers": {
         "X-Robots-Tag": "noindex, follow"
@@ -123,6 +130,10 @@
     {
       "src": "/newsletter-como-trabajamos",
       "dest": "/newsletter-como-trabajamos.html"
+    },
+    {
+      "src": "/formulario/([A-Za-z0-9]+)",
+      "dest": "https://app.benditolab.com/compartible/formulario/$1"
     },
     {
       "src": "/(.*)",
