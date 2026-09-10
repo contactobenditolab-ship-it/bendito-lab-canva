@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
 
       if (tabla === 'calc_precios') {
         const { data, error } = await supabase
-          .from('calc_precios').select('contenido').eq('id', 1).single();
+          .from('calc_precios').select('contenido').eq('id', 1).maybeSingle();
         if (error) throw error;
         return res.status(200).json({ data: data ? data.contenido : {} });
       }

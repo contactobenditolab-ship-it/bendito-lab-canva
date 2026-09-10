@@ -194,31 +194,11 @@ function margenPorTramo(cantidad, tramos) {
   return Math.max(margen, MARGEN_MINIMO);
 }
 
-// Info de tramos por cantidad para mostrar al cliente (nunca el margen en
-// sí, solo cantidades y precios ya calculados — ver cabecera del fichero).
-// Si el artículo tiene margen_pct_b2b fijo (y no hay override de tramos),
-// no hay tramos: precio plano.
-// NOTA: Esta función AÚN llama precioUnitarioProducto para cada tramo,
-// lo que sería ineficiente si fuese local. Pero ahora precisoUnitarioProducto
-// llama la API, que cachea globalmente, así que está bien.
-async function infoTramos(articulo, cantidad, articulo_id) {
-  // Resolver tramos desde contexto fue removido — ahora todo va a través de API
-  // Por ahora, devolver tabla vacía (el cliente solo ve precio actual)
-  // TODO: Si queremos mostrar tabla de tramos, hay que hacerlo desde API también
-  return { tiene_tramos: false, tabla: [] };
-  // daría un "descuento" negativo. Se acota a 0 en vez de dejarlo pasar: la
-  // UI solo pinta la línea de ahorro si es > 0, así que un valor negativo se
-  // ocultaba en vez de avisar de la configuración anómala.
-  const descuentoPct = precioSinDescuento > 0
-    ? Math.max(0, Math.round((1 - precioActual / precioSinDescuento) * 100))
-    : 0;
-  return {
-    tiene_tramos: true,
-    tabla,
-    cantidad_min_tramo_actual: tramoActual.cantidadMin,
-    descuento_pct: descuentoPct,
-  };
-}
+// La tabla de tramos por cantidad (antes calculada aquí, en infoTramos) se
+// migró a la API centralizada de bendito-os y todavía no expone ese
+// desglose — ver el objeto `tramos` fijo en calcularPrecio más abajo.
+// TODO: si se quiere volver a mostrar la tabla de tramos al cliente, hay
+// que pedirla también a esa API.
 
 // Precio unitario de una técnica de personalización según tramo de cantidad.
 // ── Precios derivados de fichas_costes (Bendito OS: /catalogo/fichas-tecnicas
