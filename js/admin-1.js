@@ -1166,7 +1166,7 @@ async function gcPublicar() {
       // Reemplazar cada variable de color en el :root
       Object.keys(colors).forEach(function(cssVar) {
         // Busca patrones tipo: --baby: #XXXXXX; o --baby:#XXXXXX;
-        var regex = new RegExp('(' + cssVar.replace('--','--') + '\s*:\s*)#[0-9A-Fa-f]{3,8}', 'g');
+        var regex = new RegExp('(' + cssVar + '\\s*:\\s*)#[0-9A-Fa-f]{3,8}', 'g');
         html = html.replace(regex, '$1' + colors[cssVar]);
       });
 
