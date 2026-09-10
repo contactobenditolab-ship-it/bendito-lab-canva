@@ -291,6 +291,10 @@ const { handleApiRoute } = require('../lib/common');
 
 module.exports = handleApiRoute(
   async (req, res) => {
+    if (!(await dentroDelLimite('contact:' + ipDesdeRequest(req), 8, 15 * 60 * 1000))) {
+      return res.status(429).json({ ok: false, error: 'Demasiadas solicitudes, inténtalo más tarde' });
+    }
+
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
@@ -364,7 +368,6 @@ module.exports = handleApiRoute(
   {
     allowedMethods: ['POST'],
     requiresAuth: false,
-    rateLimit: { maxRequests: 8, windowMs: 15 * 60 * 1000 },
     logging: true
   }
 );
