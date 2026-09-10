@@ -16,8 +16,15 @@ document.querySelectorAll('.site-nav a').forEach(function(a){
   }
 })();
 
+// enviandoContacto: btn.disabled por sí solo no basta en móvil — un doble
+// tap casi simultáneo puede disparar dos eventos "submit" antes de que
+// disabled surta efecto visualmente (mismo problema y mismo fix que
+// enviandoPresupuesto en catalogo-comun.js).
+var enviandoContacto = false;
 document.getElementById('contacto-form').addEventListener('submit', async function(e){
   e.preventDefault();
+  if (enviandoContacto) return;
+  enviandoContacto = true;
   var form = e.target;
   var f = new FormData(form);
   var errEl = document.getElementById('contacto-error');
