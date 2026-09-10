@@ -1039,7 +1039,15 @@ async function subirImgBanner(input, i) {
   reader.onload = async function(e) {
     var b64 = e.target.result.split(',')[1];
     try {
-      await ghPut(newPath, b64, 'Admin: imagen banner');
+      // newPath incluye Date.now(), así que hoy nunca colisiona con un
+      // archivo existente — pero si en el futuro se reutiliza el mismo path
+      // (p.ej. para no acumular imágenes de banners en el repo), ghPut
+      // necesitaría el sha del archivo existente para poder sobrescribirlo
+      // (la API de GitHub lo exige). Se intenta leer primero; un 404 (no
+      // existe todavía) es el caso normal y se ignora.
+      var sha;
+      try { sha = (await ghGet(newPath)).sha; } catch (e2) { /* no existe: se crea nuevo */ }
+      await ghPut(newPath, b64, 'Admin: imagen banner', sha);
       BANNERS[i].imagen = newPath;
       sessionStorage.setItem('bl-banners', JSON.stringify(BANNERS));
       showToast('✓ Imagen subida. Edita el banner para verla.');
