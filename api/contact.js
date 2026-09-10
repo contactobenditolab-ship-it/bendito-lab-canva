@@ -132,7 +132,7 @@ async function enviarContactoEmail(data) {
     from: 'Bendito Lab <no-reply@benditolab.com>',
     to: 'contacto@benditolab.com',
     subject: `Nuevo contacto web: ${data.nombre}`,
-    html: `<h2>Nuevo mensaje de contacto</h2>${filas}`,
+    html: `<img src="${SITE_BASE}/icon-web-32.png" alt="" width="24" height="24" style="display:block;margin-bottom:8px;"><h2>Nuevo mensaje de contacto</h2>${filas}`,
   };
   if (esEmailValido(data.email)) {
     emailPayload.reply_to = data.email;
@@ -161,7 +161,8 @@ async function enviarContactoEmail(data) {
           from: 'Bendito Lab <no-reply@benditolab.com>',
           to: data.email,
           subject: asuntoConfirmacion,
-          html: `<h2>¡Gracias por escribirnos, ${escapeHtml(data.nombre)}!</h2>
+          html: `<img src="${SITE_BASE}/icon-web-32.png" alt="" width="24" height="24" style="display:block;margin-bottom:8px;">
+<h2>¡Gracias por escribirnos, ${escapeHtml(data.nombre)}!</h2>
 <p>Hemos recibido tu consulta y te responderemos en menos de 24 horas.</p>
 <p>Mientras tanto, échale un vistazo a nuestra newsletter de ${escapeHtml(newsletter.etiqueta)}:</p>
 <p><a href="${SITE_BASE}${newsletter.path}">${SITE_BASE}${newsletter.path}</a></p>`,
@@ -183,7 +184,8 @@ async function enviarColaboradorConfirmacion(data) {
       from: 'Bendito Lab <no-reply@benditolab.com>',
       to: data.email,
       subject: asuntoConfirmacion,
-      html: `<h2>¡Gracias por tu solicitud, ${escapeHtml(data.nombre)}!</h2>
+      html: `<img src="${SITE_BASE}/icon-web-verde-32.png" alt="" width="24" height="24" style="display:block;margin-bottom:8px;">
+<h2>¡Gracias por tu solicitud, ${escapeHtml(data.nombre)}!</h2>
 <p>Hemos recibido tu solicitud para unirte al programa de colaboradores de Bendito Lab. Estamos revisando tu perfil y te contactaremos en breve.</p>
 <p>Mientras tanto, aquí te contamos cómo funciona la colaboración:</p>
 <p><a href="${SITE_BASE}/newsletter-colaboradores.html">${SITE_BASE}/newsletter-colaboradores.html</a></p>`,
