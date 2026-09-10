@@ -1,0 +1,21 @@
+name: Health Check
+
+# Comprueba cada 15 minutos que los endpoints públicos clave del sitio
+# responden correctamente (ver scripts/monitor.js) y avisa por Telegram si
+# algo falla. Requiere los secretos del repo TELEGRAM_BOT_TOKEN y
+# TELEGRAM_CHAT_ID (Settings → Secrets and variables → Actions) — ver
+# MONITORING.md para cómo obtenerlos.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/monitor.js
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
