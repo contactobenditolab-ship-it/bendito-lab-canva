@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bendito Lab Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/studio.css">
+</head>
+<body>
+  <div class="studio" id="studio">
+    <header class="studio-topbar">
+      <div class="brand"><span class="brand-mark">●</span><strong>BENDITO LAB</strong><span class="brand-product">STUDIO</span></div>
+      <div class="context" id="contextLabel">PÁGINA WEB <span>/</span> Inicio</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="undoBtn" title="Deshacer">↶</button>
+        <button class="icon-btn" id="redoBtn" title="Rehacer">↷</button>
+        <span class="save-state" id="saveState">Guardado</span>
+        <button class="secondary-btn" id="previewBtn">Vista previa</button>
+        <button class="primary-btn" id="publishBtn">Publicar</button>
+        <button class="mobile-menu" id="mobileMenuBtn">☰</button>
+      </div>
+    </header>
+
+    <div class="studio-body">
+      <aside class="nav-panel" id="navPanel">
+        <div class="nav-title">Studio</div>
+        <button class="nav-item active" data-section="pages">📄 <span>Páginas</span></button>
+        <button class="nav-item" data-section="newsletters">✉️ <span>Newsletters</span></button>
+        <button class="nav-item" data-section="library">🖼️ <span>Biblioteca</span></button>
+        <button class="nav-item" data-section="products">🛍️ <span>Productos</span></button>
+        <button class="nav-item" data-section="settings">⚙️ <span>Configuración</span></button>
+        <div class="nav-divider"></div>
+        <div class="nav-caption">PÁGINAS</div>
+        <div id="pageList">
+          <button class="sub-item active" data-page="portada.html" data-name="Inicio">Inicio</button>
+          <button class="sub-item" data-page="bendito-lab.html" data-name="Bendito Lab">Bendito Lab</button>
+          <button class="sub-item" data-page="dilo-bonito.html" data-name="Dilo Bonito">Dilo Bonito</button>
+          <button class="sub-item" data-page="colaboradores.html" data-name="Colaboradores">Colaboradores</button>
+          <button class="sub-item" data-page="contacto.html" data-name="Contacto">Contacto</button>
+        </div>
+        <div class="nav-caption newsletter-caption">NEWSLETTERS</div>
+        <div id="newsletterList" hidden>
+          <button class="sub-item" data-newsletter="empresas" data-name="Empresas">Empresas</button>
+          <button class="sub-item" data-newsletter="eventos" data-name="Eventos">Eventos</button>
+          <button class="sub-item" data-newsletter="club" data-name="Club">Club</button>
+        </div>
+      </aside>
+
+      <main class="canvas-area">
+        <div class="canvas-toolbar">
+          <div class="device-switcher" aria-label="Vista responsive">
+            <button class="device active" data-device="desktop">🖥 Escritorio</button>
+            <button class="device" data-device="tablet">Tablet</button>
+            <button class="device" data-device="mobile">📱 Móvil</button>
+          </div>
+          <div class="toolbar-hint">Selecciona un elemento para editarlo</div>
+        </div>
+        <div class="canvas-scroll">
+          <div class="web-canvas" id="webCanvas">
+            <iframe id="pageFrame" title="Editor de página web" src="/portada.html?admin=1"></iframe>
+          </div>
+        </div>
+      </main>
+
+      <aside class="inspector" id="inspector">
+        <div class="inspector-head"><strong id="inspectorTitle">Página</strong><button id="closeInspector" class="close-btn">×</button></div>
+        <div class="inspector-tabs"><button class="active">Contenido</button><button>Estilo</button><button>Avanzado</button></div>
+        <div class="inspector-empty" id="inspectorEmpty">
+          <div class="empty-icon">✦</div>
+          <strong>Selecciona un elemento</strong>
+          <p>Haz clic en un texto, imagen, botón o sección del lienzo para editarlo.</p>
+        </div>
+        <div class="inspector-content" id="inspectorContent" hidden>
+          <label>Texto</label><textarea id="textField" rows="4" placeholder="Contenido"></textarea>
+          <label>Enlace</label><input id="linkField" type="text" placeholder="URL o página existente">
+          <div class="field-row"><div><label>Color</label><input id="colorField" type="color" value="#17233F"></div><div><label>Tamaño</label><input id="sizeField" type="number" value="16" min="8" max="120"></div></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="mobile-sheet" id="mobileSheet">
+      <button class="sheet-handle" id="sheetClose">⌄</button>
+      <div class="sheet-title">Bendito Lab Studio</div>
+      <button data-section="pages">📄 Páginas</button>
+      <button data-section="newsletters">✉️ Newsletters</button>
+      <button data-section="library">🖼️ Biblioteca</button>
+      <button data-section="products">🛍️ Productos</button>
+      <button data-section="settings">⚙️ Configuración</button>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <script src="/js/studio.js"></script>
+</body>
+</html>
