@@ -35,7 +35,3 @@ Al tocar código compartido (funciones en `js/*-comun.js`, estilos globales, end
 - No repitas una comprobación de estado (CI, deploy) más de lo necesario. Espacia los reintentos varios minutos, no segundos, y usa el detalle por pasos en vez de re-consultar el estado agregado en bucle cuando algo "parece atascado" — a veces solo va con retraso en la API, no está realmente parado.
 - Antes de lanzar una investigación cara (subagentes, muchas llamadas de red), comprueba primero la hipótesis más barata (un `grep`, leer el archivo directamente).
 - No relances un subagente para rehacer o releer trabajo que ya se hizo en la misma sesión.
-
-## Pendiente: sitemap.xml no incluye los productos
-
-`sitemap.xml` es un fichero estático con las páginas fijas del sitio; no lista los artículos del catálogo, que ahora tienen página propia indexable en `/producto/<slug>-<id>` (ver `api/producto.js`, añadido el 2026-08-13). Mientras tanto Google los descubre por rastreo normal (enlaces desde `/catalogo` y el propio `/producto/...`), pero para que se indexen más rápido haría falta generar el sitemap dinámicamente a partir de `catalogo_articulos` (`visible_web = true`), por ejemplo sirviéndolo desde un endpoint (`api/sitemap.js`) en vez de un archivo estático.

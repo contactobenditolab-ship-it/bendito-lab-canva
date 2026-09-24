@@ -96,6 +96,10 @@
       "dest": "/api/producto?id=$1"
     },
     {
+      "src": "/sitemap\\.xml",
+      "dest": "/api/sitemap"
+    },
+    {
       "src": "/area-clientes",
       "dest": "/area-clientes.html"
     },
