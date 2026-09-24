@@ -1,5 +1,5 @@
 // js/bl-api.js — Cliente compartido para APIs seguras de Bendito Lab
-// v2: todos los datos van a /api/db (Supabase). No hay backend de Apps Script.
+// Sesión del admin (token de /api/auth) y envío de formularios a /api/contact.
 (function (global) {
   const TOKEN_KEY = 'bl_session_token';
 
@@ -30,27 +30,6 @@
     return d.ok === true;
   }
 
-  // ── SUPABASE (datos) ─────────────────────────────────────
-  async function dbGet(params) {
-    const qs = new URLSearchParams(params || {});
-    const r = await fetch('/api/db?' + qs.toString(), { headers: authHeaders() });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d;
-  }
-
-  async function dbPost(body) {
-    const r = await fetch('/api/db', {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify(body),
-    });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d;
-  }
-
-
   async function enviarContacto(type, data) {
     const r = await fetch('/api/contact', {
       method: 'POST',
@@ -68,9 +47,6 @@
     setToken,
     authHeaders,
     login,
-    // Supabase
-    dbGet,
-    dbPost,
     // Comunicaciones
     enviarContacto,
   };

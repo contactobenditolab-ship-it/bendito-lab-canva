@@ -1,6 +1,6 @@
 -- Ejecuta esto en Supabase → SQL Editor (mismo proyecto que ya usan
 -- bendito-os y generador-de-contenido — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY
--- ya configuradas en Vercel para este proyecto vía api/db.js).
+-- ya configuradas en Vercel para este proyecto).
 --
 -- Crea los dos buckets de Storage que sustituyen a Vercel Blob:
 -- - sitio-imagenes: fotos de sustitución del sitio (api/upload-image.js) y
