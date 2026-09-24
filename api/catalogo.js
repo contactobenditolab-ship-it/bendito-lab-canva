@@ -12,7 +12,38 @@
 // Mismo proyecto Supabase que usa Bendito OS. Sin autenticación (de solo
 // lectura salvo el cálculo, que no escribe nada).
 const { createClient } = require('@supabase/supabase-js');
-const { CAMPOS_PUBLICOS, enriquecerArticulos } = require('../lib/articulo-publico');
+const { CAMPOS_PUBLICOS, enriquecerArticulos, slugificar } = require('../lib/articulo-publico');
+
+const SITE_BASE = 'https://www.benditolab.com';
+
+// Mismas páginas fijas y prioridades que tenía el antiguo sitemap.xml
+// estático (ver ?sitemap=1 más abajo).
+const SITEMAP_PAGINAS_FIJAS = [
+  { loc: '/', changefreq: 'weekly', priority: '1.0' },
+  { loc: '/bendito-lab', changefreq: 'monthly', priority: '0.9' },
+  { loc: '/dilo-bonito', changefreq: 'monthly', priority: '0.9' },
+  { loc: '/catalogo', changefreq: 'weekly', priority: '0.9' },
+  { loc: '/contacto', changefreq: 'monthly', priority: '0.7' },
+  { loc: '/faq', changefreq: 'monthly', priority: '0.6' },
+  { loc: '/colaboradores', changefreq: 'monthly', priority: '0.6' },
+];
+
+function sitemapXmlEscape(value) {
+  return String(value).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+function sitemapUrlEntry(loc, lastmod, changefreq, priority) {
+  return (
+    '  <url>\n' +
+    '    <loc>' + sitemapXmlEscape(loc) + '</loc>\n' +
+    '    <lastmod>' + lastmod + '</lastmod>\n' +
+    '    <changefreq>' + changefreq + '</changefreq>\n' +
+    '    <priority>' + priority + '</priority>\n' +
+    '  </url>'
+  );
+}
 
 let cachedClient = null;
 function client() {
@@ -296,6 +327,47 @@ module.exports = async function handler(req, res) {
   const supabase = client();
 
   if (req.method === 'GET') {
+    // sitemap.xml dinámico (vercel.json enruta /sitemap.xml aquí): vive en
+    // este endpoint, no en uno propio, porque el plan Hobby de Vercel tiene
+    // un límite de 12 Serverless Functions por deployment y ya estaba al
+    // límite — ver "Vercel" en AGENTS.md/CLAUDE.md y el mismo motivo ya
+    // documentado en api/contact.js para "upload-logo".
+    if (req.query.sitemap === '1') {
+      const hoy = new Date().toISOString().slice(0, 10);
+      let articulos = [];
+      try {
+        const { data, error } = await supabase
+          .from('catalogo_articulos')
+          .select('id, nombre, updated_at')
+          .eq('visible_web', true);
+        if (error) throw error;
+        articulos = data || [];
+      } catch (e) {
+        // Fail-open: si Supabase falla, se sirve igualmente el sitemap con
+        // las páginas fijas en vez de un 500 (mejor incompleto que ninguno).
+        console.error('Error cargando artículos para sitemap:', e.message);
+      }
+
+      const entradasFijas = SITEMAP_PAGINAS_FIJAS.map((p) =>
+        sitemapUrlEntry(SITE_BASE + p.loc, hoy, p.changefreq, p.priority)
+      );
+      const entradasProducto = articulos.map((a) => {
+        const slug = slugificar(a.nombre) || 'producto';
+        const lastmod = a.updated_at ? a.updated_at.slice(0, 10) : hoy;
+        return sitemapUrlEntry(SITE_BASE + '/producto/' + slug + '-' + a.id, lastmod, 'weekly', '0.8');
+      });
+
+      const xml =
+        '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+        entradasFijas.concat(entradasProducto).join('\n') +
+        '\n</urlset>\n';
+
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+      return res.status(200).end(xml);
+    }
+
     // Metadatos públicos para la calculadora: nombres de técnicas y extras
     // con sus precios (estos SÍ son públicos, ya son precios de venta).
     if (req.query.meta === 'personalizacion') {

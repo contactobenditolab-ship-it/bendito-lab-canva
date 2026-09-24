@@ -97,7 +97,7 @@
     },
     {
       "src": "/sitemap\\.xml",
-      "dest": "/api/sitemap"
+      "dest": "/api/catalogo?sitemap=1"
     },
     {
       "src": "/area-clientes",
