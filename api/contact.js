@@ -277,9 +277,12 @@ async function enviarCotizacionAOS(data) {
     const detalle = await r.text().catch(() => '');
     throw new Error('Bendito OS respondió ' + r.status + ': ' + detalle);
   }
-  // { ok, numero, estimacion } — usado por el catálogo para la pantalla de
-  // confirmación (número de referencia + precio estimado).
-  return r.json().catch(() => ({}));
+  // Bendito OS responde { success, data: { numero, estimacion } } (patrón
+  // handleApiRoute). Se desenvuelve "data" para la pantalla de confirmación
+  // del catálogo (referencia SOL-XXXXXX + precio estimado); antes se leía
+  // numero/estimacion en el primer nivel y siempre llegaban undefined.
+  const j = await r.json().catch(() => ({}));
+  return (j && j.data) || {};
 }
 
 
