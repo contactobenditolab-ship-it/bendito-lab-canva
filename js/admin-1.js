@@ -370,11 +370,18 @@ function saveAll(){
   broadcastToPortada(buildPortadaData());
 
   // Guardar precios de calculadora en Supabase
+  // Este panel ya no tiene los campos de la calculadora (CALC_FIELDS no
+  // existen en admin.html), así que getCalcPrecios() devuelve {} y guardarlo
+  // vaciaba calc_precios entero en cada "Guardar todo" — pasó el 2026-09-12.
+  // La calculadora se edita ahora desde el editor visual; aquí solo se
+  // guarda si de verdad hay campos en la página.
   var calcP = getCalcPrecios();
-  BL_API.dbPost({ accion: 'guardarCalcPrecios', datos: calcP }).then(function(d){
-    if (d.ok) console.log('Precios calculadora guardados en Supabase ✓');
-    else console.warn('Error guardando precios calculadora:', d.error);
-  }).catch(function(e){ console.warn('Error Supabase calc-precios:', e); });
+  if (Object.keys(calcP).length) {
+    BL_API.dbPost({ accion: 'guardarCalcPrecios', datos: calcP }).then(function(d){
+      if (d.ok) console.log('Precios calculadora guardados en Supabase ✓');
+      else console.warn('Error guardando precios calculadora:', d.error);
+    }).catch(function(e){ console.warn('Error Supabase calc-precios:', e); });
+  }
 
   dirty=false;
   document.getElementById('dirty').classList.remove('on');
