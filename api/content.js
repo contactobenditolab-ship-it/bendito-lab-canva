@@ -4,7 +4,7 @@ const { readContent } = require('../lib/content-store');
 const { requireAuth } = require('../lib/auth');
 const { supabaseServiceClient: supabaseClient } = require('../lib/common');
 
-/** Lee la tabla sitio_imagenes y la vuelve a las dos formas {images, imageView} que ya esperan bl-images.js y admin.html. */
+/** Lee la tabla sitio_imagenes y la vuelve a las dos formas {images, imageView} que esperan bl-images.js y el editor visual. */
 async function leerImagenes() {
   const { data, error } = await supabaseClient().from('sitio_imagenes').select('slot, url, zoom_s, zoom_x, zoom_y');
   if (error) throw error;
