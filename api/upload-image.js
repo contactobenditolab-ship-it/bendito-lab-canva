@@ -1,9 +1,9 @@
 // POST /api/upload-image (auth) — sube una imagen a Supabase Storage (bucket
 // sitio-imagenes) y actualiza el mapa de contenido para el slot indicado.
 // Body JSON: { path, dataUrl }. `path` es el id del slot (p.ej.
-// "images/hero.jpg", el mismo valor que ya usa admin.html en IMG_GROUPS).
+// "portada/carrusel-1", el data-slot de la foto en la página).
 // `dataUrl` es un data: URL base64 ya redimensionado en el cliente (ver
-// resizeImageToDataUrl en admin.html).
+// resizeImageToDataUrl en el editor visual).
 const { requireAuth } = require('../lib/auth');
 const { supabaseServiceClient, supabaseStorageDeleteByUrl } = require('../lib/common');
 
