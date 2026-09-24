@@ -25,6 +25,11 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 values ('sitio-imagenes', 'sitio-imagenes', true, 4194304, array['image/jpeg','image/png','image/webp','image/gif','image/svg+xml'])
 on conflict (id) do nothing;
 
+-- sitio-fuentes: tipografías subidas desde el editor visual (api/upload-font.js).
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('sitio-fuentes', 'sitio-fuentes', true, 4194304, array['font/woff2','font/woff','font/ttf','font/otf'])
+on conflict (id) do nothing;
+
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('sitio-contenido', 'sitio-contenido', true, 1048576, array['application/json'])
 on conflict (id) do nothing;

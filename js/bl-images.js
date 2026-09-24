@@ -8,7 +8,7 @@
     return (src || '').replace(/^\.?\//, '').split('?')[0];
   }
 
-  var CONTENT = { images: {}, imageView: {}, colors: {}, texts: {}, links: {} };
+  var CONTENT = { images: {}, imageView: {}, colors: {}, texts: {}, links: {}, fonts: [], textFonts: {} };
 
   // Cache en localStorage del último /api/content recibido: en la primera
   // visita no hay nada que hacer (toca esperar al fetch), pero en visitas
@@ -134,6 +134,31 @@
     });
   }
 
+  // Tipografías subidas desde el editor visual (api/upload-font.js): un
+  // @font-face por cada una, en un <style> propio que se rehace entero.
+  function applyFonts(fonts) {
+    var css = (fonts || []).map(function (f) {
+      if (!f || !f.name || !f.url) return '';
+      return "@font-face{font-family:'" + f.name + "';src:url('" + f.url + "')" +
+        (f.format ? " format('" + f.format + "')" : '') + ';font-display:swap;}';
+    }).join('');
+    var tag = document.getElementById('bl-fonts');
+    if (!tag) {
+      tag = document.createElement('style');
+      tag.id = 'bl-fonts';
+      document.head.appendChild(tag);
+    }
+    tag.textContent = css;
+  }
+
+  // Tipografía elegida para cada bloque [data-edit] (valor de font-family).
+  function applyTextFonts(textFonts) {
+    document.querySelectorAll('[data-edit]').forEach(function (el) {
+      var font = textFonts[el.getAttribute('data-edit')];
+      if (font) el.style.fontFamily = font;
+    });
+  }
+
   // Aplica de inmediato lo último visto (sin esperar red) para no enseñar la
   // foto/textos por defecto del HTML estático ni un instante en visitas
   // repetidas; el fetch de abajo la sustituye por la versión fresca en
@@ -145,6 +170,8 @@
     if (cache.colors) applyColors(cache.colors);
     if (cache.texts) applyTexts(cache.texts);
     if (cache.links) applyLinks(cache.links);
+    if (cache.fonts) applyFonts(cache.fonts);
+    if (cache.textFonts) applyTextFonts(cache.textFonts);
   }
 
   fetch('/api/content', { cache: 'no-store' })
@@ -155,11 +182,15 @@
       CONTENT.colors = (data && data.colors) || {};
       CONTENT.texts = (data && data.texts) || {};
       CONTENT.links = (data && data.links) || {};
+      CONTENT.fonts = (data && data.fonts) || [];
+      CONTENT.textFonts = (data && data.textFonts) || {};
       applyImages(CONTENT.images);
       applyImageViews(CONTENT.imageView);
       applyColors(CONTENT.colors);
       applyTexts(CONTENT.texts);
       applyLinks(CONTENT.links);
+      applyFonts(CONTENT.fonts);
+      applyTextFonts(CONTENT.textFonts);
       guardarContentCache(CONTENT);
     })
     .catch(function () {});
