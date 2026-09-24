@@ -160,6 +160,7 @@ var EDITOR_PAGINAS = [
   {archivo:'colaboradores.html',nombre:'Colaboradores',     color:'#2F8FEA'},
   {archivo:'dilo-bonito.html',  nombre:'Dilo Bonito',       color:'#B6A8DB'},
   {archivo:'faq.html',          nombre:'FAQ',               color:'#9AB791'},
+  {archivo:'catalogo.html',     nombre:'Catálogo',          color:'#E3A29C'},
   {archivo:'contacto.html',     nombre:'Contacto',          color:'#E2704A'},
   {archivo:'link-bio.html',     nombre:'Link Bio (móvil)',  color:'#E2704A'},
   {archivo:'area-clientes.html',nombre:'Área Clientes',     color:'#E2704A'},
