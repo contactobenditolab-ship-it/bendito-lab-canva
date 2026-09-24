@@ -211,7 +211,7 @@ footer{background:var(--rose);}
 </head>
 <body>
 
-<header class="site-header">
+<header class="site-header" data-color-bg="catalogo.header.bg">
   <div class="header-tag">Artículos personalizados para empresas y eventos</div>
   <div class="header-logo"><a href="portada.html"><img src="logo-bendito.png" alt="Bendito Lab"></a></div>
   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
@@ -227,8 +227,8 @@ footer{background:var(--rose);}
 </header>
 
 <section class="intro">
-  <h1>Catálogo</h1>
-  <p>Todavía no tenemos tienda online — explora los artículos que trabajamos y pide presupuesto sin compromiso. Te lo preparamos a medida para tu marca o evento.</p>
+  <h1 data-edit="catalogo.hero.h1" data-color-text="catalogo.hero.h1">Catálogo</h1>
+  <p data-edit="catalogo.hero.p">Todavía no tenemos tienda online — explora los artículos que trabajamos y pide presupuesto sin compromiso. Te lo preparamos a medida para tu marca o evento.</p>
 </section>
 
 <div class="necesidades" id="necesidades" style="display:none;"></div>
@@ -245,7 +245,7 @@ footer{background:var(--rose);}
   </section>
 </div>
 
-<footer>
+<footer data-color-bg="catalogo.footer.bg">
   <div class="footer-bottom">
     <div class="footer-bottom-links">
       <img src="images/eye-logo.svg" alt="" style="height:26px;width:26px;">
@@ -271,7 +271,7 @@ footer{background:var(--rose);}
 <div id="modal-presupuesto">
   <div class="mp-box">
     <button class="btn-cerrar" id="btn-cerrar-presupuesto">✕</button>
-    <h3>Pedir presupuesto</h3>
+    <h3 data-edit="catalogo.presupuesto.title">Pedir presupuesto</h3>
     <p class="mp-producto" id="mp-producto-nombre"></p>
     <form id="presupuesto-form">
       <input class="field" name="nombre" type="text" placeholder="Nombre" required>
@@ -296,12 +296,12 @@ footer{background:var(--rose);}
         <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
         <span>Acepto que Bendito Lab guarde mis datos para gestionar esta solicitud. Consulta la <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
       </label>
-      <button type="submit" class="btn-presupuesto">ENVIAR SOLICITUD→</button>
+      <button type="submit" class="btn-presupuesto" data-edit="catalogo.presupuesto.submit">ENVIAR SOLICITUD→</button>
       <p id="presupuesto-error" style="display:none;color:#B3261E;font-size:13px;margin:0;"></p>
     </form>
     <div id="presupuesto-success" style="display:none;">
-      <h3 style="margin:0 0 4px;text-align:center;">Todo listo</h3>
-      <p style="font-size:13px;text-align:center;margin:0 0 20px;color:var(--baby);">Hemos recibido tu solicitud de presupuesto.</p>
+      <h3 style="margin:0 0 4px;text-align:center;" data-edit="catalogo.success.h3">Todo listo</h3>
+      <p style="font-size:13px;text-align:center;margin:0 0 20px;color:var(--baby);" data-edit="catalogo.success.p">Hemos recibido tu solicitud de presupuesto.</p>
 
       <div style="border:1px solid #E5DFCB;border-radius:12px;padding:18px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;" id="ps-fila-numero">
@@ -320,8 +320,8 @@ footer{background:var(--rose);}
       </div>
 
       <div style="font-size:13px;line-height:1.6;">
-        <p style="margin:0 0 4px;font-weight:700;">Qué pasa ahora</p>
-        <p style="margin:0 0 10px;color:var(--baby);">Diseñamos tu propuesta y te la mandamos por email en cuanto esté lista — normalmente en 24-48h. Si tienes cualquier duda o quieres añadir algo más, escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>.</p>
+        <p style="margin:0 0 4px;font-weight:700;" data-edit="catalogo.success.next-title">Qué pasa ahora</p>
+        <p style="margin:0 0 10px;color:var(--baby);" data-edit="catalogo.success.next-p">Diseñamos tu propuesta y te la mandamos por email en cuanto esté lista — normalmente en 24-48h. Si tienes cualquier duda o quieres añadir algo más, escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>.</p>
       </div>
     </div>
   </div>
@@ -346,5 +346,6 @@ footer{background:var(--rose);}
 <script src="js/catalogo-1.js"></script>
 <script src="js/catalogo-comun.js"></script>
 <script src="js/catalogo-2.js"></script>
+<script src="js/bl-images.js" defer></script>
 </body>
 </html>
