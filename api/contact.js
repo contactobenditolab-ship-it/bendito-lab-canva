@@ -240,6 +240,9 @@ async function enviarContactoAOS(data) {
     tipoContacto: valorUtil(data.tipo_contacto) || undefined,
     asunto: valorUtil(data.asunto) || undefined,
     mensaje: valorUtil(data.mensaje) || undefined,
+    // Casilla opcional "quiero recibir novedades": OS solo guarda el
+    // suscriptor si llega true (consentimiento expreso, LSSI art. 21).
+    newsletter: data.newsletter === true,
   };
 
   const r = await fetch(OS_CONTACTO_URL, {
@@ -262,6 +265,7 @@ async function enviarCotizacionAOS(data) {
     mensaje: valorUtil(data.mensaje) || undefined,
     articulo_id: valorUtil(data.articulo_id) || undefined,
     cantidad: data.cantidad ? Number(data.cantidad) : undefined,
+    newsletter: data.newsletter === true,
   };
 
   const r = await fetch(OS_COTIZACION_URL, {

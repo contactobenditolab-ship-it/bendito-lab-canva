@@ -38,7 +38,7 @@ document.getElementById('contacto-form').addEventListener('submit', async functi
       body: JSON.stringify({
         type: 'contacto',
         website: f.get('website'),
-        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), contacto_preferido: f.get('contacto_preferido'), tipo_contacto: f.get('tipo_contacto'), asunto: f.get('asunto'), mensaje: f.get('mensaje') }
+        data: { nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'), contacto_preferido: f.get('contacto_preferido'), tipo_contacto: f.get('tipo_contacto'), asunto: f.get('asunto'), mensaje: f.get('mensaje'), newsletter: f.get('newsletter') === 'on' }
       })
     });
     var d = await r.json();
