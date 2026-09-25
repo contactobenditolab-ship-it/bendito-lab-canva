@@ -66,10 +66,11 @@ const PRICING_API_URL = process.env.BENDITO_OS_PRICING_API || 'https://app.bendi
 // cada artículo visible (ver calcularPreciosDesde más abajo).
 const PRICING_API_BATCH_URL = PRICING_API_URL.replace(/\/calculate$/, '/calculate-batch');
 
-// El precio del producto en sí ya viene de la API (arriba). Pero el precio de
-// la TÉCNICA de personalización (DTF, láser, etc. — ver precioTecnicaDesdeFicha
-// más abajo) nunca se migró a la API porque no es por artículo, así que sigue
-// necesitando esta tabla de márgenes por defecto localmente.
+// El precio del producto en sí ya viene de la API (arriba). El de la TÉCNICA
+// de personalización lo pone el admin a mano en la ficha del producto de
+// Bendito OS (catalogo_personalizacion_tramos, ver precioTecnicaPorTramos).
+// Esta tabla de márgenes por defecto sigue haciendo falta para otros
+// cálculos locales de este archivo.
 const MARGEN_MINIMO = 0.45;
 const TRAMOS_MARGEN_DEFECTO = [
   { cantidadMin: 1, margen: 0.7 },
@@ -231,27 +232,31 @@ function margenPorTramo(cantidad, tramos) {
 // TODO: si se quiere volver a mostrar la tabla de tramos al cliente, hay
 // que pedirla también a esa API.
 
-// Precio unitario de una técnica de personalización según tramo de cantidad.
-// ── Precios derivados de fichas_costes (Bendito OS: /catalogo/fichas-tecnicas
-// y /catalogo/fichas-extras) — una sola fuente de datos, sin duplicar en
-// precios_bendito. Cada ficha trae varias líneas de coste (costes_variables);
-// se usa el coste medio de esas líneas como coste real de la técnica/extra. ──
+// ── Precio de la técnica de personalización: tramos de precio de VENTA (sin
+// IVA, por unidad) que el admin mete a mano en la ficha de cada producto en
+// Bendito OS (catalogo_personalizacion_tramos). Misma regla que
+// precioPersonalizacionPorTramo en bendito-os: el último tramo cuya
+// cantidadMin no supera la cantidad pedida. Antes se usaba la media de todas
+// las líneas de la ficha de la técnica (fichas_costes) más un margen, que
+// mezclaba medidas y cantidades: el DTF salía unas 4 veces más caro. ──
+function precioTecnicaPorTramos(tramos, cantidad) {
+  const lista = (Array.isArray(tramos) ? tramos : [])
+    .map((t) => ({ cantidadMin: Number(t && t.cantidadMin), precioUnitario: Number(t && t.precioUnitario) }))
+    .filter((t) => Number.isInteger(t.cantidadMin) && t.cantidadMin >= 1 && Number.isFinite(t.precioUnitario) && t.precioUnitario >= 0)
+    .sort((x, y) => x.cantidadMin - y.cantidadMin);
+  if (!lista.length) return null;
+  let precio = lista[0].precioUnitario;
+  for (const t of lista) {
+    if (cantidad >= t.cantidadMin) precio = t.precioUnitario;
+  }
+  return precio;
+}
+
+// Coste de una línea de una ficha de fichas_costes (la usan los extras).
 function costeTotalLinea(cv) {
   return (cv.coste_base || 0) + (cv.coste_personalizacion || 0);
 }
-function costeMedioFicha(ficha) {
-  const vars = (ficha && ficha.costes_variables) || [];
-  if (!vars.length) return 0;
-  return vars.reduce((a, cv) => a + costeTotalLinea(cv), 0) / vars.length;
-}
-// Técnicas: SÍ llevan tramos por cantidad — se reutiliza el mismo calendario
-// de márgenes (TRAMOS_MARGEN) que ya aplica al producto base, para que la
-// técnica se abarate igual que el artículo al pedir más unidades.
-function precioTecnicaDesdeFicha(ficha, cantidad, tramos) {
-  const coste = costeMedioFicha(ficha);
-  if (!coste) return 0;
-  return coste / (1 - margenPorTramo(cantidad, tramos || TRAMOS_MARGEN_DEFECTO));
-}
+
 // Extras: precio fijo (no dependen de la cantidad, igual que antes), usando
 // el margen propio de cada línea de coste de la ficha.
 function pvpMedioFicha(ficha) {
@@ -458,11 +463,11 @@ module.exports = async function handler(req, res) {
           'proveedor_id', 'grupo_tramos_id', 'moq',
         ].join(', ');
 
-        const [{ data: articulo, error: e1 }, { data: fichaTecnica }, { data: fichasExtra }] = await Promise.all([
+        const [{ data: articulo, error: e1 }, { data: preciosTecnica }, { data: fichasExtra }] = await Promise.all([
           supabase.from('catalogo_articulos').select(CAMPOS_COSTE).eq('id', articuloId).eq('visible_web', true).single(),
           nombreTecnica
-            ? supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'tecnica').eq('categoria', nombreTecnica).maybeSingle()
-            : Promise.resolve({ data: null }),
+            ? supabase.from('catalogo_personalizacion_tramos').select('tecnica, tramos').eq('articulo_id', articuloId)
+            : Promise.resolve({ data: [] }),
           extrasElegidos.length
             ? supabase.from('fichas_costes').select('categoria, costes_variables').eq('tipo', 'extra')
             : Promise.resolve({ data: [] }),
@@ -500,7 +505,17 @@ module.exports = async function handler(req, res) {
 
         let precioTecnica = 0;
         let tecnicaNombre = null;
-        if (fichaTecnica) { precioTecnica = precioTecnicaDesdeFicha(fichaTecnica, cantidad, TRAMOS_MARGEN_DEFECTO); tecnicaNombre = fichaTecnica.categoria; }
+        // Sin precios para esa técnica en el producto, no se inventa nada: el
+        // total sale sin personalización y la web avisa de que es a consultar.
+        let tecnicaSinPrecio = false;
+        if (nombreTecnica) {
+          const normalizar = (v) => String(v || '').trim().toLowerCase();
+          const fila = (preciosTecnica || []).find((p) => normalizar(p.tecnica) === normalizar(nombreTecnica));
+          const precio = fila ? precioTecnicaPorTramos(fila.tramos, cantidad) : null;
+          tecnicaNombre = fila ? fila.tecnica : nombreTecnica;
+          if (precio === null) tecnicaSinPrecio = true;
+          else precioTecnica = precio;
+        }
 
         const extrasDisponibles = fichasExtra || [];
         let extrasTotal = 0;
@@ -526,6 +541,7 @@ module.exports = async function handler(req, res) {
           tramos,
           tecnica: tecnicaNombre,
           precio_tecnica_unitario: precioTecnica,
+          tecnica_sin_precio: tecnicaSinPrecio,
           precio_unitario: precioUnitario,
           subtotal,
           extras: extrasAplicados,

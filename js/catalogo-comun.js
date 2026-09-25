@@ -461,7 +461,9 @@ async function estimacionPresupuesto(articulo, cantidad, tecnicaFormulario) {
     body: JSON.stringify({ accion: 'calcularPrecio', articulo_id: articulo.id, cantidad: cantidad, tecnica: tecnica, extras: [] })
   });
   var d = await leerRespuestaJson(r);
-  return d && d.ok && typeof d.total === 'number' ? d.total : null;
+  // Sin precio de la técnica el total sería solo el producto: mejor no
+  // enseñar una estimación que el cliente leería como precio final.
+  return d && d.ok && !d.tecnica_sin_precio && typeof d.total === 'number' ? d.total : null;
 }
 
 function mostrarConfirmacionPresupuesto(resultado) {
@@ -988,6 +990,15 @@ async function ejecutarCalculo(articuloId) {
       } else {
         personalizacionLinea = '<div class="md-calc-personalizacion">Precio desde, no incluye personalización.</div>';
       }
+    } else if (d.tecnica_sin_precio) {
+      // El producto no tiene precio para esta técnica en Bendito OS: el total
+      // es solo el producto, y se dice claro en vez de dar un total "con
+      // personalización" que no la lleva.
+      personalizacionLinea = '<div class="md-calc-personalizacion">No incluye la personalización con ' + escapeHtml(tecnica) +
+        ': te la presupuestamos aparte.</div>';
+    } else if (d.precio_tecnica_unitario > 0) {
+      personalizacionLinea = '<div class="md-calc-personalizacion">Incluye personalización con ' + escapeHtml(d.tecnica || tecnica) +
+        ' (' + d.precio_tecnica_unitario.toFixed(2) + '€/ud).</div>';
     }
 
     resEl.innerHTML =
