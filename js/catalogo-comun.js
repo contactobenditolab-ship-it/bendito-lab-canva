@@ -558,6 +558,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
           servicio: esEventos ? 'Dilo Bonito' : 'Bendito Lab', mensaje: detalles,
           articulo_id: articuloSeleccionado ? articuloSeleccionado.id : undefined,
           cantidad: f.get('cantidad') || undefined,
+          tecnica: f.get('tecnica') || undefined,
           newsletter: f.get('newsletter') === 'on',
         }
       })

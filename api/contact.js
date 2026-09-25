@@ -292,6 +292,9 @@ async function enviarCotizacionAOS(data) {
     mensaje: valorUtil(data.mensaje) || undefined,
     articulo_id: valorUtil(data.articulo_id) || undefined,
     cantidad: data.cantidad ? Number(data.cantidad) : undefined,
+    // Estructurado para que "Crear presupuesto" en Bendito OS precargue la
+    // línea (el mensaje ya lo lleva como texto).
+    tecnica: valorUtil(data.tecnica) || undefined,
     newsletter: data.newsletter === true,
   };
 
