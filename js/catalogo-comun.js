@@ -362,14 +362,72 @@ function leerArchivoComoDataUrl(file) {
   });
 }
 
-async function subirLogoPresupuesto(file) {
+// Lee la respuesta como JSON sin romper si no lo es. Vercel contesta con
+// texto/HTML cuando corta una petición antes de llegar a la función (413 si
+// el cuerpo pasa de ~4,5 MB, 504 por timeout) y r.json() lanzaba entonces
+// un error en inglés del navegador ("The string did not match the expected
+// pattern" en Safari) que acababa delante del cliente.
+async function leerRespuestaJson(r) {
+  var texto = await r.text();
+  try {
+    return JSON.parse(texto);
+  } catch (_) {
+    if (r.status === 413) throw new Error('El archivo es demasiado grande');
+    throw new Error('El servidor no respondió bien (' + r.status + ')');
+  }
+}
+
+// Límite real: Vercel rechaza cuerpos de más de ~4,5 MB y el base64 ocupa
+// un 33% más que el archivo. Por debajo de esto se sube tal cual.
+var LOGO_MAX_DATAURL = 3.5 * 1024 * 1024;
+var LOGO_LADO_MAX = 2000;
+
+// Reduce en el navegador las imágenes grandes (una foto de iPhone pesa
+// varios MB) a 2000 px de lado como mucho. Para el mockup sobra. Intenta
+// PNG primero para no perder la transparencia de un logo; si sigue siendo
+// demasiado grande, JPEG sobre fondo blanco. SVG y archivos pequeños no se
+// tocan.
+function cargarImagen(file) {
+  return new Promise(function(resolve, reject){
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function(){ URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('No se pudo leer la imagen')); };
+    img.src = url;
+  });
+}
+
+async function prepararLogo(file) {
   var dataUrl = await leerArchivoComoDataUrl(file);
+  if (file.type === 'image/svg+xml' || dataUrl.length <= LOGO_MAX_DATAURL) return dataUrl;
+
+  var img = await cargarImagen(file);
+  var escala = Math.min(1, LOGO_LADO_MAX / Math.max(img.naturalWidth, img.naturalHeight));
+  var canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.naturalWidth * escala);
+  canvas.height = Math.round(img.naturalHeight * escala);
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  var png = canvas.toDataURL('image/png');
+  if (png.length <= LOGO_MAX_DATAURL) return png;
+
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  var jpg = canvas.toDataURL('image/jpeg', 0.85);
+  if (jpg.length <= LOGO_MAX_DATAURL) return jpg;
+  throw new Error('El archivo es demasiado grande');
+}
+
+async function subirLogoPresupuesto(file) {
+  var dataUrl = await prepararLogo(file);
   var r = await fetch('/api/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'upload-logo', dataUrl: dataUrl }),
   });
-  var d = await r.json();
+  var d = await leerRespuestaJson(r);
   if (!d.ok) throw new Error(d.error || 'No se pudo subir el logo');
   return d.url;
 }
@@ -402,12 +460,22 @@ async function estimacionPresupuesto(articulo, cantidad, tecnicaFormulario) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ accion: 'calcularPrecio', articulo_id: articulo.id, cantidad: cantidad, tecnica: tecnica, extras: [] })
   });
-  var d = await r.json();
+  var d = await leerRespuestaJson(r);
   return d && d.ok && typeof d.total === 'number' ? d.total : null;
 }
 
 function mostrarConfirmacionPresupuesto(resultado) {
   var el = document.getElementById('presupuesto-success');
+
+  var avisoLogo = el.querySelector('#ps-aviso-logo');
+  if (!avisoLogo) {
+    avisoLogo = document.createElement('p');
+    avisoLogo.id = 'ps-aviso-logo';
+    avisoLogo.style.cssText = 'font-size:13px;margin:0 0 16px;padding:10px 12px;border-left:3px solid #E2704A;background:#FBF4E9;';
+    avisoLogo.textContent = 'No hemos podido adjuntar tu logo. Mándanoslo respondiendo al email de confirmación o a contacto@benditolab.com y lo añadimos al presupuesto.';
+    el.insertBefore(avisoLogo, el.firstChild.nextSibling);
+  }
+  avisoLogo.style.display = resultado.logoFallido ? 'block' : 'none';
   // Si alguna página no tiene las filas de referencia/estimación, se muestra
   // el mensaje de éxito sin ellas en vez de romper con un TypeError (que se
   // tragaba el catch del envío y dejaba el modal en blanco).
@@ -450,11 +518,20 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
   btn.disabled = true; btn.textContent = 'Enviando...';
 
   try {
+    // El logo es opcional: si no se puede subir, la solicitud sale igual
+    // (antes un logo demasiado grande hacía perder el presupuesto entero) y
+    // se avisa en el detalle y en la pantalla de confirmación.
     var logoUrl = null;
+    var logoFallido = false;
     var logoFile = form.elements.namedItem('logo').files[0];
     if (logoFile) {
       btn.textContent = 'Subiendo logo...';
-      logoUrl = await subirLogoPresupuesto(logoFile);
+      try {
+        logoUrl = await subirLogoPresupuesto(logoFile);
+      } catch (errLogo) {
+        console.error('Logo no subido:', errLogo);
+        logoFallido = true;
+      }
       btn.textContent = 'Enviando...';
     }
 
@@ -467,6 +544,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
       f.get('tecnica') ? 'Técnica: ' + f.get('tecnica') : null,
       f.get('otros_datos') ? 'Otros datos: ' + f.get('otros_datos') : null,
       logoUrl ? 'Logo: ' + logoUrl : null,
+      logoFallido ? 'Logo: no se pudo adjuntar (' + logoFile.name + '), pedírselo por email' : null,
     ].filter(Boolean).join(' · ');
 
     var esEventos = articuloSeleccionado && esArticuloEventos(articuloSeleccionado);
@@ -484,7 +562,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
         }
       })
     });
-    var d = await r.json();
+    var d = await leerRespuestaJson(r);
     if (!d.ok) throw new Error(d.error || 'Error al enviar');
     var estimacion = null;
     try {
@@ -497,7 +575,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
       // La solicitud ya está enviada: sin estimación, la fila se oculta.
     }
     form.style.display = 'none';
-    mostrarConfirmacionPresupuesto({ numero: d.numero, estimacion: estimacion });
+    mostrarConfirmacionPresupuesto({ numero: d.numero, estimacion: estimacion, logoFallido: logoFallido });
   } catch (err) {
     errEl.textContent = err.message + ' — o escríbenos directamente a contacto@benditolab.com';
     errEl.style.display = 'block';
