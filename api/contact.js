@@ -191,6 +191,33 @@ async function enviarColaboradorConfirmacion(data) {
   }
 }
 
+// Confirmación al cliente que pide presupuesto desde el catálogo: la misma
+// newsletter maquetada que ya se usa en contacto ("Hemos recibido tu
+// solicitud…"), la de empresas para Bendito Lab y la de eventos para Dilo
+// Bonito. La referencia SOL-XXXXXX que devuelve Bendito OS va en el asunto.
+// Bendito OS ya no manda su propio email al cliente, así que este es el
+// único que recibe.
+async function enviarCotizacionConfirmacion(data, numero) {
+  if (!RESEND_API_KEY || !esEmailValido(data.email)) return;
+  const esEventos = data.servicio === 'Dilo Bonito';
+  const newsletter = esEventos ? NEWSLETTER_POR_TIPO.eventos : NEWSLETTER_POR_TIPO.b2b;
+  const asunto = 'Hemos recibido tu solicitud de presupuesto' + (numero ? ' (' + numero + ')' : '') + ' · Bendito Lab';
+  const base = { from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, reply_to: 'contacto@benditolab.com', subject: asunto };
+  try {
+    const html = await obtenerNewsletterHtml(newsletter.path);
+    await enviarEmailResend({ ...base, html });
+  } catch (e) {
+    console.error('No se pudo incrustar la newsletter de ' + newsletter.etiqueta + ', se envía con enlace:', e.message);
+    await enviarEmailResend({
+      ...base,
+      html: `<h2>¡Gracias, ${escapeHtml(data.nombre)}!</h2>
+<p>Hemos recibido tu solicitud de presupuesto${numero ? ' (referencia <strong>' + escapeHtml(numero) + '</strong>)' : ''}. Te mandamos la propuesta por email en 24-48 horas.</p>
+<p>Mientras tanto, échale un vistazo a esto:</p>
+<p><a href="${SITE_BASE}${newsletter.path}">${SITE_BASE}${newsletter.path}</a></p>`,
+    });
+  }
+}
+
 async function enviarColaboradorAOS(data) {
   const esFisico = FISICOS.includes(data.tipo);
   const notas = (esFisico ? [
@@ -358,6 +385,13 @@ module.exports = handleApiRoute(
     }
 
     // Non-blocking: confirmation
+    if (type === 'cotizacion') {
+      try {
+        await enviarCotizacionConfirmacion(data, resultadoCotizacion && resultadoCotizacion.numero);
+      } catch (e) {
+        console.error('Confirmation email failed:', e.message);
+      }
+    }
     if (type === 'colaborador') {
       try {
         await enviarColaboradorConfirmacion(data);
