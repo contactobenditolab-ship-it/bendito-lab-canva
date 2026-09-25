@@ -289,13 +289,38 @@ const PIE = `
         <input type="checkbox" name="condiciones" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
         <span>Acepto que Bendito Lab guarde mis datos para gestionar esta solicitud. Consulta la <a href="#" data-modal="privacidad" style="text-decoration:underline;">política de privacidad</a>.</span>
       </label>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;">
+        <input type="checkbox" name="newsletter" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">
+        <span>Quiero recibir novedades e ideas de Bendito Lab por email. Puedes darte de baja en cualquier momento.</span>
+      </label>
       <button type="submit" class="btn-presupuesto">ENVIAR SOLICITUD→</button>
       <p id="presupuesto-error" style="display:none;color:#B3261E;font-size:13px;margin:0;"></p>
     </form>
-    <div id="presupuesto-success" style="display:none;text-align:center;padding:20px 0;">
-      <div style="font-size:34px;margin-bottom:10px;">✓</div>
-      <h3 style="margin:0 0 6px;">Hemos recibido tu mensaje</h3>
-      <p style="font-size:13px;">En breve te haremos llegar tu presupuesto, esperamos que te encante. Si tienes cualquier duda o quieres incluir algo más no dudes en contactarnos.</p>
+    <div id="presupuesto-success" style="display:none;">
+      <h3 style="margin:0 0 4px;text-align:center;">Todo listo</h3>
+      <p style="font-size:13px;text-align:center;margin:0 0 20px;color:var(--baby);">Hemos recibido tu solicitud de presupuesto.</p>
+
+      <div style="border:1px solid #E5DFCB;border-radius:12px;padding:18px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;" id="ps-fila-numero">
+          <div>
+            <div style="font-size:11px;color:var(--baby);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Presupuesto</div>
+            <div style="font-size:16px;font-weight:800;" id="ps-numero"></div>
+          </div>
+          <span style="background:#E7F3EA;color:#2E7D45;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;">Enviado</span>
+        </div>
+        <div style="display:flex;gap:16px;padding-top:14px;border-top:1px solid #E5DFCB;" id="ps-fila-estimacion">
+          <div>
+            <div style="font-size:11px;color:var(--baby);">Estimación</div>
+            <div style="font-size:15px;font-weight:800;" id="ps-estimacion"></div>
+            <div style="font-size:11px;color:var(--baby);">IVA no incluido · precio orientativo</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;line-height:1.6;">
+        <p style="margin:0 0 4px;font-weight:700;">Qué pasa ahora</p>
+        <p style="margin:0 0 10px;color:var(--baby);">Diseñamos tu propuesta y te la mandamos por email en cuanto esté lista — normalmente en 24-48h. Si tienes cualquier duda o quieres añadir algo más, escríbenos a <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a>.</p>
+      </div>
     </div>
   </div>
 </div>

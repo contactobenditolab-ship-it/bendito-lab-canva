@@ -380,8 +380,41 @@ async function subirLogoPresupuesto(file) {
 // la estimación son opcionales: si no llegan (fallo puntual del cálculo,
 // artículo sin motor de precios...) esas filas simplemente no se muestran,
 // la confirmación de "solicitud recibida" nunca depende de ellos.
+// Estimación para la pantalla de "Todo listo": la MISMA cuenta que el botón
+// "Calcular precio" (producto + técnica, vía /api/catalogo calcularPrecio),
+// así cuadra con el "Total aprox." que el cliente acaba de ver. Antes la
+// ponía Bendito OS solo con el precio del producto, sin la técnica.
+// Devuelve null (y la fila se oculta) si no se puede calcular con
+// seguridad: evento, sin cantidad, por debajo del MOQ o una técnica del
+// formulario que no existe en las fichas de coste — mejor no enseñar
+// precio que enseñar uno más bajo del real.
+async function estimacionPresupuesto(articulo, cantidad, tecnicaFormulario) {
+  if (!articulo || !cantidad || esArticuloEventos(articulo)) return null;
+  var tecnica = null;
+  if (tecnicaFormulario) {
+    var meta = await cargarMetaPersonalizacion();
+    var normalizar = function(v){ return String(v || '').trim().toLowerCase(); };
+    tecnica = (meta.tecnicas || []).find(function(t){ return normalizar(t) === normalizar(tecnicaFormulario); }) || null;
+    if (!tecnica) return null;
+  }
+  var r = await fetch('/api/catalogo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accion: 'calcularPrecio', articulo_id: articulo.id, cantidad: cantidad, tecnica: tecnica, extras: [] })
+  });
+  var d = await r.json();
+  return d && d.ok && typeof d.total === 'number' ? d.total : null;
+}
+
 function mostrarConfirmacionPresupuesto(resultado) {
   var el = document.getElementById('presupuesto-success');
+  // Si alguna página no tiene las filas de referencia/estimación, se muestra
+  // el mensaje de éxito sin ellas en vez de romper con un TypeError (que se
+  // tragaba el catch del envío y dejaba el modal en blanco).
+  if (!el.querySelector('#ps-numero') || !el.querySelector('#ps-estimacion')) {
+    el.style.display = 'block';
+    return;
+  }
 
   var numeroEl = el.querySelector('#ps-numero');
   var filaNumero = el.querySelector('#ps-fila-numero');
@@ -453,8 +486,18 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
     });
     var d = await r.json();
     if (!d.ok) throw new Error(d.error || 'Error al enviar');
+    var estimacion = null;
+    try {
+      estimacion = await estimacionPresupuesto(
+        articuloSeleccionado,
+        parseInt(f.get('cantidad'), 10) || 0,
+        f.get('tecnica') || null
+      );
+    } catch (errEstimacion) {
+      // La solicitud ya está enviada: sin estimación, la fila se oculta.
+    }
     form.style.display = 'none';
-    mostrarConfirmacionPresupuesto(d);
+    mostrarConfirmacionPresupuesto({ numero: d.numero, estimacion: estimacion });
   } catch (err) {
     errEl.textContent = err.message + ' — o escríbenos directamente a contacto@benditolab.com';
     errEl.style.display = 'block';
