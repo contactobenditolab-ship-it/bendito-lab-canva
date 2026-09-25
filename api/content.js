@@ -1,23 +1,8 @@
 // GET  /api/content            — mapa público { images: { slotPath: url }, imageView: {...}, colors, texts, links, updatedAt }
 // POST /api/content (auth)     — { path, url } asigna/quita una entrada suelta (uso interno/manual)
-const { readContent } = require('../lib/content-store');
+const { leerImagenes, leerContenidoSitio } = require('../lib/content-store');
 const { requireAuth } = require('../lib/auth');
 const { supabaseServiceClient: supabaseClient } = require('../lib/common');
-
-/** Lee la tabla sitio_imagenes y la vuelve a las dos formas {images, imageView} que esperan bl-images.js y el editor visual. */
-async function leerImagenes() {
-  const { data, error } = await supabaseClient().from('sitio_imagenes').select('slot, url, zoom_s, zoom_x, zoom_y');
-  if (error) throw error;
-  const images = {};
-  const imageView = {};
-  for (const fila of data || []) {
-    if (fila.url) images[fila.slot] = fila.url;
-    if (fila.zoom_s !== null && fila.zoom_x !== null && fila.zoom_y !== null) {
-      imageView[fila.slot] = { s: fila.zoom_s, x: fila.zoom_x, y: fila.zoom_y };
-    }
-  }
-  return { images, imageView };
-}
 
 module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
@@ -36,9 +21,9 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: 'No se pudo cargar el contenido' });
       }
     }
-    const [data, { images, imageView }] = await Promise.all([readContent(), leerImagenes()]);
+    const contenido = await leerContenidoSitio();
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-    return res.status(200).json(Object.assign({}, data, { images, imageView }));
+    return res.status(200).json(contenido);
   }
 
   if (req.method === 'POST') {

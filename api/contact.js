@@ -16,6 +16,8 @@
 // Público (sin auth): lo llaman formularios de visitantes, no el admin.
 const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
 const { supabaseServiceClient } = require('../lib/common');
+const { leerContenidoSitio } = require('../lib/content-store');
+const { aplicarContenido } = require('../lib/aplicar-contenido');
 
 const BUCKET_LOGOS = 'sitio-imagenes';
 
@@ -100,6 +102,15 @@ async function obtenerNewsletterHtml(pathname) {
   if (!r.ok) throw new Error('No se pudo cargar ' + pathname + ': ' + r.status);
   let html = await r.text();
   html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  // Los cambios del editor visual (fotos, textos, colores…) los aplica
+  // bl-images.js en el navegador, que en un email no se ejecuta: sin esto el
+  // cliente recibía las fotos y textos de ejemplo del HTML. Si falla la
+  // lectura, se manda igual la versión original antes que no mandar nada.
+  try {
+    html = aplicarContenido(html, await leerContenidoSitio());
+  } catch (e) {
+    console.error('No se pudo aplicar el contenido del editor a ' + pathname + ':', e.message);
+  }
   html = html.replace(/(src|href)="(?!https?:|mailto:|tel:|#)([^"]+)"/gi, (m, attr, val) => `${attr}="${SITE_BASE}/${val}"`);
   return html;
 }
