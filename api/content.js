@@ -1,11 +1,29 @@
 // GET  /api/content            — mapa público { images: { slotPath: url }, imageView: {...}, colors, texts, links, updatedAt }
 // POST /api/content (auth)     — { path, url } asigna/quita una entrada suelta (uso interno/manual)
 const { leerImagenes, leerContenidoSitio } = require('../lib/content-store');
+const { obtenerNewsletterHtml } = require('../lib/newsletter-html');
 const { requireAuth } = require('../lib/auth');
 const { supabaseServiceClient: supabaseClient } = require('../lib/common');
 
 module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
+    // ?newsletter=club — HTML de newsletter-club.html listo para mandar por
+    // email, con los cambios del editor visual aplicados. Lo pide Bendito OS
+    // para los envíos masivos. Público: es la misma página que ya se ve en
+    // /newsletter-club.html, solo que montada en el servidor.
+    if (req.query.newsletter) {
+      const nombre = String(req.query.newsletter);
+      if (!/^[a-z0-9-]{1,60}$/.test(nombre)) return res.status(400).json({ error: 'Newsletter no válida' });
+      try {
+        const html = await obtenerNewsletterHtml('/newsletter-' + nombre + '.html');
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');
+        return res.status(200).send(html);
+      } catch (e) {
+        console.error('Error /api/content?newsletter=:', e.message);
+        return res.status(404).json({ error: 'No existe esa newsletter' });
+      }
+    }
     // ?pagina=X — contenido de texto editado desde /admin (tabla contenido_web),
     // consumido por bl-content.js en las paginas publicas. Publico, solo lectura.
     if (req.query.pagina) {
