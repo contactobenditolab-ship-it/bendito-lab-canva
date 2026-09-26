@@ -5,7 +5,6 @@
 // presupuesto. Cada página solo aporta su propia forma de obtener/filtrar
 // la lista de artículos a mostrar (ver catalogo-2.js / coleccion-2.js).
 
-function toggleNav(){ document.body.classList.toggle('nav-open'); }
 document.querySelectorAll('.site-nav a').forEach(function(a){
   a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
 });
