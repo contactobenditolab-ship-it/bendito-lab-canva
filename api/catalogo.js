@@ -11,7 +11,7 @@
 //
 // Mismo proyecto Supabase que usa Bendito OS. Sin autenticación (de solo
 // lectura salvo el cálculo, que no escribe nada).
-const { createClient } = require('@supabase/supabase-js');
+const { handleApiRoute, supabaseServiceClient } = require('../lib/common');
 const { CAMPOS_PUBLICOS, enriquecerArticulos, slugificar } = require('../lib/articulo-publico');
 
 const SITE_BASE = 'https://www.benditolab.com';
@@ -45,17 +45,8 @@ function sitemapUrlEntry(loc, lastmod, changefreq, priority) {
   );
 }
 
-let cachedClient = null;
-function client() {
-  if (cachedClient) return cachedClient;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY no configuradas');
-  }
-  cachedClient = createClient(url, key, { auth: { persistSession: false } });
-  return cachedClient;
-}
+// Cliente service role compartido (lib/common.js), el mismo que usan contact.js y el admin
+const client = supabaseServiceClient;
 
 // ── Fórmula de precios: CENTRALIZADA en bendito-os/api/catalog/pricing/calculate ──
 // 20 Aug 2026: Migración P1 — bendito-os devuelve precioUnitario, margen, desglose
@@ -328,7 +319,7 @@ async function calcularPreciosDesde(articulosBase) {
   }
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const supabase = client();
 
   if (req.method === 'GET') {
@@ -559,4 +550,9 @@ module.exports = async function handler(req, res) {
 
   res.setHeader('Allow', 'GET, POST');
   return res.status(405).json({ error: 'Method not allowed' });
-};
+}
+
+// handleApiRoute: valida el método y recoge cualquier error no capturado (p. ej. faltan
+// las variables de Supabase) con un 500 limpio. Sin log por petición: es una ruta pública
+// con mucho tráfico de bots y el log no aportaba nada.
+module.exports = handleApiRoute(handler, { allowedMethods: ['GET', 'POST'], logging: false });
