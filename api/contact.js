@@ -17,6 +17,17 @@
 const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
 const { supabaseServiceClient } = require('../lib/common');
 const { obtenerNewsletterHtml } = require('../lib/newsletter-html');
+const { urlBaja, ponerEnlaceBaja } = require('../lib/baja');
+
+// Newsletter maquetada como cuerpo de un email automático, con el
+// "Darse de baja" de su pie apuntando a la baja real de ese destinatario
+// (antes era href="#" y no hacía nada) y la cabecera List-Unsubscribe, que
+// Gmail y Apple Mail muestran como botón "Cancelar suscripción".
+async function newsletterParaEmail(pathname, email) {
+  const url = urlBaja(email);
+  const html = ponerEnlaceBaja(await obtenerNewsletterHtml(pathname), url);
+  return { html, headers: { 'List-Unsubscribe': '<' + url + '>' } };
+}
 
 const BUCKET_LOGOS = 'sitio-imagenes';
 
@@ -134,8 +145,8 @@ async function enviarContactoEmail(data) {
     if (newsletter) {
       const asuntoConfirmacion = 'Hemos recibido tu mensaje · Bendito Lab';
       try {
-        const html = await obtenerNewsletterHtml(newsletter.path);
-        await enviarEmailResend({ from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, subject: asuntoConfirmacion, html });
+        const { html, headers } = await newsletterParaEmail(newsletter.path, data.email);
+        await enviarEmailResend({ from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, subject: asuntoConfirmacion, html, headers });
       } catch (e) {
         // Si falla la carga de la newsletter (sitio caído, etc.), se manda
         // igualmente un email de confirmación con enlace en vez de dejar al
@@ -159,8 +170,8 @@ async function enviarColaboradorConfirmacion(data) {
   if (!RESEND_API_KEY || !esEmailValido(data.email)) return;
   const asuntoConfirmacion = '¡Gracias por querer colaborar con nosotros! · Bendito Lab';
   try {
-    const html = await obtenerNewsletterHtml('/newsletter-colaboradores.html');
-    await enviarEmailResend({ from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, subject: asuntoConfirmacion, html });
+    const { html, headers } = await newsletterParaEmail('/newsletter-colaboradores.html', data.email);
+    await enviarEmailResend({ from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, subject: asuntoConfirmacion, html, headers });
   } catch (e) {
     console.error('No se pudo incrustar la newsletter de colaboradores, se envía con enlace:', e.message);
     await enviarEmailResend({
@@ -188,8 +199,8 @@ async function enviarCotizacionConfirmacion(data, numero) {
   const asunto = 'Hemos recibido tu solicitud de presupuesto' + (numero ? ' (' + numero + ')' : '') + ' · Bendito Lab';
   const base = { from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, reply_to: 'contacto@benditolab.com', subject: asunto };
   try {
-    const html = await obtenerNewsletterHtml(newsletter.path);
-    await enviarEmailResend({ ...base, html });
+    const { html, headers } = await newsletterParaEmail(newsletter.path, data.email);
+    await enviarEmailResend({ ...base, html, headers });
   } catch (e) {
     console.error('No se pudo incrustar la newsletter de ' + newsletter.etiqueta + ', se envía con enlace:', e.message);
     await enviarEmailResend({
