@@ -1,5 +1,4 @@
 
-function toggleNav(){ document.body.classList.toggle('nav-open'); }
 
 var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
 <p>En cumplimiento del artículo 10 de la Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), te informamos de quién está detrás de esta web.</p>
