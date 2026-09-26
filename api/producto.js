@@ -13,18 +13,11 @@
 // la versión interactiva reutilizando renderFichaProducto() de
 // catalogo-comun.js una vez carga el JS — así no se duplica la lógica de
 // colores/talla/calculadora/presupuesto, solo el HTML de la primera pintura.
-const { createClient } = require('@supabase/supabase-js');
+const { handleApiRoute, supabaseServiceClient } = require('../lib/common');
 const { CAMPOS_PUBLICOS, enriquecerArticulos, slugificar } = require('../lib/articulo-publico');
 
-let cachedClient = null;
-function client() {
-  if (cachedClient) return cachedClient;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY no configuradas');
-  cachedClient = createClient(url, key, { auth: { persistSession: false } });
-  return cachedClient;
-}
+// Cliente service role compartido (lib/common.js), el mismo que usan contact.js y el admin
+const client = supabaseServiceClient;
 
 function escapeHtml(value) {
   return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => (
@@ -360,7 +353,7 @@ ${PIE}
 </html>`;
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const idParam = String(req.query.id || '');
   const match = idParam.match(UUID_RE);
   if (!match) {
@@ -507,4 +500,9 @@ ${PIE}
     res.status(500).setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.end('<!DOCTYPE html><html><body>No se pudo cargar el producto. Inténtalo de nuevo.</body></html>');
   }
-};
+}
+
+// handleApiRoute: valida el método y recoge cualquier error no capturado (p. ej. faltan
+// las variables de Supabase) con un 500 limpio. Sin log por petición: es una ruta pública
+// con mucho tráfico de bots y el log no aportaba nada.
+module.exports = handleApiRoute(handler, { allowedMethods: ['GET', 'HEAD'], logging: false });
