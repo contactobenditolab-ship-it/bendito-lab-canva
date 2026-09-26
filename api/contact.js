@@ -16,8 +16,7 @@
 // Público (sin auth): lo llaman formularios de visitantes, no el admin.
 const { dentroDelLimite, ipDesdeRequest } = require('../lib/rate-limit');
 const { supabaseServiceClient } = require('../lib/common');
-const { leerContenidoSitio } = require('../lib/content-store');
-const { aplicarContenido } = require('../lib/aplicar-contenido');
+const { obtenerNewsletterHtml } = require('../lib/newsletter-html');
 
 const BUCKET_LOGOS = 'sitio-imagenes';
 
@@ -88,32 +87,6 @@ const NEWSLETTER_POR_TIPO = {
 };
 
 const SITE_BASE = 'https://www.benditolab.com';
-
-// Las páginas newsletter-*.html ya están maquetadas como un email HTML
-// completo (tablas, estilos inline, condicionales MSO) — se usan también
-// como página pública en el sitio para poder editarlas visualmente desde
-// el admin. Para mandarlas como CUERPO del email (no solo enlazadas) se
-// trae el HTML publicado y se convierten sus rutas relativas (images/...,
-// articulo-*.html, faq.html) en absolutas, y se quitan los <script> (no
-// funcionan dentro de un email y los clientes de correo los descartan de
-// todas formas).
-async function obtenerNewsletterHtml(pathname) {
-  const r = await fetch(SITE_BASE + pathname);
-  if (!r.ok) throw new Error('No se pudo cargar ' + pathname + ': ' + r.status);
-  let html = await r.text();
-  html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-  // Los cambios del editor visual (fotos, textos, colores…) los aplica
-  // bl-images.js en el navegador, que en un email no se ejecuta: sin esto el
-  // cliente recibía las fotos y textos de ejemplo del HTML. Si falla la
-  // lectura, se manda igual la versión original antes que no mandar nada.
-  try {
-    html = aplicarContenido(html, await leerContenidoSitio());
-  } catch (e) {
-    console.error('No se pudo aplicar el contenido del editor a ' + pathname + ':', e.message);
-  }
-  html = html.replace(/(src|href)="(?!https?:|mailto:|tel:|#)([^"]+)"/gi, (m, attr, val) => `${attr}="${SITE_BASE}/${val}"`);
-  return html;
-}
 
 async function enviarEmailResend(payload) {
   const r = await fetch('https://api.resend.com/emails', {
