@@ -33,7 +33,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
 <li><strong>NIF:</strong> 05931103-R</li>
 <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
 <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
-<li><strong>Teléfono / WhatsApp:</strong> +34 647 44 43 08</li>
+<li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
 <li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
 </ul>
 <h3>Uso de la web</h3>
