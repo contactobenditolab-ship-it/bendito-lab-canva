@@ -56,6 +56,13 @@ textarea.field{resize:vertical;}
 .info-value{font-size:15px;font-weight:600;}
 .social-row{display:flex;align-items:center;gap:14px;font-size:20px;}
 
+.cita-wrap{max-width:1100px;margin:0 auto;padding:0 5vw 80px;}
+.cita-card{background:var(--deep);color:var(--white);border-radius:14px;padding:36px 40px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;}
+.cita-card h2{font-weight:800;font-size:clamp(22px,3vw,28px);margin:0 0 10px;}
+.cita-card p{margin:0;font-size:16px;line-height:1.6;opacity:.9;max-width:560px;}
+.btn-cita{background:var(--captain);color:var(--white);font-weight:700;font-size:14px;padding:16px 32px;border-radius:8px;white-space:nowrap;display:inline-block;text-align:center;}
+.btn-cita:hover{opacity:.88;}
+
 footer{background:var(--rose);}
 .footer-bottom{max-width:1200px;margin:0 auto;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
 .footer-bottom-links{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
@@ -66,6 +73,7 @@ footer{background:var(--rose);}
 @media(max-width:900px){
   .form-wrap{grid-template-columns:1fr;gap:32px;}
   .grid2{grid-template-columns:1fr;}
+  .cita-card{grid-template-columns:1fr;padding:28px 24px;}
   .site-nav{display:none;flex-direction:column;gap:18px;position:fixed;inset:0;background:var(--deep);z-index:1000;align-items:center;justify-content:center;}
   .site-nav a{font-size:20px;color:var(--white)!important;}
   .nav-hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;position:absolute;top:28px;right:5vw;z-index:1001;}
@@ -171,6 +179,16 @@ footer{background:var(--rose);}
       <div class="info-label" data-edit="contacto.info.label-canal">Canal de WhatsApp</div>
       <a class="info-value" href="https://whatsapp.com/channel/0029VbDJH7D5Ejxwl1Cjid2w" target="_blank" rel="noopener" data-link-id="canal-whatsapp" data-edit="contacto.info.canal">Novedades y campañas →</a>
     </div>
+  </div>
+</section>
+
+<section data-section="contacto.cita" class="cita-wrap" id="cita">
+  <div class="cita-card">
+    <div>
+      <h2 data-edit="contacto.cita.h2">¿Prefieres que lo hablemos?</h2>
+      <p data-edit="contacto.cita.p">Reserva una cita sin compromiso: eliges en nuestra agenda el día y la hora que te vengan bien y te llega la confirmación al momento.</p>
+    </div>
+    <a class="btn-cita" href="https://leads-bendito.vercel.app/cita" target="_blank" rel="noopener" data-link-id="contacto-cita" data-edit="contacto.cita.btn">RESERVAR CITA→</a>
   </div>
 </section>
 
