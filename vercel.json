@@ -135,6 +135,18 @@
       "dest": "https://app.benditolab.com/compartible/formulario/$1"
     },
     {
+      "src": "/cita",
+      "dest": "https://leads-bendito.vercel.app/cita"
+    },
+    {
+      "src": "/cita\\.js",
+      "dest": "https://leads-bendito.vercel.app/cita.js"
+    },
+    {
+      "src": "/api/cita",
+      "dest": "https://leads-bendito.vercel.app/api/cita"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
