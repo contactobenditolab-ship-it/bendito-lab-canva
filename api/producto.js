@@ -234,7 +234,7 @@ const PIE = `
 <footer>
   <div class="footer-bottom">
     <div class="footer-bottom-links">
-      <img src="/images/eye-logo.svg" alt="" style="height:26px;width:26px;">
+      <img src="/images/eye-logo.svg" alt="" style="height:34px;width:auto;">
       <a href="/dilo-bonito.html">Dilo bonito</a>
       <a href="/bendito-lab.html">Bendito lab.</a>
       <a href="/colaboradores">Colaboradores</a>
