@@ -120,41 +120,54 @@ async function calcularPrecioDesdeAPI(articulo_id, cantidad, canal = 'b2c') {
  * -> precioUnitario), con `null` para los que no se pudieron calcular (no
  * lanza por artículo individual: solo lanza si la llamada entera falla).
  */
+// El endpoint de bendito-os recibe { articulos: [{ articulo_id, cantidad }], canal }
+// (máximo 100 por llamada) y responde { success, data: { resultados } }, con
+// `error` en los artículos que no se pudieron calcular. Antes aquí se mandaba
+// { items } y se leía data como lista: el lote fallaba siempre con 400 y cada
+// carga del catálogo acababa en una llamada suelta por artículo.
+const MAX_LOTE = 100;
+
 async function calcularPreciosDesdeAPIBatch(items) {
   if (!items.length) return new Map();
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
-  try {
-    const response = await fetch(PRICING_API_BATCH_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items }),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'API error desconocido');
-    }
-    const resultado = new Map();
-    for (const item of result.data) {
-      if (item.success) resultado.set(item.articulo_id, item.precioUnitario);
-      else {
-        console.warn(`[calcularPreciosDesdeAPIBatch] Error para artículo ${item.articulo_id}:`, item.error);
-        resultado.set(item.articulo_id, null);
+  const resultado = new Map();
+  for (let i = 0; i < items.length; i += MAX_LOTE) {
+    const lote = items.slice(i, i + MAX_LOTE);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    try {
+      const response = await fetch(PRICING_API_BATCH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          articulos: lote.map(({ articulo_id, cantidad }) => ({ articulo_id, cantidad })),
+          canal: lote[0].canal || 'b2c',
+        }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'API error desconocido');
+      }
+      for (const item of (result.data && result.data.resultados) || []) {
+        if (!item.error && typeof item.precioUnitario === 'number') resultado.set(item.articulo_id, item.precioUnitario);
+        else {
+          console.warn(`[calcularPreciosDesdeAPIBatch] Error para artículo ${item.articulo_id}:`, item.error);
+          resultado.set(item.articulo_id, null);
+        }
+      }
+    } catch (error) {
+      const motivo = error.name === 'AbortError' ? 'timeout (8s)' : error.message;
+      console.error('[calcularPreciosDesdeAPIBatch]', motivo);
+      throw new Error(`No se pudo calcular precios en lote: ${motivo}`);
+    } finally {
+      clearTimeout(timeoutId);
     }
-    return resultado;
-  } catch (error) {
-    const motivo = error.name === 'AbortError' ? 'timeout (8s)' : error.message;
-    console.error('[calcularPreciosDesdeAPIBatch]', motivo);
-    throw new Error(`No se pudo calcular precios en lote: ${motivo}`);
-  } finally {
-    clearTimeout(timeoutId);
   }
+  return resultado;
 }
 
 // Los tramos de un grupo (catalogo_grupos_tramos.tramos, JSONB en Supabase)
@@ -556,3 +569,4 @@ async function handler(req, res) {
 // las variables de Supabase) con un 500 limpio. Sin log por petición: es una ruta pública
 // con mucho tráfico de bots y el log no aportaba nada.
 module.exports = handleApiRoute(handler, { allowedMethods: ['GET', 'POST'], logging: false });
+module.exports.calcularPreciosDesdeAPIBatch = calcularPreciosDesdeAPIBatch; // para tests
