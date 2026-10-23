@@ -187,11 +187,10 @@ function tramosOrdenados(tramos) {
 // físico, no aplica aquí), solo por el número de invitados, igual que la
 // calculadora de presupuestos interna.
 const PACKS_EVENTOS = [
-  { nombre: 'MINI', min: 0, max: 30, precio: 250 },
-  { nombre: 'ESENCIAL', min: 31, max: 50, precio: 300 },
-  { nombre: 'CLÁSICO', min: 51, max: 100, precio: 400 },
-  { nombre: 'COMPLETO', min: 101, max: 150, precio: 500 },
-  { nombre: 'A MEDIDA', min: 151, max: 9999, precio: 750 },
+  { nombre: 'BÁSICO', min: 0, max: 50, precio: 200 },
+  { nombre: 'CLÁSICO', min: 51, max: 100, precio: 300 },
+  { nombre: 'COMPLETO', min: 101, max: 150, precio: 450 },
+  { nombre: 'A MEDIDA', min: 151, max: 9999, precio: 700 },
 ];
 function getPackEvento(invitados) {
   return PACKS_EVENTOS.find((p) => invitados >= p.min && invitados <= p.max) || PACKS_EVENTOS[PACKS_EVENTOS.length - 1];
