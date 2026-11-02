@@ -1,7 +1,7 @@
 # Bendito Lab
 
 > Personalización de artículos para empresas (Bendito Lab) y personalización
-> en directo para bodas y eventos (Dilo Bonito). Manzanares, Ciudad Real, España.
+> en directo para bodas y eventos. Manzanares, Ciudad Real, España.
 
 ## Datos de contacto
 
@@ -18,15 +18,15 @@
 **Bendito Lab** — Personalización B2B para empresas: merchandising corporativo,
 ropa laboral, uniformes, regalos de empresa y artículos promocionales.
 
-**Dilo Bonito** — Personalización en directo para eventos: bodas, comuniones,
+**Eventos** — Personalización en directo para eventos: bodas, comuniones,
 bautizos y todo tipo de celebraciones. El servicio incluye transporte, montaje,
 personalización durante el evento y desmontaje.
 
 ## Páginas principales
 
-- [Inicio](https://www.benditolab.com/): visión general de ambas marcas
+- [Inicio](https://www.benditolab.com/): visión general
 - [Bendito Lab](https://www.benditolab.com/bendito-lab): servicios para empresas
-- [Dilo Bonito](https://www.benditolab.com/dilo-bonito): personalización en eventos
+- [Eventos](https://www.benditolab.com/eventos): personalización en eventos
 - [Contacto](https://www.benditolab.com/contacto): formulario y datos de contacto
 - [Preguntas frecuentes](https://www.benditolab.com/faq): pedidos, plazos, envíos, pagos
 - [Colaboradores](https://www.benditolab.com/colaboradores): programa para fincas,

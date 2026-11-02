@@ -221,7 +221,7 @@ const CABECERA = `
   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
   <nav class="site-nav" id="site-nav">
     <a class="navlink" href="/portada.html">PORTADA→</a>
-    <a class="navlink" href="/dilo-bonito.html">DILO BONITO→</a>
+    <a class="navlink" href="/eventos.html">EVENTOS→</a>
     <a class="navlink" href="/bendito-lab.html">BENDITO LAB→</a>
     <a class="navlink" href="/catalogo">CATÁLOGO→</a>
     <a class="navlink" href="/colaboradores">COLABORADORES→</a>
@@ -235,7 +235,7 @@ const PIE = `
   <div class="footer-bottom">
     <div class="footer-bottom-links">
       <img src="/images/eye-logo.svg" alt="" style="height:34px;width:auto;">
-      <a href="/dilo-bonito.html">Dilo bonito</a>
+      <a href="/eventos.html">Eventos</a>
       <a href="/bendito-lab.html">Bendito lab.</a>
       <a href="/colaboradores">Colaboradores</a>
       <a href="#" data-modal="aviso">Aviso legal</a>

@@ -194,7 +194,7 @@ async function enviarColaboradorConfirmacion(data) {
 // único que recibe.
 async function enviarCotizacionConfirmacion(data, numero) {
   if (!RESEND_API_KEY || !esEmailValido(data.email)) return;
-  const esEventos = data.servicio === 'Dilo Bonito';
+  const esEventos = data.servicio === 'Eventos';
   const newsletter = esEventos ? NEWSLETTER_POR_TIPO.eventos : NEWSLETTER_POR_TIPO.b2b;
   const asunto = 'Hemos recibido tu solicitud de presupuesto' + (numero ? ' (' + numero + ')' : '') + ' · Bendito Lab';
   const base = { from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, reply_to: 'contacto@benditolab.com', subject: asunto };

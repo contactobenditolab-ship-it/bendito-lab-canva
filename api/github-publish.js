@@ -14,7 +14,7 @@ const REPO = 'contactobenditolab-ship-it/bendito-lab-canva';
 // ruta del repo (código de la app, workflows de CI, etc.) queda fuera de
 // alcance de este endpoint aunque el admin esté autenticado.
 const ALLOWED_FILES = new Set([
-  'dilo-bonito.html',
+  'eventos.html',
   'index.html',
   'portada.html',
   'bendito-lab.html',

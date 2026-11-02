@@ -72,7 +72,7 @@ tracking.cotizacionGenerada(5, 250); // 5 artículos, ~250€
 tracking.contactoEnviado("B2B", "Solicitud de presupuesto");
 ```
 
-#### Dilo Bonito
+#### Eventos
 ```javascript
 // Cuando usuario consulta evento
 tracking.eventoConsulta("Congreso", 150); // 150 personas
@@ -102,7 +102,7 @@ document.querySelector('[data-form="cotizacion"]')?.addEventListener('submit', f
 | `cotizacion_descargada` | Descarga PDF | `cotizacion_id` |
 | `contacto_enviado` | Formulario contacto | `tema`, `asunto` |
 | `colaborador_solicitud` | Solicitud de socio | `tipo` (distribuidor, etc) |
-| `evento_consulta` | Consulta Dilo Bonito | `tipo_evento`, `numero_personas` |
+| `evento_consulta` | Consulta eventos | `tipo_evento`, `numero_personas` |
 | `evento_reserva` | Reserva de evento | `tipo_evento`, `numero_dias`, `precio_estimado` |
 | `catalogo_filtro` | Usuario filtra catálogo | `filtro`, `valor` |
 | `busqueda` | Usuario busca | `termino`, `numero_resultados` |

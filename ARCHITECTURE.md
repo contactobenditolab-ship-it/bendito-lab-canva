@@ -83,7 +83,7 @@ bendito-lab-canva/
 | `common.js` | ✅ CREADO | 110L | toggleNav, modales, cookies, analytics, escape, slug |
 | `admin-panel.js` | admin-1.js | 1.4k | Panel administrativo |
 | `catalogo-module.js` | catalogo-comun/1/2/producto | 1.3k | Grid, modal, tallas, presupuesto |
-| `pages.js` | index-1/2/3, portada, dilo-bonito, bendito-lab | 500L | Init lógica para portada + índices |
+| `pages.js` | index-1/2/3, portada, eventos, bendito-lab | 500L | Init lógica para portada + índices |
 | `images.js` | bl-images.js | 1.0k | Upload, preview, delete imágenes |
 | `content.js` | bl-api.js, bl-content.js | 110L | Sync contenido desde Supabase |
 | `contact-module.js` | contacto-1/2.js | 101L | Formularios de contacto frontend |
