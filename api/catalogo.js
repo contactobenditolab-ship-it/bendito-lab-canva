@@ -21,7 +21,7 @@ const SITE_BASE = 'https://www.benditolab.com';
 const SITEMAP_PAGINAS_FIJAS = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
   { loc: '/bendito-lab', changefreq: 'monthly', priority: '0.9' },
-  { loc: '/dilo-bonito', changefreq: 'monthly', priority: '0.9' },
+  { loc: '/eventos', changefreq: 'monthly', priority: '0.9' },
   { loc: '/catalogo', changefreq: 'weekly', priority: '0.9' },
   { loc: '/contacto', changefreq: 'monthly', priority: '0.7' },
   { loc: '/faq', changefreq: 'monthly', priority: '0.6' },
@@ -182,7 +182,7 @@ function tramosOrdenados(tramos) {
 
 // Réplica de PACKS/getPack() en bendito-os (src/lib/eventos/calculator.ts)
 // — repo separado, sin código compartido. Es la única fuente de precio
-// para "Personalización para eventos" (Dilo Bonito) en el catálogo
+// para "Personalización para eventos" en el catálogo
 // público: no pasa por precioUnitarioProducto (coste/margen de artículo
 // físico, no aplica aquí), solo por el número de invitados, igual que la
 // calculadora de presupuestos interna.

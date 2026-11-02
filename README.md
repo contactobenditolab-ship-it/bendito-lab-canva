@@ -1,10 +1,10 @@
 # Bendito Lab · Canva
 
-Snapshot of the Bendito Lab / Dilo Bonito site redesigned with the Canva
+Snapshot of the Bendito Lab site redesigned with the Canva
 brand aesthetic: cream/orange/sage/yellow palette, Helvetica World +
 Inter typography, rounded cards and CTAs.
 
-Pages: `portada`, `dilo-bonito`, `bendito-lab`, `colaboradores`, `faq`,
+Pages: `portada`, `eventos`, `bendito-lab`, `colaboradores`, `faq`,
 `unete`, `admin`, `produccion`, `index`.
 
 This is a static snapshot pulled from the `redesign/canva-aesthetic`

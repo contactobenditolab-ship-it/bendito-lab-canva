@@ -65,8 +65,13 @@
       "dest": "/colaboradores.html"
     },
     {
-      "src": "/dilo-bonito",
-      "dest": "/dilo-bonito.html"
+      "src": "/dilo-bonito(\\.html)?",
+      "status": 301,
+      "headers": { "Location": "/eventos" }
+    },
+    {
+      "src": "/eventos",
+      "dest": "/eventos.html"
     },
     {
       "src": "/bendito-lab",

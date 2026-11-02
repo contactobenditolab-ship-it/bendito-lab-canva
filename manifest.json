@@ -1,6 +1,6 @@
 {
-  "name": "Bendito Lab - Dilo Bonito",
-  "short_name": "Dilo Bonito",
+  "name": "Bendito Lab",
+  "short_name": "Bendito Lab",
   "description": "Personalización en vivo para bodas y eventos",
   "start_url": "/",
   "display": "standalone",

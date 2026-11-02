@@ -556,7 +556,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
         type: 'cotizacion',
         data: {
           nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'),
-          servicio: esEventos ? 'Dilo Bonito' : 'Bendito Lab', mensaje: detalles,
+          servicio: esEventos ? 'Eventos' : 'Bendito Lab', mensaje: detalles,
           articulo_id: articuloSeleccionado ? articuloSeleccionado.id : undefined,
           cantidad: f.get('cantidad') || undefined,
           tecnica: f.get('tecnica') || undefined,
@@ -803,7 +803,7 @@ function cargarMetaPersonalizacion() {
   return METAP_CACHE;
 }
 
-// "Personalización para eventos" (Dilo Bonito) no es un artículo físico:
+// "Personalización para eventos" no es un artículo físico:
 // no tiene técnica/área que calcular, su precio depende del nº de
 // invitados (packs) — usa una calculadora propia en vez de la de
 // cantidad+técnica del resto del catálogo.

@@ -11,7 +11,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
 <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
 <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
 <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
+<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
 </ul>
 <h3>Uso de la web</h3>
 <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
@@ -82,7 +82,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
 
 <h3>Qué datos recogemos y para qué</h3>
 <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
 <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
 <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
 <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
