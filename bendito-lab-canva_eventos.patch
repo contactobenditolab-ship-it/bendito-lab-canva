@@ -1,0 +1,1156 @@
+From 4fea8c1593cde2badf777d138a5c3353b4b6fbc1 Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Mon, 2 Nov 2026 21:19:24 +0000
+Subject: [PATCH] =?UTF-8?q?Renombrar=20p=C3=A1gina=20Dilo=20Bonito=20a=20E?=
+ =?UTF-8?q?ventos=20y=20quitar=20referencias=20a=20Dilo=20Bonito?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- dilo-bonito.html -> eventos.html, js/dilo-bonito-1.js -> js/eventos-1.js
+- Ruta /eventos y redirect 301 desde /dilo-bonito
+- Textos, menús, SEO, manifest, llms.txt, sitemap y docs actualizados
+- servicio de formulario: 'Dilo Bonito' -> 'Eventos'
+- Quitada la tarjeta de Instagram de Dilo Bonito del home
+---
+ 404.html                                      |  2 +-
+ ARCHITECTURE.md                               |  2 +-
+ GA4_SETUP.md                                  |  4 ++--
+ README.md                                     |  4 ++--
+ api/catalogo.js                               |  4 ++--
+ api/contact.js                                |  2 +-
+ api/github-publish.js                         |  2 +-
+ api/producto.js                               |  4 ++--
+ area-clientes.html                            |  2 +-
+ articulo-cero-gestion.html                    |  4 ++--
+ articulo-comision-evento.html                 |  4 ++--
+ articulo-elige-articulos.html                 |  4 ++--
+ articulo-monouso.html                         |  4 ++--
+ articulo-packs-estacionales.html              |  4 ++--
+ articulo-personalizacion-directo-empresa.html |  6 ++---
+ articulo-regalo-corporativo.html              |  4 ++--
+ articulo-servicio-exclusivo.html              |  4 ++--
+ articulo-stand-boda.html                      |  8 +++----
+ articulo-uniformes.html                       |  4 ++--
+ bendito-lab.html                              |  4 ++--
+ catalogo.html                                 |  4 ++--
+ colaboradores.html                            |  4 ++--
+ contacto.html                                 |  4 ++--
+ dilo-bonito.html => eventos.html              | 22 +++++++++----------
+ faq.html                                      | 14 ++++++------
+ index.html                                    | 21 +++++++-----------
+ js/area-clientes-1.js                         |  4 ++--
+ js/bendito-lab-1.js                           |  4 ++--
+ js/catalogo-1.js                              |  4 ++--
+ js/catalogo-comun.js                          |  4 ++--
+ js/colaboradores-1.js                         |  4 ++--
+ js/contacto-1.js                              |  4 ++--
+ js/{dilo-bonito-1.js => eventos-1.js}         |  4 ++--
+ js/faq-1.js                                   |  4 ++--
+ js/index-3.js                                 |  4 ++--
+ js/link-bio-1.js                              |  4 ++--
+ js/portada-1.js                               |  4 ++--
+ link-bio.html                                 |  2 +-
+ llms.txt                                      |  8 +++----
+ manifest.json                                 |  4 ++--
+ newsletter-eventos.html                       |  4 ++--
+ portada.html                                  |  9 ++++----
+ vercel.json                                   |  9 ++++++--
+ 43 files changed, 112 insertions(+), 113 deletions(-)
+ rename dilo-bonito.html => eventos.html (95%)
+ rename js/{dilo-bonito-1.js => eventos-1.js} (97%)
+
+diff --git a/404.html b/404.html
+index dea5444..ac64d3e 100644
+--- a/404.html
++++ b/404.html
+@@ -28,7 +28,7 @@
+     <ul>
+       <li><a href="/">Ir al inicio</a></li>
+       <li><a class="alt" href="/bendito-lab">Para empresas</a></li>
+-      <li><a class="alt" href="/dilo-bonito">Para eventos</a></li>
++      <li><a class="alt" href="/eventos">Para eventos</a></li>
+       <li><a class="alt" href="/contacto">Contacto</a></li>
+     </ul>
+   </main>
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+index 29b61a4..3075a00 100644
+--- a/ARCHITECTURE.md
++++ b/ARCHITECTURE.md
+@@ -83,7 +83,7 @@ bendito-lab-canva/
+ | `common.js` | ✅ CREADO | 110L | toggleNav, modales, cookies, analytics, escape, slug |
+ | `admin-panel.js` | admin-1.js | 1.4k | Panel administrativo |
+ | `catalogo-module.js` | catalogo-comun/1/2/producto | 1.3k | Grid, modal, tallas, presupuesto |
+-| `pages.js` | index-1/2/3, portada, dilo-bonito, bendito-lab | 500L | Init lógica para portada + índices |
++| `pages.js` | index-1/2/3, portada, eventos, bendito-lab | 500L | Init lógica para portada + índices |
+ | `images.js` | bl-images.js | 1.0k | Upload, preview, delete imágenes |
+ | `content.js` | bl-api.js, bl-content.js | 110L | Sync contenido desde Supabase |
+ | `contact-module.js` | contacto-1/2.js | 101L | Formularios de contacto frontend |
+diff --git a/GA4_SETUP.md b/GA4_SETUP.md
+index f6a1d47..234eb5a 100644
+--- a/GA4_SETUP.md
++++ b/GA4_SETUP.md
+@@ -72,7 +72,7 @@ tracking.cotizacionGenerada(5, 250); // 5 artículos, ~250€
+ tracking.contactoEnviado("B2B", "Solicitud de presupuesto");
+ ```
+ 
+-#### Dilo Bonito
++#### Eventos
+ ```javascript
+ // Cuando usuario consulta evento
+ tracking.eventoConsulta("Congreso", 150); // 150 personas
+@@ -102,7 +102,7 @@ document.querySelector('[data-form="cotizacion"]')?.addEventListener('submit', f
+ | `cotizacion_descargada` | Descarga PDF | `cotizacion_id` |
+ | `contacto_enviado` | Formulario contacto | `tema`, `asunto` |
+ | `colaborador_solicitud` | Solicitud de socio | `tipo` (distribuidor, etc) |
+-| `evento_consulta` | Consulta Dilo Bonito | `tipo_evento`, `numero_personas` |
++| `evento_consulta` | Consulta eventos | `tipo_evento`, `numero_personas` |
+ | `evento_reserva` | Reserva de evento | `tipo_evento`, `numero_dias`, `precio_estimado` |
+ | `catalogo_filtro` | Usuario filtra catálogo | `filtro`, `valor` |
+ | `busqueda` | Usuario busca | `termino`, `numero_resultados` |
+diff --git a/README.md b/README.md
+index 5b4437a..58059f2 100644
+--- a/README.md
++++ b/README.md
+@@ -1,10 +1,10 @@
+ # Bendito Lab · Canva
+ 
+-Snapshot of the Bendito Lab / Dilo Bonito site redesigned with the Canva
++Snapshot of the Bendito Lab site redesigned with the Canva
+ brand aesthetic: cream/orange/sage/yellow palette, Helvetica World +
+ Inter typography, rounded cards and CTAs.
+ 
+-Pages: `portada`, `dilo-bonito`, `bendito-lab`, `colaboradores`, `faq`,
++Pages: `portada`, `eventos`, `bendito-lab`, `colaboradores`, `faq`,
+ `unete`, `admin`, `produccion`, `index`.
+ 
+ This is a static snapshot pulled from the `redesign/canva-aesthetic`
+diff --git a/api/catalogo.js b/api/catalogo.js
+index f61b2ce..ed5a6ba 100644
+--- a/api/catalogo.js
++++ b/api/catalogo.js
+@@ -21,7 +21,7 @@ const SITE_BASE = 'https://www.benditolab.com';
+ const SITEMAP_PAGINAS_FIJAS = [
+   { loc: '/', changefreq: 'weekly', priority: '1.0' },
+   { loc: '/bendito-lab', changefreq: 'monthly', priority: '0.9' },
+-  { loc: '/dilo-bonito', changefreq: 'monthly', priority: '0.9' },
++  { loc: '/eventos', changefreq: 'monthly', priority: '0.9' },
+   { loc: '/catalogo', changefreq: 'weekly', priority: '0.9' },
+   { loc: '/contacto', changefreq: 'monthly', priority: '0.7' },
+   { loc: '/faq', changefreq: 'monthly', priority: '0.6' },
+@@ -182,7 +182,7 @@ function tramosOrdenados(tramos) {
+ 
+ // Réplica de PACKS/getPack() en bendito-os (src/lib/eventos/calculator.ts)
+ // — repo separado, sin código compartido. Es la única fuente de precio
+-// para "Personalización para eventos" (Dilo Bonito) en el catálogo
++// para "Personalización para eventos" en el catálogo
+ // público: no pasa por precioUnitarioProducto (coste/margen de artículo
+ // físico, no aplica aquí), solo por el número de invitados, igual que la
+ // calculadora de presupuestos interna.
+diff --git a/api/contact.js b/api/contact.js
+index 7f90e59..c587802 100644
+--- a/api/contact.js
++++ b/api/contact.js
+@@ -194,7 +194,7 @@ async function enviarColaboradorConfirmacion(data) {
+ // único que recibe.
+ async function enviarCotizacionConfirmacion(data, numero) {
+   if (!RESEND_API_KEY || !esEmailValido(data.email)) return;
+-  const esEventos = data.servicio === 'Dilo Bonito';
++  const esEventos = data.servicio === 'Eventos';
+   const newsletter = esEventos ? NEWSLETTER_POR_TIPO.eventos : NEWSLETTER_POR_TIPO.b2b;
+   const asunto = 'Hemos recibido tu solicitud de presupuesto' + (numero ? ' (' + numero + ')' : '') + ' · Bendito Lab';
+   const base = { from: 'Bendito Lab <no-reply@benditolab.com>', to: data.email, reply_to: 'contacto@benditolab.com', subject: asunto };
+diff --git a/api/github-publish.js b/api/github-publish.js
+index 29c3f30..31b50a7 100644
+--- a/api/github-publish.js
++++ b/api/github-publish.js
+@@ -14,7 +14,7 @@ const REPO = 'contactobenditolab-ship-it/bendito-lab-canva';
+ // ruta del repo (código de la app, workflows de CI, etc.) queda fuera de
+ // alcance de este endpoint aunque el admin esté autenticado.
+ const ALLOWED_FILES = new Set([
+-  'dilo-bonito.html',
++  'eventos.html',
+   'index.html',
+   'portada.html',
+   'bendito-lab.html',
+diff --git a/api/producto.js b/api/producto.js
+index b7ebae0..78e13cd 100644
+--- a/api/producto.js
++++ b/api/producto.js
+@@ -221,7 +221,7 @@ const CABECERA = `
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="/portada.html">PORTADA→</a>
+-    <a class="navlink" href="/dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="/eventos.html">EVENTOS→</a>
+     <a class="navlink" href="/bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="/catalogo">CATÁLOGO→</a>
+     <a class="navlink" href="/colaboradores">COLABORADORES→</a>
+@@ -235,7 +235,7 @@ const PIE = `
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="/images/eye-logo.svg" alt="" style="height:34px;width:auto;">
+-      <a href="/dilo-bonito.html">Dilo bonito</a>
++      <a href="/eventos.html">Eventos</a>
+       <a href="/bendito-lab.html">Bendito lab.</a>
+       <a href="/colaboradores">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/area-clientes.html b/area-clientes.html
+index 529b2be..24ec98c 100644
+--- a/area-clientes.html
++++ b/area-clientes.html
+@@ -47,7 +47,7 @@ form{display:flex;flex-direction:column;gap:20px;align-items:center;}
+   <div class="brands">
+     <img src="logo-bendito.png" alt="Bendito Lab">
+     <img src="images/eye-logo-blanco.svg" alt="" style="height:42px;width:auto;filter:none;">
+-    <img src="logo.webp" alt="Dilo Bonito">
++    <img src="logo.webp" alt="Bendito Lab">
+   </div>
+ 
+   <p style="margin-top:40px;font-size:12px;opacity:.85;">
+diff --git a/articulo-cero-gestion.html b/articulo-cero-gestion.html
+index bb8d267..829fa30 100644
+--- a/articulo-cero-gestion.html
++++ b/articulo-cero-gestion.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-cero-gestion.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-cero-gestion.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-comision-evento.html b/articulo-comision-evento.html
+index 25d5439..984e974 100644
+--- a/articulo-comision-evento.html
++++ b/articulo-comision-evento.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-comision-evento.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-comision-evento.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-elige-articulos.html b/articulo-elige-articulos.html
+index 39b1661..68c4db1 100644
+--- a/articulo-elige-articulos.html
++++ b/articulo-elige-articulos.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-elige-articulos.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-elige-articulos.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-monouso.html b/articulo-monouso.html
+index 67927d9..3a4c8f7 100644
+--- a/articulo-monouso.html
++++ b/articulo-monouso.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-monouso.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-monouso.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-packs-estacionales.html b/articulo-packs-estacionales.html
+index 951eec4..c39145a 100644
+--- a/articulo-packs-estacionales.html
++++ b/articulo-packs-estacionales.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-packs-estacionales.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-packs-estacionales.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-personalizacion-directo-empresa.html b/articulo-personalizacion-directo-empresa.html
+index e850797..b4d3802 100644
+--- a/articulo-personalizacion-directo-empresa.html
++++ b/articulo-personalizacion-directo-empresa.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-personalizacion-directo-empresa.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -52,12 +52,12 @@
+     <img src="images/db-personalizacion.webp" data-slot="articulo-personalizacion-directo-empresa/img-2" alt="Foto adicional 2 · Personalización en directo en tu empresa" style="width:100%;height:180px;object-fit:cover;display:block;border-radius:14px;background:#E8C24A;border:1px solid #E3DFCF;">
+   </div>
+ 
+-  <a href="dilo-bonito.html" style="display:inline-block;background:#E2704A;color:#FBF4E9;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;padding:15px 34px;border-radius:8px;text-decoration:none;margin:12px 0 60px;" data-color-bg="articulo-personalizacion-directo-empresa.cta.bg" data-edit="articulo-personalizacion-directo-empresa.cta.text">Ver el servicio →</a>
++  <a href="eventos.html" style="display:inline-block;background:#E2704A;color:#FBF4E9;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;padding:15px 34px;border-radius:8px;text-decoration:none;margin:12px 0 60px;" data-color-bg="articulo-personalizacion-directo-empresa.cta.bg" data-edit="articulo-personalizacion-directo-empresa.cta.text">Ver el servicio →</a>
+ </section>
+ <footer style="background:#93ACA7;" data-color-bg="articulo-personalizacion-directo-empresa.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-regalo-corporativo.html b/articulo-regalo-corporativo.html
+index a1c1bc7..df77753 100644
+--- a/articulo-regalo-corporativo.html
++++ b/articulo-regalo-corporativo.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-regalo-corporativo.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-regalo-corporativo.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-servicio-exclusivo.html b/articulo-servicio-exclusivo.html
+index 55a5792..81fa8b5 100644
+--- a/articulo-servicio-exclusivo.html
++++ b/articulo-servicio-exclusivo.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-servicio-exclusivo.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-servicio-exclusivo.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-stand-boda.html b/articulo-stand-boda.html
+index 0be8659..0c67bc0 100644
+--- a/articulo-stand-boda.html
++++ b/articulo-stand-boda.html
+@@ -5,7 +5,7 @@
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Cómo funciona el stand de personalización en directo · Bendito Lab</title>
+ <meta name="description" content="Llevamos nuestro taller a tu boda, comunión o evento. Cada invitado elige y personaliza su artículo en el momento, y se lo lleva ese día.">
+-<meta name="keywords" content="stand personalización boda, taller personalización eventos, Dilo Bonito bodas, detalles personalizados en directo">
++<meta name="keywords" content="stand personalización boda, taller personalización eventos, detalles personalizados en directo">
+ <meta name="author" content="Bendito Lab">
+ <meta name="robots" content="noindex, follow">
+ <meta name="geo.region" content="ES-CR">
+@@ -32,12 +32,12 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-stand-boda.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+ <section style="max-width:760px;margin:0 auto;padding:64px 5vw 24px;">
+-  <p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#2F8FEA;" data-edit="articulo-stand-boda.hero.tag">Dilo Bonito · Eventos</p>
++  <p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#2F8FEA;" data-edit="articulo-stand-boda.hero.tag">Eventos</p>
+   <h1 style="margin:0 0 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(28px,4.5vw,42px);line-height:1.15;" data-edit="articulo-stand-boda.hero.h1">Cómo funciona el stand de personalización en directo</h1>
+   <p style="margin:0 0 32px;font-size:17px;line-height:1.7;color:#5A6470;" data-edit="articulo-stand-boda.hero.lead">Llevamos nuestro taller a tu boda, comunión o evento. Cada invitado elige y personaliza su artículo en el momento, y se lo lleva ese mismo día.</p>
+ 
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-stand-boda.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/articulo-uniformes.html b/articulo-uniformes.html
+index 3705188..efc5c32 100644
+--- a/articulo-uniformes.html
++++ b/articulo-uniformes.html
+@@ -32,7 +32,7 @@
+     <div style="text-align:center;color:#FBF4E9;font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;opacity:.92;font-family:Arial,Helvetica,sans-serif;margin:0 0 12px;" data-edit="articulo-uniformes.header-tag">Artículos personalizados para empresas y eventos</div>
+     <img src="https://www.benditolab.com/logo-bendito-blanco.png" alt="Bendito Lab" style="display:block;margin:0 auto;height:56px;width:auto;">
+     <nav style="display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,30px);margin-top:20px;flex-wrap:wrap;">
+-      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="dilo-bonito.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">DILO BONITO</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
++      <a href="portada.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">INICIO</a><a href="eventos.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">EVENTOS</a><a href="bendito-lab.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">BENDITO LAB</a><a href="catalogo.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CATÁLOGO</a><a href="colaboradores.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">COLABORADORES</a><a href="contacto.html" style="font-weight:700;font-size:12px;letter-spacing:.5px;color:#FBF4E9;text-decoration:none;">CONTACTO</a>
+       <a href="area-clientes.html" style="border:1px solid #FBF4E9;padding:8px 16px;border-radius:20px;font-weight:700;font-size:12px;color:#FBF4E9;text-decoration:none;">ÁREA CLIENTE</a>
+     </nav>
+   </header>
+@@ -57,7 +57,7 @@
+ <footer style="background:#93ACA7;" data-color-bg="articulo-uniformes.footer.bg">
+     <div style="max-width:1200px;margin:0 auto;padding:26px 5vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+       <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:Arial,Helvetica,sans-serif;">
+-        <a href="dilo-bonito.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Dilo bonito</a>
++        <a href="eventos.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Eventos</a>
+         <a href="bendito-lab.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Bendito lab</a>
+         <a href="catalogo.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">Catálogo</a>
+         <a href="faq.html" style="color:#FBF4E9;font-weight:600;font-size:13px;text-decoration:none;">F.A.Q.</a>
+diff --git a/bendito-lab.html b/bendito-lab.html
+index fcd42a9..3ba770d 100644
+--- a/bendito-lab.html
++++ b/bendito-lab.html
+@@ -150,7 +150,7 @@ footer{background:var(--poppy);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="portada.html">PORTADA→</a>
+-    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="eventos.html">EVENTOS→</a>
+     <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="catalogo.html">CATÁLOGO→</a>
+     <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+@@ -267,7 +267,7 @@ footer{background:var(--poppy);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:34px;width:auto;" loading="lazy" decoding="async">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/catalogo.html b/catalogo.html
+index f9a30d5..32b634e 100644
+--- a/catalogo.html
++++ b/catalogo.html
+@@ -217,7 +217,7 @@ footer{background:var(--rose);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="portada.html">PORTADA→</a>
+-    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="eventos.html">EVENTOS→</a>
+     <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="catalogo.html">CATÁLOGO→</a>
+     <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+@@ -249,7 +249,7 @@ footer{background:var(--rose);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:34px;width:auto;">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/colaboradores.html b/colaboradores.html
+index e8c8b83..9369f66 100644
+--- a/colaboradores.html
++++ b/colaboradores.html
+@@ -119,7 +119,7 @@ footer{background:var(--poppy);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="portada.html">PORTADA→</a>
+-    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="eventos.html">EVENTOS→</a>
+     <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="catalogo.html">CATÁLOGO→</a>
+     <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+@@ -193,7 +193,7 @@ footer{background:var(--poppy);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:34px;width:auto;" loading="lazy" decoding="async">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/contacto.html b/contacto.html
+index fc8c3a6..42cc413 100644
+--- a/contacto.html
++++ b/contacto.html
+@@ -101,7 +101,7 @@ footer{background:var(--rose);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="portada.html">PORTADA→</a>
+-    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="eventos.html">EVENTOS→</a>
+     <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="catalogo.html">CATÁLOGO→</a>
+     <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+@@ -196,7 +196,7 @@ footer{background:var(--rose);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:34px;width:auto;" loading="lazy" decoding="async">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/dilo-bonito.html b/eventos.html
+similarity index 95%
+rename from dilo-bonito.html
+rename to eventos.html
+index ab57727..10d423b 100644
+--- a/dilo-bonito.html
++++ b/eventos.html
+@@ -6,23 +6,23 @@
+   <meta http-equiv="Pragma" content="no-cache">
+   <meta http-equiv="Expires" content="0">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-<title>Dilo Bonito · Personalización en Directo para Bodas y Eventos | Bendito Lab</title>
++<title>Eventos · Personalización en Directo para Bodas y Eventos | Bendito Lab</title>
+   <meta name="description" content="Stand de personalización en directo para bodas, comuniones, bautizos y fiestas. Ropa, gafas, vasos y más, personalizados en el momento. Servicio en toda España.">
+-  <meta name="keywords" content="personalización en directo bodas, stand personalización eventos, dilo bonito, personalización bodas España, regalos invitados boda, personalización comuniones, gafas personalizadas boda">
++  <meta name="keywords" content="personalización en directo bodas, stand personalización eventos, personalización bodas España, regalos invitados boda, personalización comuniones, gafas personalizadas boda">
+   <meta name="author" content="Bendito Lab">
+   <meta name="robots" content="index, follow">
+   <meta name="geo.region" content="ES-CR">
+   <meta name="geo.placename" content="Manzanares, Ciudad Real">
+-  <link rel="canonical" href="https://www.benditolab.com/dilo-bonito">
+-  <meta property="og:title" content="Dilo Bonito · Personalización en Directo para Bodas y Eventos | Bendito Lab">
++  <link rel="canonical" href="https://www.benditolab.com/eventos">
++  <meta property="og:title" content="Eventos · Personalización en Directo para Bodas y Eventos | Bendito Lab">
+   <meta property="og:description" content="Stand de personalización en directo para bodas, comuniones, bautizos y fiestas.">
+-  <meta property="og:url" content="https://www.benditolab.com/dilo-bonito">
++  <meta property="og:url" content="https://www.benditolab.com/eventos">
+   <meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
+   <meta property="og:type" content="website">
+   <meta property="og:locale" content="es_ES">
+   <meta property="og:site_name" content="Bendito Lab">
+   <meta name="twitter:card" content="summary_large_image">
+-  <meta name="twitter:title" content="Dilo Bonito · Personalización en Directo para Bodas y Eventos | Bendito Lab">
++  <meta name="twitter:title" content="Eventos · Personalización en Directo para Bodas y Eventos | Bendito Lab">
+   <meta name="twitter:description" content="Stand de personalización en directo para bodas, comuniones, bautizos y fiestas.">
+   <meta name="twitter:image" content="https://www.benditolab.com/logo-bendito.png">
+   <script type="application/ld+json">
+@@ -33,7 +33,7 @@
+     "description": "Stand de personalización en directo para bodas, comuniones, bautizos y fiestas.",
+     "provider": { "@type": "LocalBusiness", "name": "Bendito Lab", "url": "https://www.benditolab.com/" },
+     "areaServed": { "@type": "Country", "name": "España" },
+-    "url": "https://www.benditolab.com/dilo-bonito"
++    "url": "https://www.benditolab.com/eventos"
+   }
+   </script>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+@@ -137,7 +137,7 @@ footer{background:var(--sage);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="portada.html">PORTADA→</a>
+-    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="eventos.html">EVENTOS→</a>
+     <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="catalogo.html">CATÁLOGO→</a>
+     <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+@@ -146,7 +146,7 @@ footer{background:var(--sage);}
+   </nav>
+ </header>
+ 
+-<h1 class="page-title"><img src="logo.webp" alt="Dilo Bonito"> <span data-edit="dilo-bonito.page-title">Nuestros servicios</span></h1>
++<h1 class="page-title"><img src="logo.webp" alt="Bendito Lab"> <span data-edit="dilo-bonito.page-title">Nuestros servicios</span></h1>
+ 
+ <section data-section="dilo-bonito.servicios" class="servicios">
+   <div class="sv-card">
+@@ -253,7 +253,7 @@ footer{background:var(--sage);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:60px;width:auto;" loading="lazy" decoding="async">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+@@ -285,7 +285,7 @@ footer{background:var(--sage);}
+ </div>
+ 
+ <script src="js/nav.js"></script>
+-<script src="js/dilo-bonito-1.js"></script>
++<script src="js/eventos-1.js"></script>
+ <script src="js/bl-images.js" defer></script>
+ 
+ </body>
+diff --git a/faq.html b/faq.html
+index 38be67c..8e15e41 100644
+--- a/faq.html
++++ b/faq.html
+@@ -4,18 +4,18 @@
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Preguntas frecuentes · Bendito Lab</title>
+-<meta name="description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab y Dilo Bonito.">
++<meta name="description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab.">
+ <meta name="robots" content="index, follow">
+ <link rel="canonical" href="https://www.benditolab.com/faq">
+ <meta property="og:title" content="Preguntas frecuentes · Bendito Lab">
+-<meta property="og:description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab y Dilo Bonito.">
++<meta property="og:description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab.">
+ <meta property="og:url" content="https://www.benditolab.com/faq">
+ <meta property="og:image" content="https://www.benditolab.com/logo-bendito.png">
+ <meta property="og:type" content="website">
+ <meta property="og:locale" content="es_ES">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="Preguntas frecuentes · Bendito Lab">
+-<meta name="twitter:description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab y Dilo Bonito.">
++<meta name="twitter:description" content="Resolvemos las dudas más habituales sobre pedidos, plazos, envíos, colaboraciones y personalización en directo con Bendito Lab.">
+ <meta name="twitter:image" content="https://www.benditolab.com/logo-bendito.png">
+ <script type="application/ld+json">
+ {
+@@ -29,7 +29,7 @@
+     { "@type": "Question", "name": "¿Trabajáis en toda España?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Realizamos envíos a cualquier punto de la península y, si estás cerca de nuestras instalaciones, también puedes recoger tu pedido en persona." } },
+     { "@type": "Question", "name": "¿Qué incluye el servicio de personalización en directo?", "acceptedAnswer": { "@type": "Answer", "text": "Nos encargamos del transporte, montaje, personalización durante el evento y desmontaje. Tú solo tienes que disfrutar de la experiencia junto a tus invitados." } },
+     { "@type": "Question", "name": "¿Puedo seguir el estado de mi pedido?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Dispondrás de un área privada de cliente donde podrás consultar presupuestos, aprobar diseños, revisar el estado de tus pedidos y acceder a toda la documentación relacionada con tus proyectos." } },
+-    { "@type": "Question", "name": "¿Puedo colaborar con Bendito Lab o Dilo Bonito?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes." } },
++    { "@type": "Question", "name": "¿Puedo colaborar con Bendito Lab?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes." } },
+     { "@type": "Question", "name": "¿Y si no encuentro el producto o servicio que necesito?", "acceptedAnswer": { "@type": "Answer", "text": "No trabajamos con un catálogo cerrado. Si tienes una idea o un proyecto especial, prepararemos una propuesta personalizada adaptada a tus necesidades." } },
+     { "@type": "Question", "name": "¿Cómo solicito un presupuesto?", "acceptedAnswer": { "@type": "Answer", "text": "Puedes hacerlo a través del formulario de contacto, por WhatsApp o por correo electrónico. Cuéntanos tu idea y prepararemos una propuesta personalizada sin compromiso." } },
+     { "@type": "Question", "name": "¿Cómo funciona el proceso de trabajo?", "acceptedAnswer": { "@type": "Answer", "text": "Solo tienes que contarnos tu idea. Nosotros te asesoramos, preparamos el presupuesto, adaptamos el diseño, producimos el pedido y te mantenemos informado hasta la entrega." } },
+@@ -97,7 +97,7 @@ footer{background:var(--rose);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a href="portada.html">PORTADA→</a>
+-    <a href="dilo-bonito.html">DILO BONITO→</a>
++    <a href="eventos.html">EVENTOS→</a>
+     <a href="bendito-lab.html">BENDITO LAB→</a>
+     <a href="catalogo.html">CATÁLOGO→</a>
+     <a href="colaboradores.html">COLABORADORES→</a>
+@@ -116,7 +116,7 @@ footer{background:var(--rose);}
+   <div class="faq-row"><div class="faq-num">05</div><div class="faq-text" data-edit="faq.item05"><strong>¿Trabajáis en toda España?</strong> Sí. Realizamos envíos a cualquier punto de la península y, si estás cerca de nuestras instalaciones, también puedes recoger tu pedido en persona.</div></div>
+   <div class="faq-row"><div class="faq-num">06</div><div class="faq-text" data-edit="faq.item06"><strong>¿Qué incluye el servicio de personalización en directo?</strong> Nos encargamos del transporte, montaje, personalización durante el evento y desmontaje. Tú solo tienes que disfrutar de la experiencia junto a tus invitados.</div></div>
+   <div class="faq-row"><div class="faq-num">07</div><div class="faq-text" data-edit="faq.item07"><strong>¿Puedo seguir el estado de mi pedido?</strong> Sí. Dispondrás de un área privada de cliente donde podrás consultar presupuestos, aprobar diseños, revisar el estado de tus pedidos y acceder a toda la documentación relacionada con tus proyectos.</div></div>
+-  <div class="faq-row"><div class="faq-num">08</div><div class="faq-text" data-edit="faq.item08"><strong>¿Puedo colaborar con Bendito Lab o Dilo Bonito?</strong> Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes.</div></div>
++  <div class="faq-row"><div class="faq-num">08</div><div class="faq-text" data-edit="faq.item08"><strong>¿Puedo colaborar con Bendito Lab?</strong> Sí. Contamos con un programa de colaboradores para fincas, wedding planners, agencias, diseñadores y otros profesionales que quieran ofrecer nuestros servicios a sus clientes.</div></div>
+   <div class="faq-row"><div class="faq-num">09</div><div class="faq-text" data-edit="faq.item09"><strong>¿Y si no encuentro el producto o servicio que necesito?</strong> No trabajamos con un catálogo cerrado. Si tienes una idea o un proyecto especial, prepararemos una propuesta personalizada adaptada a tus necesidades.</div></div>
+   <div class="faq-row"><div class="faq-num">10</div><div class="faq-text" data-edit="faq.item10"><strong>¿Cómo solicito un presupuesto?</strong> Puedes hacerlo a través del formulario de contacto, por WhatsApp o por correo electrónico. Cuéntanos tu idea y prepararemos una propuesta personalizada sin compromiso.</div></div>
+   <div class="faq-row"><div class="faq-num">11</div><div class="faq-text" data-edit="faq.item11"><strong>¿Cómo funciona el proceso de trabajo?</strong> Solo tienes que contarnos tu idea. Nosotros te asesoramos, preparamos el presupuesto, adaptamos el diseño, producimos el pedido y te mantenemos informado hasta la entrega.</div></div>
+@@ -130,7 +130,7 @@ footer{background:var(--rose);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:60px;width:auto;">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/index.html b/index.html
+index d714187..ef5acf4 100644
+--- a/index.html
++++ b/index.html
+@@ -7,7 +7,7 @@
+   <meta http-equiv="Expires" content="0">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Bendito Lab · Personalización que marca</title>
+-<meta name="description" content="Bendito Lab · Artículos personalizados para empresas y eventos en Manzanares, Ciudad Real. Merchandising corporativo B2B y stand de personalización en directo para bodas y eventos con Dilo Bonito.">
++<meta name="description" content="Bendito Lab · Artículos personalizados para empresas y eventos en Manzanares, Ciudad Real. Merchandising corporativo B2B y stand de personalización en directo para bodas y eventos.">
+ <meta name="robots" content="noindex, follow">
+ <meta name="author" content="Bendito Lab">
+ <meta name="geo.region" content="ES-CR">
+@@ -189,7 +189,7 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
+   </button>
+   <nav class="nav-links" id="nav-links">
+     <a href="portada.html">Inicio</a>
+-    <a href="dilo-bonito.html">Dilo Bonito</a>
++    <a href="eventos.html">Eventos</a>
+     <a href="bendito-lab.html">Bendito Lab</a>
+     <a href="catalogo.html" class="mob-close-link">Precios y descuentos por cantidad</a>
+     <a href="colaboradores.html">Colaboradores</a>
+@@ -219,18 +219,18 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
+   <p class="hero-sub" id="p-sub" data-edit="index.hero.sub">Merchandising corporativo para empresas y personalización en directo para bodas, comuniones y eventos. Producción propia. Trato directo. Respuesta en 24h.</p>
+   <div class="hero-actions">
+     <a href="#sec-cotizacion" class="btn-primary" data-edit="index.hero.cta-primary">Solicitar cotización →</a>
+-    <a href="dilo-bonito.html" class="btn-ghost" data-edit="index.hero.cta-ghost">Ver servicios</a>
++    <a href="eventos.html" class="btn-ghost" data-edit="index.hero.cta-ghost">Ver servicios</a>
+   </div>
+ </section>
+ 
+ <!-- DOS LÍNEAS DE NEGOCIO -->
+ <div class="lineas" id="sec-lineas" data-section="lineas">
+ 
+-  <!-- DILO BONITO -->
++  <!-- EVENTOS -->
+   <div class="linea linea-db">
+     <div>
+       <div class="linea-tag" id="p-db-tag" data-edit="index.lineas.db-tag">Para bodas, comuniones y eventos</div>
+-      <div class="linea-title" id="p-db-title" data-edit="index.lineas.db-title">DILO<br>BONITO.</div>
++      <div class="linea-title" id="p-db-title" data-edit="index.lineas.db-title">EVENTOS.</div>
+       <p class="linea-desc" id="p-db-desc" data-edit="index.lineas.db-desc">Llevamos nuestro taller a tu evento. Cada invitado personaliza su artículo en el momento y se lo lleva ese mismo día.</p>
+       <div class="linea-pills">
+         <span class="pill">Bodas</span>
+@@ -239,7 +239,7 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
+         <span class="pill">Cumpleaños</span>
+       </div>
+     </div>
+-    <a href="dilo-bonito.html" class="linea-cta" id="p-db-cta" data-edit="index.lineas.db-cta">Ver el servicio →</a>
++    <a href="eventos.html" class="linea-cta" id="p-db-cta" data-edit="index.lineas.db-cta">Ver el servicio →</a>
+     <div class="linea-num">01</div>
+   </div>
+ 
+@@ -313,7 +313,7 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
+           <label>Tipo de servicio</label>
+           <select id="f-tipo">
+             <option value="">— Selecciona —</option>
+-            <option>Dilo Bonito · Evento personalizado</option>
++            <option>Evento personalizado</option>
+             <option>Bendito Lab · Artículos para empresa</option>
+             <option>Los dos</option>
+           </select>
+@@ -345,11 +345,6 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
+         <span class="red-name">Instagram</span>
+         <span class="red-handle">@bendito_lab</span>
+       </a>
+-      <a href="https://instagram.com/dilobonitopersonalizados" target="_blank" class="red-card" id="red-ig2">
+-        <span class="red-icon">✨</span>
+-        <span class="red-name">Instagram</span>
+-        <span class="red-handle">@dilobonitopersonalizados</span>
+-      </a>
+       <a href="https://tiktok.com/@bendito_lab" target="_blank" class="red-card" id="red-tiktok">
+         <span class="red-icon">🎵</span>
+         <span class="red-name">TikTok</span>
+@@ -367,7 +362,7 @@ footer a{color:var(--white);text-decoration:none;font-size:12px;font-weight:600;
+ <!-- FOOTER -->
+ <footer>
+   <p>© 2026 Bendito Lab · Ciudad Real · <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></p>
+-  <p><a href="dilo-bonito.html">Dilo Bonito</a> · <a href="bendito-lab.html">Bendito Lab</a> · <a href="colaboradores.html">Colaboradores</a> · <a href="faq.html">F.A.Q.</a></p>
++  <p><a href="eventos.html">Eventos</a> · <a href="bendito-lab.html">Bendito Lab</a> · <a href="colaboradores.html">Colaboradores</a> · <a href="faq.html">F.A.Q.</a></p>
+   <p>
+     <a href="#" data-modal="aviso">Aviso Legal</a> ·
+     <a href="#" data-modal="privacidad">Privacidad</a> ·
+diff --git a/js/area-clientes-1.js b/js/area-clientes-1.js
+index 93fa3d7..1c04260 100644
+--- a/js/area-clientes-1.js
++++ b/js/area-clientes-1.js
+@@ -7,7 +7,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -78,7 +78,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/bendito-lab-1.js b/js/bendito-lab-1.js
+index a467376..40d5f9f 100644
+--- a/js/bendito-lab-1.js
++++ b/js/bendito-lab-1.js
+@@ -34,7 +34,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -105,7 +105,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/catalogo-1.js b/js/catalogo-1.js
+index de0f686..3d4febf 100644
+--- a/js/catalogo-1.js
++++ b/js/catalogo-1.js
+@@ -7,7 +7,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -78,7 +78,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/catalogo-comun.js b/js/catalogo-comun.js
+index 3ae28c1..9f543cc 100644
+--- a/js/catalogo-comun.js
++++ b/js/catalogo-comun.js
+@@ -556,7 +556,7 @@ document.getElementById('presupuesto-form').addEventListener('submit', async fun
+         type: 'cotizacion',
+         data: {
+           nombre: f.get('nombre'), email: f.get('email'), telefono: f.get('telefono'),
+-          servicio: esEventos ? 'Dilo Bonito' : 'Bendito Lab', mensaje: detalles,
++          servicio: esEventos ? 'Eventos' : 'Bendito Lab', mensaje: detalles,
+           articulo_id: articuloSeleccionado ? articuloSeleccionado.id : undefined,
+           cantidad: f.get('cantidad') || undefined,
+           tecnica: f.get('tecnica') || undefined,
+@@ -803,7 +803,7 @@ function cargarMetaPersonalizacion() {
+   return METAP_CACHE;
+ }
+ 
+-// "Personalización para eventos" (Dilo Bonito) no es un artículo físico:
++// "Personalización para eventos" no es un artículo físico:
+ // no tiene técnica/área que calcular, su precio depende del nº de
+ // invitados (packs) — usa una calculadora propia en vez de la de
+ // cantidad+técnica del resto del catálogo.
+diff --git a/js/colaboradores-1.js b/js/colaboradores-1.js
+index 562bede..b252748 100644
+--- a/js/colaboradores-1.js
++++ b/js/colaboradores-1.js
+@@ -11,7 +11,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -82,7 +82,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/contacto-1.js b/js/contacto-1.js
+index 0891a66..b0c1ea9 100644
+--- a/js/contacto-1.js
++++ b/js/contacto-1.js
+@@ -8,7 +8,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -79,7 +79,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/dilo-bonito-1.js b/js/eventos-1.js
+similarity index 97%
+rename from js/dilo-bonito-1.js
+rename to js/eventos-1.js
+index f977416..98f09ed 100644
+--- a/js/dilo-bonito-1.js
++++ b/js/eventos-1.js
+@@ -10,7 +10,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -81,7 +81,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/faq-1.js b/js/faq-1.js
+index 0891a66..b0c1ea9 100644
+--- a/js/faq-1.js
++++ b/js/faq-1.js
+@@ -8,7 +8,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -79,7 +79,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/index-3.js b/js/index-3.js
+index 06e13aa..50f3b0f 100644
+--- a/js/index-3.js
++++ b/js/index-3.js
+@@ -7,7 +7,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -27,7 +27,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/link-bio-1.js b/js/link-bio-1.js
+index 93fa3d7..1c04260 100644
+--- a/js/link-bio-1.js
++++ b/js/link-bio-1.js
+@@ -7,7 +7,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -78,7 +78,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/js/portada-1.js b/js/portada-1.js
+index 064f357..17726ae 100644
+--- a/js/portada-1.js
++++ b/js/portada-1.js
+@@ -34,7 +34,7 @@ var textoAviso = `<h2 style="color:#17233F;margin-top:0">Aviso legal</h2>
+ <li><strong>Domicilio:</strong> Calle Independencia 65, 13200 Manzanares (Ciudad Real)</li>
+ <li><strong>Email:</strong> <a href="mailto:contacto@benditolab.com">contacto@benditolab.com</a></li>
+ <li><strong>Teléfono / WhatsApp:</strong> +34 694 57 69 31</li>
+-<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos (Dilo Bonito).</li>
++<li><strong>Actividad:</strong> personalización de artículos y merchandising para empresas (Bendito Lab) y personalización en directo para eventos.</li>
+ </ul>
+ <h3>Uso de la web</h3>
+ <p>Al navegar por benditolab.com aceptas usarla de forma lícita. La información del catálogo es orientativa: los precios "desde" no son una oferta vinculante, el precio final va siempre en el presupuesto que te enviamos.</p>
+@@ -105,7 +105,7 @@ var textoPrivacidad = `<h2 style="color:#17233F;margin-top:0">Política de priva
+ 
+ <h3>Qué datos recogemos y para qué</h3>
+ <p><strong>Formulario de contacto.</strong> Nombre, email, teléfono (si lo das), cómo prefieres que te contactemos, el tipo de consulta y tu mensaje. Los usamos para responderte y, si te interesa, prepararte un presupuesto. Base legal: tu consentimiento al marcar la casilla y las medidas precontractuales que pides (art. 6.1.a y 6.1.b RGPD).</p>
+-<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab y Dilo Bonito. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
++<p><strong>Novedades por email.</strong> Solo si marcas la casilla de novedades, usamos tu email para enviarte ideas, productos nuevos y promociones de Bendito Lab. Es voluntario y puedes darte de baja cuando quieras, desde el enlace de cada email o escribiéndonos. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 21 LSSI-CE).</p>
+ <p><strong>Área de cliente.</strong> Si trabajamos juntos, te damos acceso a un área privada donde guardamos tus datos de contacto y facturación, presupuestos, diseños, pedidos y facturas. Base legal: la ejecución del contrato (art. 6.1.b RGPD) y nuestras obligaciones fiscales y contables (art. 6.1.c RGPD).</p>
+ <p><strong>WhatsApp, email y redes sociales.</strong> Si nos escribes por estos canales, usamos lo que nos mandes solo para atender tu consulta. Esas plataformas tienen sus propias políticas de privacidad.</p>
+ <p><strong>Analítica.</strong> Si aceptas las cookies analíticas, Google Analytics recoge datos de navegación de forma agregada para saber qué páginas se visitan. Más detalle en la política de cookies.</p>
+diff --git a/link-bio.html b/link-bio.html
+index 69b1245..c738758 100644
+--- a/link-bio.html
++++ b/link-bio.html
+@@ -37,7 +37,7 @@ a{color:inherit;text-decoration:none;}
+     <div class="tagline" data-edit="link-bio.card.tagline">PERSONALIZACIONES Y EVENTOS<br>EN DIRECTO</div>
+     <div class="links">
+       <a class="pill" href="bendito-lab.html">BENDITO LAB B2B →</a>
+-      <a class="pill" href="dilo-bonito.html">DILO BONITO →</a>
++      <a class="pill" href="eventos.html">EVENTOS →</a>
+       <a class="pill" href="colaboradores.html">COLABORADORES →</a>
+       <a class="pill" href="contacto.html">CONTACTO →</a>
+       <a class="pill" href="https://whatsapp.com/channel/0029VbDJH7D5Ejxwl1Cjid2w" target="_blank" rel="noopener" data-link-id="canal-whatsapp">CANAL DE WHATSAPP →</a>
+diff --git a/llms.txt b/llms.txt
+index 84e8eb4..237912d 100644
+--- a/llms.txt
++++ b/llms.txt
+@@ -1,7 +1,7 @@
+ # Bendito Lab
+ 
+ > Personalización de artículos para empresas (Bendito Lab) y personalización
+-> en directo para bodas y eventos (Dilo Bonito). Manzanares, Ciudad Real, España.
++> en directo para bodas y eventos. Manzanares, Ciudad Real, España.
+ 
+ ## Datos de contacto
+ 
+@@ -18,15 +18,15 @@
+ **Bendito Lab** — Personalización B2B para empresas: merchandising corporativo,
+ ropa laboral, uniformes, regalos de empresa y artículos promocionales.
+ 
+-**Dilo Bonito** — Personalización en directo para eventos: bodas, comuniones,
++**Eventos** — Personalización en directo para eventos: bodas, comuniones,
+ bautizos y todo tipo de celebraciones. El servicio incluye transporte, montaje,
+ personalización durante el evento y desmontaje.
+ 
+ ## Páginas principales
+ 
+-- [Inicio](https://www.benditolab.com/): visión general de ambas marcas
++- [Inicio](https://www.benditolab.com/): visión general
+ - [Bendito Lab](https://www.benditolab.com/bendito-lab): servicios para empresas
+-- [Dilo Bonito](https://www.benditolab.com/dilo-bonito): personalización en eventos
++- [Eventos](https://www.benditolab.com/eventos): personalización en eventos
+ - [Contacto](https://www.benditolab.com/contacto): formulario y datos de contacto
+ - [Preguntas frecuentes](https://www.benditolab.com/faq): pedidos, plazos, envíos, pagos
+ - [Colaboradores](https://www.benditolab.com/colaboradores): programa para fincas,
+diff --git a/manifest.json b/manifest.json
+index 1164b44..ab3a9e4 100644
+--- a/manifest.json
++++ b/manifest.json
+@@ -1,6 +1,6 @@
+ {
+-  "name": "Bendito Lab - Dilo Bonito",
+-  "short_name": "Dilo Bonito",
++  "name": "Bendito Lab",
++  "short_name": "Bendito Lab",
+   "description": "Personalización en vivo para bodas y eventos",
+   "start_url": "/",
+   "display": "standalone",
+diff --git a/newsletter-eventos.html b/newsletter-eventos.html
+index 58b73bd..aad9e66 100644
+--- a/newsletter-eventos.html
++++ b/newsletter-eventos.html
+@@ -35,7 +35,7 @@ table {border-collapse:collapse;}
+ <!-- CONFIRMACIÓN -->
+ <tr>
+ <td style="padding:40px 32px 8px;">
+-<p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#2F8FEA;" data-edit="newsletter-eventos.confirm.tag" data-color-text="newsletter-eventos.accent.text">Dilo Bonito · Eventos</p>
++<p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#2F8FEA;" data-edit="newsletter-eventos.confirm.tag" data-color-text="newsletter-eventos.accent.text">Eventos</p>
+ <h1 style="margin:0 0 18px 0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:28px;line-height:1.25;font-weight:bold;color:#17233F;" data-edit="newsletter-eventos.confirm.h1">¡Hola! Hemos recibido tu solicitud.</h1>
+ <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:#5A6470;" data-edit="newsletter-eventos.confirm.p1">Gracias por contarnos tu boda, comunión o evento. Nuestro equipo está revisando los detalles para preparar tu propuesta.</p>
+ <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:#5A6470;" data-edit="newsletter-eventos.confirm.p2">Te responderemos en menos de 24 horas con una propuesta personalizada.</p>
+@@ -104,7 +104,7 @@ table {border-collapse:collapse;}
+ <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+ <tr>
+ <td align="center" bgcolor="#E2704A" style="border-radius:8px;background-color:#E2704A;" data-color-bg="newsletter-eventos.cta.bg">
+-<a href="https://www.benditolab.com/dilo-bonito.html" style="display:block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#FBF4E9;text-decoration:none;" data-edit="newsletter-eventos.cta.label">Ver Dilo Bonito →</a>
++<a href="https://www.benditolab.com/eventos.html" style="display:block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#FBF4E9;text-decoration:none;" data-edit="newsletter-eventos.cta.label">Ver Dilo Bonito →</a>
+ </td>
+ </tr>
+ </table>
+diff --git a/portada.html b/portada.html
+index 8399a71..c63fe87 100644
+--- a/portada.html
++++ b/portada.html
+@@ -26,7 +26,6 @@
+   "@context": "https://schema.org",
+   "@type": "LocalBusiness",
+   "name": "Bendito Lab",
+-  "alternateName": "Dilo Bonito",
+   "image": "https://www.benditolab.com/logo-bendito.png",
+   "url": "https://www.benditolab.com/",
+   "telephone": "+34694576931",
+@@ -174,7 +173,7 @@ footer{background:var(--poppy);}
+   <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+   <nav class="site-nav" id="site-nav">
+     <a class="navlink" href="portada.html">PORTADA→</a>
+-    <a class="navlink" href="dilo-bonito.html">DILO BONITO→</a>
++    <a class="navlink" href="eventos.html">EVENTOS→</a>
+     <a class="navlink" href="bendito-lab.html">BENDITO LAB→</a>
+     <a class="navlink" href="catalogo.html">CATÁLOGO→</a>
+     <a class="navlink" href="colaboradores.html">COLABORADORES→</a>
+@@ -211,9 +210,9 @@ footer{background:var(--poppy);}
+     <div class="qh-card">
+       <div class="qh-card-img"><img src="images/db-personalizacion.webp" alt="Personalización en directo" data-slot="portada/qh1" loading="lazy" decoding="async"></div>
+       <div class="qh-card-body">
+-        <h3 data-edit="portada.qh1.h3">DILO BONITO</h3>
++        <h3 data-edit="portada.qh1.h3">EVENTOS</h3>
+         <p data-edit="portada.qh1.p">Experiencias que hacen cada evento inolvidable. Personalización en directo y detalles diferenciadores</p>
+-        <a href="dilo-bonito.html" data-edit="portada.qh1.cta">MÁS INFO→</a>
++        <a href="eventos.html" data-edit="portada.qh1.cta">MÁS INFO→</a>
+       </div>
+     </div>
+     <div class="qh-card">
+@@ -255,7 +254,7 @@ footer{background:var(--poppy);}
+   <div class="footer-bottom">
+     <div class="footer-bottom-links">
+       <img src="images/eye-logo.svg" alt="" style="height:60px;width:auto;" loading="lazy" decoding="async">
+-      <a href="dilo-bonito.html">Dilo bonito</a>
++      <a href="eventos.html">Eventos</a>
+       <a href="bendito-lab.html">Bendito lab.</a>
+       <a href="colaboradores.html">Colaboradores</a>
+       <a href="#" data-modal="aviso">Aviso legal</a>
+diff --git a/vercel.json b/vercel.json
+index 95565fe..4dafff8 100644
+--- a/vercel.json
++++ b/vercel.json
+@@ -65,8 +65,13 @@
+       "dest": "/colaboradores.html"
+     },
+     {
+-      "src": "/dilo-bonito",
+-      "dest": "/dilo-bonito.html"
++      "src": "/dilo-bonito(\\.html)?",
++      "status": 301,
++      "headers": { "Location": "/eventos" }
++    },
++    {
++      "src": "/eventos",
++      "dest": "/eventos.html"
+     },
+     {
+       "src": "/bendito-lab",
+-- 
+2.43.0
+
